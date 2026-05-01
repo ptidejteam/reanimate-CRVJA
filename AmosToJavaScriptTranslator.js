@@ -821,6 +821,38 @@ ${this.indent()}document.getElementById('amos-screen').style.backgroundColor = c
   }
   enterBlitter_fill(ctx) {}
 
+  enterBlitter_clear(ctx) {
+    // Blitter Clear clears a rectangular region on screen
+    // Grammar: 'Blitter' 'Clear' NUMBER COMMA NUMBER (COMMA expression1 COMMA expression1 'To' expression1 COMMA expression1)?
+    if (ctx.expression1().length >= 4) {
+      const x1 = ctx.expression1(0)?.getText();
+      const y1 = ctx.expression1(1)?.getText();
+      const x2 = ctx.expression1(2)?.getText();
+      const y2 = ctx.expression1(3)?.getText();
+
+      this.output += `
+${this.indent()}// Blitter Clear - remove elements in the region
+${this.indent()}{
+${this.indent()}  const clearX1 = ${x1};
+${this.indent()}  const clearY1 = ${y1};
+${this.indent()}  const clearX2 = ${x2};
+${this.indent()}  const clearY2 = ${y2};
+${this.indent()}  const screen = document.getElementById('amos-screen');
+${this.indent()}  if (screen) {
+${this.indent()}    const children = Array.from(screen.children);
+${this.indent()}    children.forEach(child => {
+${this.indent()}      const left = parseInt(child.style.left) || 0;
+${this.indent()}      const top = parseInt(child.style.top) || 0;
+${this.indent()}      if (left >= clearX1 && left <= clearX2 && top >= clearY1 && top <= clearY2) {
+${this.indent()}        child.remove();
+${this.indent()}      }
+${this.indent()}    });
+${this.indent()}  }
+${this.indent()}}
+`;
+    }
+  }
+
   enterLoadBank(ctx) {
     const fileName = ctx.children[1]?.getText();
     const bankId = ctx.children[3]?.getText();
@@ -1277,9 +1309,9 @@ ${this.indent()}}`;
       this.globalVariables += `${this.indent()}let ${variable} = 0;`;
     }
 
-    if (ctx.children.length > 4) {
-      valueStarter = ctx.children[5]?.getText();
-      valueEndIteration = ctx.children[7]?.getText();
+    if (ctx.expression1().length > 1) {
+      valueStarter = ctx.expression1(1)?.getText();
+      valueEndIteration = ctx.expression1(2)?.getText();
 
       this.output += `
     ${this.indent()}${variable} = (${variable} + ${valueExpression}) % ${valueEndIteration};
