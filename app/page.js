@@ -131,6 +131,7 @@ function CodeEditorWithErrors({
               onMouseLeave={() => setTip(null)}
               onMouseDown={(e) => {
                 e.preventDefault();
+                navigator.clipboard.writeText(msg);
                 const ta = taRef.current;
                 if (!ta) return;
                 const line = Number(e.currentTarget.dataset.line);
