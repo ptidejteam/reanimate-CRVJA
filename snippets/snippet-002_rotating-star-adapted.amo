@@ -1,0 +1,112 @@
+' Simple rotating flat star with a kind of shadow
+' Adapted from HAPPY NEW YEAR 2021 / AGIMA Dec 2020
+' Original by Aghnar, adapted for project May 2025
+
+Screen Open 0,320,256,8,Lowres
+Flash Off : Curs Off : Hide : Degree
+Paper 0 : Cls : Palette $0,$214,$519,$103,$519,$666,$888,$BBB
+Pen 2
+Double Buffer : Autoback 0
+
+Dim C(359),S(359)
+For I=0 To 359
+   C(I)=256*Cos(I) : S(I)=256*Sin(I)
+Next I
+
+CX=160 : CY=128
+ANG=0
+
+' Definition of the star points
+X0=170 : Y0=0
+X1=69  : Y1=49
+X2=52  : Y2=162
+X3=-26 : Y3=81
+X4=-138: Y4=99
+X5=-85 : Y5=0
+X6=-137: Y6=-100
+X7=-26 : Y7=-81
+X8=53  : Y8=-162
+X9=69  : Y9=-49
+
+Do
+   Blitter Clear 0,0
+   Blitter Clear 0,1
+
+   Add ANG,1,0 To 359
+   CA=C(ANG)
+   SA=S(ANG)
+
+   XE0=CX+(X0*CA-Y0*SA)/256
+   YE0=CY+(X0*SA+Y0*CA)/256
+
+   XE1=CX+(X1*CA-Y1*SA)/256
+   YE1=CY+(X1*SA+Y1*CA)/256
+
+   XE2=CX+(X2*CA-Y2*SA)/256
+   YE2=CY+(X2*SA+Y2*CA)/256
+
+   XE3=CX+(X3*CA-Y3*SA)/256
+   YE3=CY+(X3*SA+Y3*CA)/256
+
+   XE4=CX+(X4*CA-Y4*SA)/256
+   YE4=CY+(X4*SA+Y4*CA)/256
+
+   XE5=CX+(X5*CA-Y5*SA)/256
+   YE5=CY+(X5*SA+Y5*CA)/256
+
+   XE6=CX+(X6*CA-Y6*SA)/256
+   YE6=CY+(X6*SA+Y6*CA)/256
+
+   XE7=CX+(X7*CA-Y7*SA)/256
+   YE7=CY+(X7*SA+Y7*CA)/256
+
+   XE8=CX+(X8*CA-Y8*SA)/256
+   YE8=CY+(X8*SA+Y8*CA)/256
+
+   XE9=CX+(X9*CA-Y9*SA)/256
+   YE9=CY+(X9*SA+Y9*CA)/256
+
+   ' Draw main star outline (ink 1)
+   Turbo Draw XE0,YE0 To XE1,YE1,1,-1
+   Turbo Draw XE1,YE1 To XE2,YE2,1,-1
+   Turbo Draw XE2,YE2 To XE3,YE3,1,-1
+   Turbo Draw XE3,YE3 To XE4,YE4,1,-1
+   Turbo Draw XE4,YE4 To XE5,YE5,1,-1
+   Turbo Draw XE5,YE5 To XE6,YE6,1,-1
+   Turbo Draw XE6,YE6 To XE7,YE7,1,-1
+   Turbo Draw XE7,YE7 To XE8,YE8,1,-1
+   Turbo Draw XE8,YE8 To XE9,YE9,1,-1
+   Turbo Draw XE9,YE9 To XE0,YE0,1,-1
+
+   Blitter Fill 0,0
+
+   ' Shadow: offset all points by +8,+8
+   XE0=XE0+8 : YE0=YE0+8
+   XE1=XE1+8 : YE1=YE1+8
+   XE2=XE2+8 : YE2=YE2+8
+   XE3=XE3+8 : YE3=YE3+8
+   XE4=XE4+8 : YE4=YE4+8
+   XE5=XE5+8 : YE5=YE5+8
+   XE6=XE6+8 : YE6=YE6+8
+   XE7=XE7+8 : YE7=YE7+8
+   XE8=XE8+8 : YE8=YE8+8
+   XE9=XE9+8 : YE9=YE9+8
+
+   ' Draw shadow outline (ink 2)
+   Turbo Draw XE0,YE0 To XE1,YE1,2,-2
+   Turbo Draw XE1,YE1 To XE2,YE2,2,-2
+   Turbo Draw XE2,YE2 To XE3,YE3,2,-2
+   Turbo Draw XE3,YE3 To XE4,YE4,2,-2
+   Turbo Draw XE4,YE4 To XE5,YE5,2,-2
+   Turbo Draw XE5,YE5 To XE6,YE6,2,-2
+   Turbo Draw XE6,YE6 To XE7,YE7,2,-2
+   Turbo Draw XE7,YE7 To XE8,YE8,2,-2
+   Turbo Draw XE8,YE8 To XE9,YE9,2,-2
+   Turbo Draw XE9,YE9 To XE0,YE0,2,-2
+
+   Blitter Fill 0,1
+
+   Screen Swap
+   Wait Vbl
+
+Loop

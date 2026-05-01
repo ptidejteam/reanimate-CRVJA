@@ -2,7 +2,7 @@ grammar AMOS;
 
 // Lexer rules
 SCREENOPEN: 'Screen Open'; 
-NUMBER: '-'? [0-9]+;
+NUMBER: [0-9]+;
 LOWRES: 'Lowres'; 
 HIRES: 'Hires'; 
 COMMA: ','; 
@@ -304,7 +304,7 @@ statement:
     'Locate' NUMBER COMMA? NUMBER?
     ;
     add:
-    'Add' IDENTIFIER COMMA expression1 (COMMA expression1 'To' NUMBER)?
+    'Add' IDENTIFIER COMMA expression1 (COMMA expression1 'To' expression1)?
     ;
     blitter_copy:
     'Blitter' 'Copy'  'Limit'? NUMBER COMMA NUMBER 'To' NUMBER COMMA NUMBER
