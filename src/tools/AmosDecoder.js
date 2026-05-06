@@ -1,31 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
-import AMOS_TOKEN_MAP from "./AMOS_TOKEN_MAP.json";
 import {
   parseExtensionToTable,
   printAMOSSource,
   TokenTable,
 } from "./AmosCsStyle";
-
-function parseTokenKey(k) {
-  if (typeof k !== "string") return Number(k) >>> 0;
-  const s = k.trim();
-  if (/^0x[0-9a-f]+$/i.test(s)) return parseInt(s, 16) >>> 0; // "0x09EA"
-  if (/^[0-9a-f]{1,4}$/i.test(s)) return parseInt(s, 16) >>> 0; // "09EA"
-  if (/^\d+$/.test(s)) return parseInt(s, 10) >>> 0; // "2538"
-  return NaN;
-}
-
-function loadCoreTokens(table, MAP) {
-  for (const [k, v] of Object.entries(MAP)) {
-    const key = parseTokenKey(k);
-    if (!Number.isFinite(key)) continue;
-    if (v && typeof v === "object") {
-      table.set(key, v.type || "I", v.name || "");
-    } else if (typeof v === "string") {
-      table.set(key, "I", v);
-    }
-  }
-}
 function collectTableEntries(table) {
   const out = [];
   // common cases
@@ -144,8 +122,7 @@ export default function AMOSDecoder({ onDecoded }) {
     (async () => {
       const table = new TokenTable();
 
-      // 1) Core tokens (slot 0)
-      loadCoreTokens(table, AMOS_TOKEN_MAP);
+      // Core tokens (slot 0) — all defined in seedBuiltins()
       seedBuiltins(table);
 
       // 2) Optional simple hardcoded helpers (if you still need a few)
