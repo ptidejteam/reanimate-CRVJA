@@ -1,5 +1,5 @@
 import antlr4 from "antlr4";
-import AmosToJavaScriptTranslator from "../AmosToJavaScriptTranslator";
+import AmosToJavaScriptTranslator from "@/src/transpiler/AmosToJavaScriptTranslator";
 import AMOSParser from "../grammar/generated/AMOSParser";
 import AMOSLexer from "../grammar/generated/AMOSLexer";
 

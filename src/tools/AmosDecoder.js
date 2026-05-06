@@ -94,11 +94,11 @@ const be32 = (b, i) =>
 function findExtSlots(code) {
   const be16 = (b, i) => (b[i] << 8) | b[i + 1];
   const slots = new Set();
-  for (let p = 0; p + 2 <= code.length; ) {
+  for (let p = 0; p + 2 <= code.length;) {
     const nWords = code[p];
     if (!nWords) break;
     const end = p + nWords * 2;
-    for (let q = p + 2; q + 2 <= end; ) {
+    for (let q = p + 2; q + 2 <= end;) {
       const t = be16(code, q);
       q += 2;
       if (t === 0x004e && q + 4 <= end) {
@@ -138,7 +138,7 @@ export default function AMOSDecoder({ onDecoded }) {
         ];
         for (const { file, slot } of libs) {
           const res = await fetch(file);
-    
+
           if (!res.ok) throw new Error(`Failed to fetch ${file}`);
           const buf = new Uint8Array(await res.arrayBuffer());
 
@@ -146,7 +146,7 @@ export default function AMOSDecoder({ onDecoded }) {
           let ok = parseExtensionToTable(buf, slot, 6, table);
           if (!ok) ok = parseExtensionToTable(buf, slot, 0, table);
         }
-      
+
       } catch (e) {
         console.warn("Extension load warning:", e);
       }
@@ -169,7 +169,7 @@ export default function AMOSDecoder({ onDecoded }) {
       const text = printAMOSSource(code, tableRef.current);
       onDecoded?.(text);
       setLog(""); // or keep a console log if you want
-      
+
 
     };
     r.readAsArrayBuffer(file);
