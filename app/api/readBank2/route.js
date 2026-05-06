@@ -2,6 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   const filePath = path.join(process.cwd(), 'tests/testFolderForWrittenTests/Wonderland_Objets.abk');
   try {
