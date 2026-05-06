@@ -1,7 +1,7 @@
 import antlr4 from "antlr4";
 import AmosToJavaScriptTranslator from "../AmosToJavaScriptTranslator";
-import AMOSParser from "../AMOSParser";
-import AMOSLexer from "../AMOSLexer";
+import AMOSParser from "../grammar/generated/AMOSParser";
+import AMOSLexer from "../grammar/generated/AMOSLexer";
 
 test("print_something_2", () => {
   // const amosBasicCode = `Print #1,"_COLOR_TABLE("+Right$(Str$(L),Len(Str$(L))-1)+")="+Hex$(CV)`;

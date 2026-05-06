@@ -1,7 +1,7 @@
 import antlr4 from "antlr4";
 import AmosToJavaScriptTranslator from "../AmosToJavaScriptTranslator";
-import AMOSParser from "../AMOSParser";
-import AMOSLexer from "../AMOSLexer";
+import AMOSParser from "../grammar/generated/AMOSParser";
+import AMOSLexer from "../grammar/generated/AMOSLexer";
 
 test("create_array", () => {
 
@@ -26,6 +26,6 @@ test("create_array", () => {
 
   expect(translatedJsCode).toContain(`const C = new Array(359)`);
   expect(translatedJsCode).toContain(`const S = new Array(359)`);
-   
-  
+
+
 });

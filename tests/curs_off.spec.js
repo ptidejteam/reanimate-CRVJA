@@ -1,7 +1,7 @@
 import antlr4 from "antlr4";
 import AmosToJavaScriptTranslator from "../AmosToJavaScriptTranslator";
-import AMOSParser from "../AMOSParser";
-import AMOSLexer from "../AMOSLexer";
+import AMOSParser from "../grammar/generated/AMOSParser";
+import AMOSLexer from "../grammar/generated/AMOSLexer";
 
 test("curs_off", () => {
 
@@ -27,5 +27,5 @@ test("curs_off", () => {
   expect(translatedJsCode).toContain(
     `document.getElementById('amos-screen').style.cursor = 'none';`
   );
-  
+
 });

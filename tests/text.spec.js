@@ -1,7 +1,7 @@
 import antlr4 from "antlr4";
 import AmosToJavaScriptTranslator from "../AmosToJavaScriptTranslator";
-import AMOSParser from "../AMOSParser";
-import AMOSLexer from "../AMOSLexer";
+import AMOSParser from "../grammar/generated/AMOSParser";
+import AMOSLexer from "../grammar/generated/AMOSLexer";
 
 test("Text", () => {
 
@@ -23,8 +23,8 @@ test("Text", () => {
   const walker = new antlr4.tree.ParseTreeWalker();
   walker.walk(translator, tree);
   const translatedJsCode = translator.getJavaScript(); // Get the translated JavaScript code
-  let targetString = 
-  `const textDiv1010 = document.createElement('div');
+  let targetString =
+    `const textDiv1010 = document.createElement('div');
   textDiv1010.innerText = 'ReAnimate(d) Piano';
   textDiv1010.style.position = 'absolute';
   textDiv1010.style.left = '10px';
@@ -35,6 +35,6 @@ test("Text", () => {
   /* test */
   const normalizedTranslatedJsCode = translatedJsCode.replace(/\s+/g, ' ').trim();
   const normalizedExpectedJsCode = targetString.replace(/\s+/g, ' ').trim();
-    expect(normalizedTranslatedJsCode).toContain(normalizedExpectedJsCode);
- 
+  expect(normalizedTranslatedJsCode).toContain(normalizedExpectedJsCode);
+
 });

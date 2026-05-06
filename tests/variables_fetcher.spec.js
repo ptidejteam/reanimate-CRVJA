@@ -1,11 +1,11 @@
 import antlr4 from "antlr4";
 import AmosToJavaScriptTranslator from "../AmosToJavaScriptTranslator";
-import AMOSParser from "../AMOSParser";
-import AMOSLexer from "../AMOSLexer";
+import AMOSParser from "../grammar/generated/AMOSParser";
+import AMOSLexer from "../grammar/generated/AMOSLexer";
 
 test("variables_fetcher", () => {
 
-  const amosBasicCode = `
+   const amosBasicCode = `
   'REANIMATE PIANO 
 'BY GABRIEL C. ULLMANN, YANN-GAËL GUÉHÉNEUC, 2024 
 'INSPIRED BY: https://www.youtube.com/watch?v=iW-v7SpgS9Q
@@ -82,20 +82,20 @@ End
 
     `;
 
-  const chars = new antlr4.InputStream(amosBasicCode);
-  const lexer = new AMOSLexer(chars);
-  const tokens = new antlr4.CommonTokenStream(lexer);
-  const parser = new AMOSParser(tokens);
+   const chars = new antlr4.InputStream(amosBasicCode);
+   const lexer = new AMOSLexer(chars);
+   const tokens = new antlr4.CommonTokenStream(lexer);
+   const parser = new AMOSParser(tokens);
 
-  const tree = parser.program();
+   const tree = parser.program();
 
-  // Translate the parsed AMOS BASIC into JavaScript
-  const translator = new AmosToJavaScriptTranslator();
-  const walker = new antlr4.tree.ParseTreeWalker();
-  walker.walk(translator, tree);
-  const translatedJsCode = translator.getJavaScript(); // Get the translated JavaScript code
-  let targetString = 
-  `  
+   // Translate the parsed AMOS BASIC into JavaScript
+   const translator = new AmosToJavaScriptTranslator();
+   const walker = new antlr4.tree.ParseTreeWalker();
+   walker.walk(translator, tree);
+   const translatedJsCode = translator.getJavaScript(); // Get the translated JavaScript code
+   let targetString =
+      `  
 let XW = 70;
 let YW = 70;
 let WW = 50;
@@ -105,11 +105,11 @@ let YB = 70;
 let WB = 30;
 let HB = 60;
   `
-  /* test */
-  const normalizedTranslatedJsCode = translatedJsCode.replace(/\s+/g, ' ').trim();
-  const normalizedExpectedJsCode = targetString.replace(/\s+/g, ' ').trim();
-    expect(normalizedTranslatedJsCode).toContain(normalizedExpectedJsCode);
-  /* test */
+   /* test */
+   const normalizedTranslatedJsCode = translatedJsCode.replace(/\s+/g, ' ').trim();
+   const normalizedExpectedJsCode = targetString.replace(/\s+/g, ' ').trim();
+   expect(normalizedTranslatedJsCode).toContain(normalizedExpectedJsCode);
+   /* test */
 
-  
+
 });
