@@ -1,4 +1,4 @@
-import AMOSListener from "@/grammar/generated/AMOSListener";
+import AMOSListener from "@/AMOSListener";
 
 class AmosToJavaScriptTranslator extends AMOSListener {
   constructor() {
