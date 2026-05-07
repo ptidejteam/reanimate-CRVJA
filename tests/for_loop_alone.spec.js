@@ -1,7 +1,7 @@
 import antlr4 from "antlr4";
-import AmosToJavaScriptTranslator from "../AmosToJavaScriptTranslator";
-import AMOSParser from "../AMOSParser";
-import AMOSLexer from "../AMOSLexer";
+import AmosToJavaScriptTranslator from "@/src/transpiler/AmosToJavaScriptTranslator";
+import AMOSParser from "../grammar/generated/AMOSParser";
+import AMOSLexer from "../grammar/generated/AMOSLexer";
 
 test("for_loop_alone", () => {
   const amosBasicCode = `
@@ -23,10 +23,10 @@ test("for_loop_alone", () => {
   const translatedJsCode = translator.getJavaScript(); // Get the translated JavaScript code
 
   /* test */
-  const testTarget = 
-`for (let I = 0; I <= 10; I++) {}`;
+  const testTarget =
+    `for (let I = 0; I <= 10; I++) {}`;
 
   expect(translatedJsCode).toContain(testTarget);
-  
-  
+
+
 });

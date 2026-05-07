@@ -1,9 +1,9 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import antlr4 from "antlr4";
-import AmosToJavaScriptTranslator from "@/AmosToJavaScriptTranslator";
-import AMOSParser from "@/AMOSParser";
-import AMOSLexer from "@/AMOSLexer";
+import AmosToJavaScriptTranslator from "@/src/transpiler/AmosToJavaScriptTranslator";
+import AMOSParser from "@/grammar/generated/AMOSParser";
+import AMOSLexer from "@/grammar/generated/AMOSLexer";
 import { Sketch } from "@uiw/react-color";
 import prettier from "prettier/standalone";
 import babelPlugin from "prettier/plugins/babel";
@@ -1817,7 +1817,7 @@ html, body, #game-container, #amos-screen, * { font-family: 'Amiga4Ever', sans-s
           <AnalogClock />
         </WorkbenchWindow>
       )}
-     
+
 
 
     </WorkbenchShell>

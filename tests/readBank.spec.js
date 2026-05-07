@@ -6,7 +6,7 @@ test("readBank", async () => {
   let objectsArray = [];
   
   fs.readFile(
-    "./tests/testFolderForWrittenTests/AmosBank_test.abk",
+    "./tests/fixtures/AmosBank_test.abk",
     (err, data) => {
       if (err) {
         console.error("Error reading file:", err);

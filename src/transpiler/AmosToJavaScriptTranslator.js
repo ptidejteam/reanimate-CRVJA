@@ -1,5 +1,5 @@
-import AMOSListener from "./AMOSListener";
-import bankReader from "./src/tools/bankReader/bankReader.js";
+import AMOSListener from "@/grammar/generated/AMOSListener";
+
 class AmosToJavaScriptTranslator extends AMOSListener {
   constructor() {
     super();
@@ -819,7 +819,7 @@ ${this.indent()}document.getElementById('game-container').appendChild(screenDiv)
 ${this.indent()}document.getElementById('amos-screen').style.backgroundColor = colorMapping[${color}];
         `;
   }
-  enterBlitter_fill(ctx) {}
+  enterBlitter_fill(ctx) { }
 
   enterBlitter_clear(ctx) {
     // Blitter Clear clears a rectangular region on screen
@@ -1508,47 +1508,47 @@ ${this.indent()}}, 16); \n
     console.log(finalIfStatement);
   }
 
-enterArray_create(ctx) {
-  for (let i = 0; i < ctx.array_structure().length; i++) {
-    const struct = ctx.array_structure(i);
-    const name = struct.IDENTIFIER(0)?.getText();
+  enterArray_create(ctx) {
+    for (let i = 0; i < ctx.array_structure().length; i++) {
+      const struct = ctx.array_structure(i);
+      const name = struct.IDENTIFIER(0)?.getText();
 
-    // Check if we have 2 dimensions (either NUMBER or expression1)
-    const hasTwoDimensions = 
-      struct.NUMBER().length > 1 || 
-      struct.expression1().length > 1;
+      // Check if we have 2 dimensions (either NUMBER or expression1)
+      const hasTwoDimensions =
+        struct.NUMBER().length > 1 ||
+        struct.expression1().length > 1;
 
-    if (hasTwoDimensions) {
-      // Get dimensions (could be numbers or variables)
-      const dim0 = struct.NUMBER(0)?.getText() || 
-                   struct.expression1(0)?.getText() || 
-                   "0";
-      const dim1 = struct.NUMBER(1)?.getText() || 
-                   struct.expression1(1)?.getText();
+      if (hasTwoDimensions) {
+        // Get dimensions (could be numbers or variables)
+        const dim0 = struct.NUMBER(0)?.getText() ||
+          struct.expression1(0)?.getText() ||
+          "0";
+        const dim1 = struct.NUMBER(1)?.getText() ||
+          struct.expression1(1)?.getText();
 
-      if (dim1) {
-        // 2D Matrix - need to add 1 to dimensions
-        // Check if dimensions are numeric literals or variables
-        const xSize = struct.NUMBER(0) ? `${parseInt(dim0) + 1}` : `(${dim0} + 1)`;
-        const ySize = struct.NUMBER(1) ? `${parseInt(dim1) + 1}` : `(${dim1} + 1)`;
+        if (dim1) {
+          // 2D Matrix - need to add 1 to dimensions
+          // Check if dimensions are numeric literals or variables
+          const xSize = struct.NUMBER(0) ? `${parseInt(dim0) + 1}` : `(${dim0} + 1)`;
+          const ySize = struct.NUMBER(1) ? `${parseInt(dim1) + 1}` : `(${dim1} + 1)`;
 
-        this.output += `${this.indent()}const ${name} = new Array(${ySize});\n`;
-        this.output += `${this.indent()}for (let i = 0; i < ${ySize}; i++) ${name}[i] = new Array(${xSize});\n`;
+          this.output += `${this.indent()}const ${name} = new Array(${ySize});\n`;
+          this.output += `${this.indent()}for (let i = 0; i < ${ySize}; i++) ${name}[i] = new Array(${xSize});\n`;
+        } else {
+          // 1D Array
+          const size = struct.NUMBER(0) ? `${parseInt(dim0) + 1}` : `(${dim0} + 1)`;
+          this.output += `${this.indent()}const ${name} = new Array(${size});\n`;
+        }
       } else {
-        // 1D Array
+        // Single dimension array
+        const dim0 = struct.NUMBER(0)?.getText() ||
+          struct.expression1(0)?.getText() ||
+          "0";
         const size = struct.NUMBER(0) ? `${parseInt(dim0) + 1}` : `(${dim0} + 1)`;
         this.output += `${this.indent()}const ${name} = new Array(${size});\n`;
       }
-    } else {
-      // Single dimension array
-      const dim0 = struct.NUMBER(0)?.getText() || 
-                   struct.expression1(0)?.getText() || 
-                   "0";
-      const size = struct.NUMBER(0) ? `${parseInt(dim0) + 1}` : `(${dim0} + 1)`;
-      this.output += `${this.indent()}const ${name} = new Array(${size});\n`;
     }
   }
-}
   exitFor_loop(ctx) {
     this.indentLevel--; // Decrease indentation after exiting the loop
     this.output += `${this.indent()}}`;
@@ -1594,45 +1594,45 @@ enterArray_create(ctx) {
     }
   }
 
-enterArray_update(ctx) {
-  const arrayName = ctx.IDENTIFIER(0).getText();
+  enterArray_update(ctx) {
+    const arrayName = ctx.IDENTIFIER(0).getText();
 
-  // ----------- INDEX -----------
-  let index1 =
-    ctx.NUMBER(0)?.getText() ||
-    ctx.IDENTIFIER(1)?.getText() ||
-    ctx.expression1(0)?.getText(); // only if index is an expression
+    // ----------- INDEX -----------
+    let index1 =
+      ctx.NUMBER(0)?.getText() ||
+      ctx.IDENTIFIER(1)?.getText() ||
+      ctx.expression1(0)?.getText(); // only if index is an expression
 
-  // ----------- SECOND INDEX (2D array) -----------
-  let index2 = null;
+    // ----------- SECOND INDEX (2D array) -----------
+    let index2 = null;
 
-  if (ctx.COMMA()) {
-    index2 =
-      ctx.NUMBER(1)?.getText() ||
-      ctx.IDENTIFIER(2)?.getText() ||
-      ctx.expression1(1)?.getText();
-  }
+    if (ctx.COMMA()) {
+      index2 =
+        ctx.NUMBER(1)?.getText() ||
+        ctx.IDENTIFIER(2)?.getText() ||
+        ctx.expression1(1)?.getText();
+    }
 
-  // ----------- VALUE (ALWAYS final expression1) -----------
-  const exprCount = ctx.expression1().length;
-  let arrayTargetValue = ctx.expression1(exprCount - 1).getText();
+    // ----------- VALUE (ALWAYS final expression1) -----------
+    const exprCount = ctx.expression1().length;
+    let arrayTargetValue = ctx.expression1(exprCount - 1).getText();
 
-  // ----------- Qcos/Qsin Processing -----------
-  if (arrayTargetValue.includes("Qcos") || arrayTargetValue.includes("Qsin")) {
-    const m = arrayTargetValue.match(/(Qcos|Qsin)\(([^,]+),([^)]+)\)/);
-    if (m) {
-      arrayTargetValue =
-        (m[1] === "Qcos" ? "Cos" : "Sin") + `(${m[2]}) * ${m[3]}`;
+    // ----------- Qcos/Qsin Processing -----------
+    if (arrayTargetValue.includes("Qcos") || arrayTargetValue.includes("Qsin")) {
+      const m = arrayTargetValue.match(/(Qcos|Qsin)\(([^,]+),([^)]+)\)/);
+      if (m) {
+        arrayTargetValue =
+          (m[1] === "Qcos" ? "Cos" : "Sin") + `(${m[2]}) * ${m[3]}`;
+      }
+    }
+
+    // ----------- OUTPUT JS -----------
+    if (index2) {
+      this.output += `${this.indent()}${arrayName}[${index2}][${index1}] = ${arrayTargetValue};\n`;
+    } else {
+      this.output += `${this.indent()}${arrayName}[${index1}] = ${arrayTargetValue};\n`;
     }
   }
-
-  // ----------- OUTPUT JS -----------
-  if (index2) {
-    this.output += `${this.indent()}${arrayName}[${index2}][${index1}] = ${arrayTargetValue};\n`;
-  } else {
-    this.output += `${this.indent()}${arrayName}[${index1}] = ${arrayTargetValue};\n`;
-  }
-}
 
   enterIf_statement(ctx) {
     function convertAMOSArrayAccess(text) {

@@ -1,7 +1,7 @@
 import antlr4 from "antlr4";
-import AmosToJavaScriptTranslator from "../AmosToJavaScriptTranslator";
-import AMOSParser from "../AMOSParser";
-import AMOSLexer from "../AMOSLexer";
+import AmosToJavaScriptTranslator from "@/src/transpiler/AmosToJavaScriptTranslator";
+import AMOSParser from "../grammar/generated/AMOSParser";
+import AMOSLexer from "../grammar/generated/AMOSLexer";
 
 test("procedures", () => {
 
@@ -35,11 +35,11 @@ test("procedures", () => {
     return; } lastTimeP_DRAWKEYS = currentTime; timeoutIdP_DRAWKEYS = null; // Clear the timeout ID after execution }
 `;
 
-// Normalizar a string gerada e a esperada para remover quebras de linha e espaços extras
-const normalizedTranslatedJsCode = translatedJsCode.replace(/\s+/g, ' ').trim();
-const normalizedExpectedJsCode = expectedJsCode.replace(/\s+/g, ' ').trim();
+  // Normalizar a string gerada e a esperada para remover quebras de linha e espaços extras
+  const normalizedTranslatedJsCode = translatedJsCode.replace(/\s+/g, ' ').trim();
+  const normalizedExpectedJsCode = expectedJsCode.replace(/\s+/g, ' ').trim();
 
-expect(normalizedTranslatedJsCode).toContain(normalizedExpectedJsCode);
-  
-  
+  expect(normalizedTranslatedJsCode).toContain(normalizedExpectedJsCode);
+
+
 });

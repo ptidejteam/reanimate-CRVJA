@@ -1,7 +1,7 @@
 import antlr4 from "antlr4";
-import AmosToJavaScriptTranslator from "../AmosToJavaScriptTranslator";
-import AMOSParser from "../AMOSParser";
-import AMOSLexer from "../AMOSLexer";
+import AmosToJavaScriptTranslator from "@/src/transpiler/AmosToJavaScriptTranslator";
+import AMOSParser from "../grammar/generated/AMOSParser";
+import AMOSLexer from "../grammar/generated/AMOSLexer";
 
 test("print_something", () => {
   const amosBasicCode = `Print 500/Timer;" FPS"`;

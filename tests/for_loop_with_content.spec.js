@@ -1,7 +1,7 @@
 import antlr4 from "antlr4";
-import AmosToJavaScriptTranslator from "../AmosToJavaScriptTranslator";
-import AMOSParser from "../AMOSParser";
-import AMOSLexer from "../AMOSLexer";
+import AmosToJavaScriptTranslator from "@/src/transpiler/AmosToJavaScriptTranslator";
+import AMOSParser from "../grammar/generated/AMOSParser";
+import AMOSLexer from "../grammar/generated/AMOSLexer";
 
 test("for_loop_filled", () => {
   const amosBasicCode = `
@@ -30,8 +30,8 @@ test("for_loop_filled", () => {
   const translatedJsCode = translator.getJavaScript(); // Get the translated JavaScript code
 
   /* test */
-  let targetString = 
-`for (let I = 0; I <= 10; I++) {
+  let targetString =
+    `for (let I = 0; I <= 10; I++) {
 
   if (currentPressedKey === keyMapping[16+I]) {
 
@@ -51,8 +51,8 @@ test("for_loop_filled", () => {
 }}`
 
 
-// Normalizar a string gerada e a esperada para remover quebras de linha e espaços extras
-const normalizedTranslatedJsCode = translatedJsCode.replace(/\s+/g, ' ').trim();
-const normalizedExpectedJsCode = targetString.replace(/\s+/g, ' ').trim();
+  // Normalizar a string gerada e a esperada para remover quebras de linha e espaços extras
+  const normalizedTranslatedJsCode = translatedJsCode.replace(/\s+/g, ' ').trim();
+  const normalizedExpectedJsCode = targetString.replace(/\s+/g, ' ').trim();
   expect(normalizedTranslatedJsCode).toContain(normalizedExpectedJsCode);
 });

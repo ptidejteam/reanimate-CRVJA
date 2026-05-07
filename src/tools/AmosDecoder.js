@@ -1,31 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
-import AMOS_TOKEN_MAP from "./AMOS_TOKEN_MAP.json";
 import {
   parseExtensionToTable,
   printAMOSSource,
   TokenTable,
 } from "./AmosCsStyle";
-
-function parseTokenKey(k) {
-  if (typeof k !== "string") return Number(k) >>> 0;
-  const s = k.trim();
-  if (/^0x[0-9a-f]+$/i.test(s)) return parseInt(s, 16) >>> 0; // "0x09EA"
-  if (/^[0-9a-f]{1,4}$/i.test(s)) return parseInt(s, 16) >>> 0; // "09EA"
-  if (/^\d+$/.test(s)) return parseInt(s, 10) >>> 0; // "2538"
-  return NaN;
-}
-
-function loadCoreTokens(table, MAP) {
-  for (const [k, v] of Object.entries(MAP)) {
-    const key = parseTokenKey(k);
-    if (!Number.isFinite(key)) continue;
-    if (v && typeof v === "object") {
-      table.set(key, v.type || "I", v.name || "");
-    } else if (typeof v === "string") {
-      table.set(key, "I", v);
-    }
-  }
-}
 function collectTableEntries(table) {
   const out = [];
   // common cases
@@ -116,11 +94,11 @@ const be32 = (b, i) =>
 function findExtSlots(code) {
   const be16 = (b, i) => (b[i] << 8) | b[i + 1];
   const slots = new Set();
-  for (let p = 0; p + 2 <= code.length; ) {
+  for (let p = 0; p + 2 <= code.length;) {
     const nWords = code[p];
     if (!nWords) break;
     const end = p + nWords * 2;
-    for (let q = p + 2; q + 2 <= end; ) {
+    for (let q = p + 2; q + 2 <= end;) {
       const t = be16(code, q);
       q += 2;
       if (t === 0x004e && q + 4 <= end) {
@@ -144,8 +122,7 @@ export default function AMOSDecoder({ onDecoded }) {
     (async () => {
       const table = new TokenTable();
 
-      // 1) Core tokens (slot 0)
-      loadCoreTokens(table, AMOS_TOKEN_MAP);
+      // Core tokens (slot 0) — all defined in seedBuiltins()
       seedBuiltins(table);
 
       // 2) Optional simple hardcoded helpers (if you still need a few)
@@ -161,7 +138,7 @@ export default function AMOSDecoder({ onDecoded }) {
         ];
         for (const { file, slot } of libs) {
           const res = await fetch(file);
-    
+
           if (!res.ok) throw new Error(`Failed to fetch ${file}`);
           const buf = new Uint8Array(await res.arrayBuffer());
 
@@ -169,7 +146,7 @@ export default function AMOSDecoder({ onDecoded }) {
           let ok = parseExtensionToTable(buf, slot, 6, table);
           if (!ok) ok = parseExtensionToTable(buf, slot, 0, table);
         }
-      
+
       } catch (e) {
         console.warn("Extension load warning:", e);
       }
@@ -192,7 +169,7 @@ export default function AMOSDecoder({ onDecoded }) {
       const text = printAMOSSource(code, tableRef.current);
       onDecoded?.(text);
       setLog(""); // or keep a console log if you want
-      
+
 
     };
     r.readAsArrayBuffer(file);
