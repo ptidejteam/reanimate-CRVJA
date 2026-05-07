@@ -35,16 +35,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# ANTLR generated
-*.interp
-*.tokens
-AMOSLexer.js
-AMOSParser.js
-AMOSListener.js
-AmosBasicLexer.js
-
-# ANTLR tool
-antlr-*.jar
-
 # backup
 /backup/
