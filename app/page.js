@@ -11,6 +11,7 @@ import estreePlugin from "prettier/plugins/estree";
 import AMOSDecoder from "@/src/tools/AmosDecoder";
 import AnalogClock from "@/src/tools/UI/analogClock";
 import { WorkbenchIcon, WorkbenchShell, WorkbenchWindow } from "@/src/tools/UI/workbench";
+import ReactMarkdown from 'react-markdown';
 
 const styleButton = {
   backgroundColor: "#00aaaa",
@@ -1423,7 +1424,18 @@ html, body, #game-container, #amos-screen, * { font-family: 'Amiga4Ever', sans-s
   const [showSpriteEditor, setShowSpriteEditor] = useState(false);
   const [showExamples, setShowExamples] = useState(false);
   const [showClock, setShowClock] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [tutorialContent, setTutorialContent] = useState("");
   const [selectedIcon, setSelectedIcon] = useState(null);
+
+  useEffect(() => {
+    if (showTutorial && !tutorialContent) {
+      fetch("/api/tutorial")
+        .then(res => res.text())
+        .then(text => setTutorialContent(text))
+        .catch(err => console.error("Failed to load tutorial", err));
+    }
+  }, [showTutorial, tutorialContent]);
   const styleButton = {
     backgroundColor: "#00aaaa",
     minWidth: "300px",
@@ -1450,7 +1462,7 @@ html, body, #game-container, #amos-screen, * { font-family: 'Amiga4Ever', sans-s
           position: "absolute",
 
           display: "grid",
-          gridTemplateColumns: "repeat(3, 1fr)",
+          gridTemplateColumns: "repeat(4, 1fr)",
           gap: "60px",
           margin: "20px"
         }}>
@@ -1460,6 +1472,8 @@ html, body, #game-container, #amos-screen, * { font-family: 'Amiga4Ever', sans-s
           setSelectedIcon={setSelectedIcon} />
 
         <WorkbenchIcon id="clock" label="Clock" icon="/icons/clock.png" onOpen={() => setShowClock(true)} selected={selectedIcon === "clock"}
+          setSelectedIcon={setSelectedIcon} />
+        <WorkbenchIcon id="tutorial" label="Tutorial" icon="/icons/book.png" onOpen={() => setShowTutorial(true)} selected={selectedIcon === "tutorial"}
           setSelectedIcon={setSelectedIcon} />
       </div>
 
@@ -1818,7 +1832,75 @@ html, body, #game-container, #amos-screen, * { font-family: 'Amiga4Ever', sans-s
         </WorkbenchWindow>
       )}
 
-
+      {showTutorial && (
+        <WorkbenchWindow title="Tutorial" onClose={() => setShowTutorial(false)}>
+          <div style={{ padding: '20px', background: '#fff', color: '#000', height: '100%', overflowY: 'auto', boxSizing: 'border-box', userSelect: 'text' }}>
+            <ReactMarkdown
+              components={{
+                code({node, className, children, ...props}) {
+                  const match = /language-(\w+)/.exec(className || '');
+                  return match ? (
+                    <div style={{ position: 'relative', marginTop: '10px', marginBottom: '10px' }}>
+                      <button
+                        onClick={() => navigator.clipboard.writeText(String(children).replace(/\n$/, ''))}
+                        style={{
+                          position: 'absolute',
+                          top: '5px',
+                          right: '5px',
+                          padding: '6px 12px',
+                          backgroundColor: '#00aaaa',
+                          color: 'white',
+                          border: '2px solid #006666',
+                          boxShadow: '2px 2px 0 #004444',
+                          cursor: 'pointer',
+                          fontFamily: 'monospace',
+                          fontSize: '12px',
+                          zIndex: 10
+                        }}
+                        onMouseDown={(e) => {
+                          e.target.style.transform = "translate(2px, 2px)";
+                          e.target.style.boxShadow = "0 0 0 #004444";
+                        }}
+                        onMouseUp={(e) => {
+                          e.target.style.transform = "translate(0, 0)";
+                          e.target.style.boxShadow = "2px 2px 0 #004444";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.transform = "translate(0, 0)";
+                          e.target.style.boxShadow = "2px 2px 0 #004444";
+                        }}
+                      >
+                        Copy
+                      </button>
+                      <pre style={{
+                        backgroundColor: '#222',
+                        color: '#0f0',
+                        padding: '16px',
+                        paddingTop: '36px',
+                        border: '4px solid #444',
+                        overflowX: 'auto',
+                        fontFamily: '"Amiga4Ever", monospace',
+                        userSelect: 'text',
+                        whiteSpace: 'pre-wrap'
+                      }}>
+                        <code className={className} {...props} style={{ userSelect: 'text' }}>
+                          {children}
+                        </code>
+                      </pre>
+                    </div>
+                  ) : (
+                    <code className={className} {...props} style={{ backgroundColor: '#eee', padding: '2px 4px', borderRadius: '4px', userSelect: 'text' }}>
+                      {children}
+                    </code>
+                  )
+                }
+              }}
+            >
+              {tutorialContent}
+            </ReactMarkdown>
+          </div>
+        </WorkbenchWindow>
+      )}
 
     </WorkbenchShell>
   );
