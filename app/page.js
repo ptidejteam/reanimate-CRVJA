@@ -1011,7 +1011,7 @@ html, body, #game-container, #amos-screen, * { font-family: 'Amiga4Ever', sans-s
 
                               const text = await (await fetch("/AmosFiles/Pacman.txt")).text();
                               setAmosCode(text);
-                              parseAmosCode(text);
+                              forceParse(text);
                             },
                           },
                           {
@@ -1019,7 +1019,7 @@ html, body, #game-container, #amos-screen, * { font-family: 'Amiga4Ever', sans-s
                             onClick: async () => {
                               const text = await (await fetch("/AmosFiles/Amos1_piano_improved.asc")).text();
                               setAmosCode(text);
-                              parseAmosCode(text);
+                              forceParse(text);
                             },
                           },
 
@@ -1030,14 +1030,14 @@ html, body, #game-container, #amos-screen, * { font-family: 'Amiga4Ever', sans-s
                             onClick: async () => {
                               const text = await (await fetch("/AmosFiles/Amos2_Rotating_Triangle.txt")).text();
                               setAmosCode(text);
-                              parseAmosCode(text);
+                              forceParse(text);
                             },
                           },
                           {
                             label: "Empty",
                             onClick: () => {
                               setAmosCode("");
-                              parseAmosCode("");
+                              forceParse("");
                             },
                           },
                         ],

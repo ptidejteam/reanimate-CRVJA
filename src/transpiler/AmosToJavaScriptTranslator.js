@@ -1375,7 +1375,7 @@ ${this.indent()}}\n`;
     const x = ctx.children[1]?.getText();
     const y = ctx.children[3]?.getText();
     const text = ctx.children[5]?.getText();
-    if (!text.includes('"')) {
+    if (!text || !text.includes('"')) {
       this.output += `
        
 ${this.indent()}const textDiv${x}${y} = document.createElement('div');
