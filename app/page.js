@@ -17,6 +17,9 @@ import CollectingErrorListener from "@/src/transpiler/CollectingErrorListener";
 import CodeEditorWithErrors from "@/app/components/Editor/CodeEditorWithErrors";
 import ExampleTabs from "@/app/components/Editor/ExampleTabs";
 import { downloadASCFile } from "@/src/tools/fileUtils";
+import { parseBankFile } from "@/src/tools/bankReader/loadBank";
+import { generateAmosBankFile } from "@/src/tools/bankWriter/generateAmosBankFile";
+import { renderSpritePixels } from "@/src/tools/spriteRenderer";
 
 function App() {
   const [showCode, setShowCode] = useState(false);
@@ -56,88 +59,7 @@ function App() {
     localStorage.setItem("bankCreator", JSON.stringify(bankCreator));
   }, [bankCreator]);
 
-  function loadBank(bank) {
-    const findElementId = "Creator_bankStored" + bank;
-    const inputElement = document.getElementById(findElementId);
-    const file = inputElement?.files?.[0];
 
-    console.log("Storing bank:", inputElement?.id);
-    if (!file) {
-      console.log("Bank failed to be loaded: No file was selected");
-      return;
-    }
-    const reader = new FileReader();
-
-    reader.onload = function (e) {
-      const arrayBuffer = e.target.result; // The result is now an ArrayBuffer
-      const buffer = new Uint8Array(arrayBuffer); // Convert to Uint8Array for easier byte manipulation
-      console.log(buffer);
-      let offset = 6; // Adjust the starting offset as per the file format
-      const numberExpected = (buffer[4] << 8) | buffer[5]; // Check this is correct
-
-      let objectsArray = [];
-
-      for (let i = 0; i < numberExpected; i++) {
-        const width = (buffer[offset] << 8) | buffer[offset + 1];
-        const height = (buffer[offset + 2] << 8) | buffer[offset + 3];
-        const depth = (buffer[offset + 4] << 8) | buffer[offset + 5];
-        const hotspotX = (buffer[offset + 6] << 8) | buffer[offset + 7];
-        const hotspotY = (buffer[offset + 8] << 8) | buffer[offset + 9];
-
-        const planarGraphicData = [];
-        const dataSize = width * 2 * height * depth; // Ensure this calculation is correct
-
-        for (let j = 0; j < dataSize; j++) {
-          planarGraphicData.push(buffer[offset + 10 + j]);
-        }
-
-        const objectBuilder = {
-          width,
-          height,
-          depth,
-          hotspotX,
-          hotspotY,
-          planarGraphicData,
-        };
-
-        objectsArray.push(objectBuilder);
-        offset += 10 + dataSize;
-      }
-
-      // Initialize colorPalette to hold 32 colors (64 bytes in total)
-      let colorPalette = [];
-
-      // Loop through each pair of bytes in the color palette section (32 colors x 2 bytes)
-      for (let k = offset; k < offset + 64; k += 2) {
-        const byte1 = buffer[k];
-        const byte2 = buffer[k + 1];
-
-        const color1 = (byte1 << 8) | byte2;
-
-        // Extract the red, green, and blue components (4 bits each)
-        const red = (color1 >> 8) & 0xf;
-        const green = (color1 >> 4) & 0xf;
-        const blue = color1 & 0xf;
-
-        // Convert 4-bit values (0-15) to 8-bit values (0-255) by multiplying by 17
-        const red8 = (red * 17).toString(16).padStart(2, "0");
-        const green8 = (green * 17).toString(16).padStart(2, "0");
-        const blue8 = (blue * 17).toString(16).padStart(2, "0");
-
-        // Format as HTML color code #RRGGBB
-        const color = "#" + red8 + green8 + blue8;
-        colorPalette.push(color.toUpperCase());
-      }
-      setBankCreator({
-        ...bankCreator,
-        sprites: objectsArray,
-        palette: colorPalette,
-      });
-      console.log("Bank loaded successfully:", objectsArray, colorPalette);
-    };
-
-    reader.readAsArrayBuffer(file); // Use readAsArrayBuffer for binary data
-  }
 
   const clearBank = () => {
     localStorage.removeItem("bankCreator");
@@ -469,124 +391,14 @@ html, body, #game-container, #amos-screen, * { font-family: 'Amiga4Ever', sans-s
     };
   }, [jsCode, runNonce]);
 
-  function generateAmosBankFile(bankCreator) {
-    const { sprites, palette } = bankCreator;
-    const identifier = "AmSp"; // 4-byte identifier for sprites
 
-    // Create an array to hold the binary data
-    let binaryData = [];
-
-    // Add the 4-byte identifier
-    for (let i = 0; i < identifier.length; i++) {
-      binaryData.push(identifier.charCodeAt(i));
-    }
-
-    // Add the 2-byte number of sprites
-    const spriteCount = sprites.length;
-    binaryData.push((spriteCount >> 8) & 0xff); // High byte
-    binaryData.push(spriteCount & 0xff); // Low byte
-    // Add each sprite's data
-    sprites.forEach((sprite) => {
-      const { width, height, depth, hotspotX, hotspotY, planarGraphicData } =
-        sprite;
-
-      let object = [];
-      // Width and height are each 2 bytes
-      object.push((width >> 8) & 0xff);
-      object.push(width & 0xff);
-      object.push((height >> 8) & 0xff);
-      object.push(height & 0xff);
-
-      // Depth, hotspot X, and hotspot Y are each 2 bytes
-      object.push((depth >> 8) & 0xff);
-      object.push(depth & 0xff);
-      object.push((hotspotX >> 8) & 0xff);
-      object.push(hotspotX & 0xff);
-      object.push((hotspotY >> 8) & 0xff);
-      object.push(hotspotY & 0xff);
-      if (Array.isArray(planarGraphicData)) {
-        object.push(...planarGraphicData);
-      } else {
-        console.error("planarGraphicData is not an array", planarGraphicData);
-      }
-
-      binaryData.push(...object);
-    });
-    let newPalette = [...palette];
-    function rgbTo16Bit(rgbColor) {
-      // Extract the red, green, and blue components from the hex color
-      const red = parseInt(rgbColor.slice(1, 3), 16) >> 4; // Red channel (top 4 bits)
-      const green = parseInt(rgbColor.slice(3, 5), 16) >> 4; // Green channel (middle 4 bits)
-      const blue = parseInt(rgbColor.slice(5, 7), 16) >> 4; // Blue channel (bottom 4 bits)
-
-      // Combine red, green, and blue components into a 16-bit color value
-      const color16Bit = (red << 8) | (green << 4) | blue;
-
-      return color16Bit;
-    }
-    let binaryPalette = [];
-    // Convert the palette into 16-bit color values and then add to binaryData
-    newPalette.forEach((color) => {
-      const rgb = rgbTo16Bit(color); // Convert to 16-bit color
-      binaryData.push((rgb >> 8) & 0xff); // High byte
-      binaryData.push(rgb & 0xff); // Low byte
-
-      binaryPalette.push((rgb >> 8) & 0xff); // High byte
-      binaryPalette.push(rgb & 0xff); // Low byte
-    });
-
-    console.log(binaryPalette);
-
-    console.log(binaryData);
-    const blob = new Blob([new Uint8Array(binaryData)], {
-      type: "application/octet-stream",
-    });
-    const url = URL.createObjectURL(blob);
-
-    // Create a download link
-    const downloadLink = document.createElement("a");
-    downloadLink.href = url;
-    downloadLink.download = "AmosBank_test4.abk";
-    downloadLink.click();
-  }
 
   // Helper function to convert pixels array to planar format
 
   // Helper function to convert a hex color to 4-bit RGB values
 
   function BankEditor({ bankCreator, setBankCreator }) {
-    const renderSpritePixels = (
-      planarGraphicData,
-      width,
-      height,
-      depth,
-      palette
-    ) => {
-      const pixels = [];
-      const bytesPerRow = width / 8;
 
-      for (let y = 0; y < height; y++) {
-        for (let x = 0; x < width; x++) {
-          let colorIndex = 0;
-
-          // Build colorIndex by combining bits across planes
-          for (let plane = 0; plane < depth; plane++) {
-            const byteIndex =
-              y * bytesPerRow +
-              plane * (height * bytesPerRow) +
-              Math.floor(x / 8);
-            const bitPos = 7 - (x % 8);
-            const bit = (planarGraphicData[byteIndex] >> bitPos) & 1;
-
-            colorIndex |= bit << plane;
-          }
-
-          const hexColor = palette[colorIndex];
-          pixels.push(hexColor);
-        }
-      }
-      return pixels;
-    };
 
     const [palette, setPalette] = useState(
       bankCreator.palette || Array(32).fill("#000000")
@@ -799,12 +611,17 @@ html, body, #game-container, #amos-screen, * { font-family: 'Amiga4Ever', sans-s
             <input
               id={`Creator_bankStored1`}
               type="file"
-              onChange={(e) => {
+              onChange={async (e) => {
                 setBankCreator({ ...bankCreator, sprites: [], palette: [] });
                 if (e.target.files.length > 0) {
                   const file = e.target.files[0];
                   console.log("File selected for bank 1:", file.name);
-                  loadBank(1);
+                  try {
+                    const result = await parseBankFile(file);
+                    setBankCreator({ ...bankCreator, ...result });
+                  } catch (err) {
+                    console.error("Failed to load bank:", err);
+                  }
                 }
               }}
               multiple
