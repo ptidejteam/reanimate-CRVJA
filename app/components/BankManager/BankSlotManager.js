@@ -1,0 +1,62 @@
+"use client";
+import React from "react";
+
+export default function BankSlotManager({ numBanks, bankFiles, onFileChange }) {
+  return (
+    <div
+      style={{
+        width: "100%",
+        display: "flex",
+        flexDirection: "row",
+        border: "1px solid black",
+      }}
+    >
+      <div
+        style={{
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <div>
+          {" "}
+          {bankFiles.map((file, index) => (
+            <li key={index}>
+              Bank {index + 1}:{" "}
+              {file ? file.name.split("_")[1] : <i>No file selected</i>}
+            </li>
+          ))}
+        </div>
+      </div>
+      <div
+        style={{
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <div style={{ width: "100%" }}>
+          {Array.from({ length: numBanks }, (_, index) => (
+            <div style={{ marginBottom: "10px" }} key={index}>
+              <label>Bank {index + 1}: </label>
+              <input
+                id={`bankStored${index + 1}`}
+                type="file"
+                onChange={(e) => {
+                  if (e.target.files.length > 0) {
+                    const file = e.target.files[0];
+                    console.log(
+                      `File selected for bank ${index + 1}:`,
+                      file.name
+                    );
+                    onFileChange(index, file);
+                  }
+                }}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
