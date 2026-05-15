@@ -1,31 +1,24 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import antlr4 from "antlr4";
-import AmosToJavaScriptTranslator from "@/src/transpiler/AmosToJavaScriptTranslator";
-import AMOSParser from "@/AMOSParser";
-import AMOSLexer from "@/AMOSLexer";
 import { Sketch } from "@uiw/react-color";
-import prettier from "prettier/standalone";
-import babelPlugin from "prettier/plugins/babel";
-import estreePlugin from "prettier/plugins/estree";
 import AMOSDecoder from "@/src/tools/AmosDecoder";
 import AnalogClock from "@/src/tools/UI/analogClock";
 import { WorkbenchIcon, WorkbenchShell, WorkbenchWindow } from "@/src/tools/UI/workbench";
 import ReactMarkdown from 'react-markdown';
 import { styleButton } from "@/app/constants/styles";
-import CollectingErrorListener from "@/src/transpiler/CollectingErrorListener";
+import { useAMOSParser } from "@/app/hooks/useAMOSParser";
 import CodeEditorWithErrors from "@/app/components/Editor/CodeEditorWithErrors";
 import ExampleTabs from "@/app/components/Editor/ExampleTabs";
 import { downloadASCFile } from "@/src/tools/fileUtils";
 import { parseBankFile } from "@/src/tools/bankReader/loadBank";
 import { generateAmosBankFile } from "@/src/tools/bankWriter/generateAmosBankFile";
 import { renderSpritePixels } from "@/src/tools/spriteRenderer";
+import { useBankCreator } from "@/app/hooks/useBankCreator";
 
 function App() {
   const [showCode, setShowCode] = useState(false);
 
-  const [jsCode, setJsCode] = useState("");
-  const [parseErrors, setParseErrors] = useState([]);
+
   const [numBanks, setNumBanks] = useState(6);
   const [bankFiles, setBankFiles] = useState([]);
   const [option, setOption] = useState("file");
@@ -36,35 +29,16 @@ function App() {
     Array(numBanks).fill(null)
   );
   const [decodedText, setDecodedText] = useState("");
-  const [bankCreator, setBankCreator] = useState({
-    sprites: [],
-    palette: Array(32).fill("#000000"),
-  });
+  const { bankCreator, setBankCreator, clearBank } = useBankCreator();
+  const { jsCode, parseErrors, forceParse } = useAMOSParser(AmosCode);
 
   useEffect(() => {
     setAmosCode(decodedText);
   }, [decodedText]);
-  useEffect(() => {
-    // Load bank data from local storage if it exists
-    const savedBankData = localStorage.getItem("bankCreator");
-    if (savedBankData) {
-      setBankCreator(JSON.parse(savedBankData));
-    }
-  }, []);
 
   const bankFilesRef = React.useRef(bankFiles);
   useEffect(() => { bankFilesRef.current = bankFiles; }, [bankFiles]);
-  useEffect(() => {
-    // Save bank data to local storage whenever it changes
-    localStorage.setItem("bankCreator", JSON.stringify(bankCreator));
-  }, [bankCreator]);
 
-
-
-  const clearBank = () => {
-    localStorage.removeItem("bankCreator");
-    setBankCreator({ sprites: [], palette: Array(32).fill("#000000") });
-  };
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
@@ -73,49 +47,13 @@ function App() {
     reader.onload = (event) => {
       const amosBasicCode = event.target.result;
       setAmosCode(amosBasicCode);
-      parseAmosCode(amosBasicCode);
+      forceParse(amosBasicCode);
     };
 
     reader.readAsText(file);
   };
 
-  const parseAmosCode = async (amosBasicCode) => {
-    const chars = new antlr4.InputStream(amosBasicCode);
-    const lexer = new AMOSLexer(chars);
 
-    const lexErr = new CollectingErrorListener();
-    lexer.removeErrorListeners();
-    lexer.addErrorListener(lexErr);
-
-    const tokens = new antlr4.CommonTokenStream(lexer);
-    const parser = new AMOSParser(tokens);
-
-    const parseErr = new CollectingErrorListener();
-    parser.removeErrorListeners();
-    parser.addErrorListener(parseErr);
-
-    const tree = parser.program();
-
-    // Save errors for UI highlighting (1-based line numbers)
-    setParseErrors([...lexErr.errors, ...parseErr.errors]);
-
-    // … your translation, formatting and setJsCode as before …
-    const translator = new AmosToJavaScriptTranslator();
-    const walker = new antlr4.tree.ParseTreeWalker();
-    walker.walk(translator, tree);
-
-    const translatedJsCode = translator.getJavaScript();
-    try {
-      const formatted = await prettier.format(translatedJsCode, {
-        parser: "babel",
-        plugins: [babelPlugin, estreePlugin],
-      });
-      setJsCode(formatted);
-      console.log(formatted);
-    } catch {
-      setJsCode(translatedJsCode);
-    }
-  };
   const handleFileChange = (index, file) => {
     console.log(file);
     const newBankFiles = [...bankFiles];
@@ -849,18 +787,7 @@ html, body, #game-container, #amos-screen, * { font-family: 'Amiga4Ever', sans-s
       </div>
     );
   }
-  useEffect(() => {
-    if (!AmosCode) {
-      setParseErrors([]);
-      return;
-    }
 
-    const id = setTimeout(() => {
-      parseAmosCode(AmosCode);
-    }, 250); // debounce 250ms
-
-    return () => clearTimeout(id);
-  }, [AmosCode]);
 
 
   const [showRender, setShowRender] = useState(false);
@@ -1005,7 +932,7 @@ html, body, #game-container, #amos-screen, * { font-family: 'Amiga4Ever', sans-s
                       <button
                         onClick={async () => {
                           try {
-                            await parseAmosCode(AmosCode); // updates jsCode
+                            await forceParse(AmosCode); // updates jsCode
                             onRunClick(); // bumps runNonce -> useEffect runs -> iframe rebuilt
                           } catch (err) {
                             console.error("❌ Failed to run code:", err);
