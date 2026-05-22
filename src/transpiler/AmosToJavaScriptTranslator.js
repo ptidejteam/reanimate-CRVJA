@@ -972,12 +972,28 @@ ${this.indent()}closeChannel(${channel});
   }
 
   enterCls(ctx) {
+    const colorExpr = ctx.expression1();
+    if (colorExpr) {
+      // Case A: Cls color_number
+      const color = colorExpr.getText();
+      this.output += `
+${this.indent()}const amosScreen = document.getElementById('amos-screen');
+${this.indent()}if (amosScreen) {
+${this.indent()}  amosScreen.innerHTML = '';
+${this.indent()}  amosScreen.style.backgroundColor = colorMapping[${color}];
+${this.indent()}  console.log("Cls with parameter");
+${this.indent()}}
+`;
+      console.log("Cls with parameter.");
+    } else {
+      // Case B: Cls (no parameter)
     this.output += `
 ${this.indent()}const amosScreen = document.getElementById('amos-screen');
 ${this.indent()}if (amosScreen) {
 ${this.indent()}  amosScreen.innerHTML = '';
 ${this.indent()}}
     `;
+    }
   }
 
   enterCurs_off(ctx) {
