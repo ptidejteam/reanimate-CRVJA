@@ -1,4 +1,4 @@
-import AMOSListener from "@/AMOSListener";
+import AMOSListener from "@/grammar/generated/AMOSListener";
 
 class AmosToJavaScriptTranslator extends AMOSListener {
   constructor() {
@@ -969,6 +969,15 @@ ${this.indent()}closeChannel(${channel});
         `;
       }
     }
+  }
+
+  enterCls(ctx) {
+    this.output += `
+${this.indent()}const amosScreen = document.getElementById('amos-screen');
+${this.indent()}if (amosScreen) {
+${this.indent()}  amosScreen.innerHTML = '';
+${this.indent()}}
+    `;
   }
 
   enterCurs_off(ctx) {

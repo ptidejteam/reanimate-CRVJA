@@ -21,7 +21,9 @@ The system is built as a Next.js web application and relies heavily on **ANTLR4*
 ## 3. How it is Organized
 The codebase is structured as a Next.js project with the following key directories and files:
 
-- **`/` (Root)**: Contains the ANTLR grammar (`AMOS.g4`), generated ANTLR files (`AMOSLexer.js`, `AMOSParser.js`, `AMOSListener.js`), the main translator class (`AmosToJavaScriptTranslator.js`), and standard project config files (`package.json`, `next.config.mjs`, `jest.config.js`).
+- **`/` (Root)**: Contains standard configuration files (`package.json`, `next.config.mjs`, `jest.config.js`, `jsconfig.json`).
+- **`/grammar`**: Contains the ANTLR grammar definition (`AMOS.g4`) and the generated parser/lexer/listener output files inside `/grammar/generated`.
+- **`/src/transpiler`**: Contains the translation engine (`AmosToJavaScriptTranslator.js`).
 - **`/app`**: Contains the Next.js frontend pages and global styles. `page.js` is the monolithic main application file containing the Workbench UI, code editor with error highlighting, the sprite editor component, and the execution iframe logic.
 - **`/src/tools`**: Contains helper modules:
   - `AmosDecoder.js` / `AmosCsStyle.js`: Decodes binary `.amos` files back to readable source text, loading Amiga extension libraries.
@@ -66,9 +68,10 @@ Adding support for a new AMOS command involves modifying both the grammar defini
    ```
 
 ### Step 2: Generate the ANTLR Parser
-Run the following command in the terminal to rebuild the JavaScript lexer, parser, and listener files based on your updated grammar:
+Run the following commands in the terminal to rebuild the JavaScript lexer, parser, and listener files under the unified target directory:
 ```bash
-java -jar .\antlr-4.13.2-complete.jar -Dlanguage=JavaScript AMOS.g4
+cd grammar
+java -jar ../antlr-4.13.2-complete.jar -Dlanguage=JavaScript -o generated AMOS.g4
 ```
 *(Ensure you have Java installed and the ANTLR `.jar` file in the root directory)*
 
@@ -90,3 +93,11 @@ java -jar .\antlr-4.13.2-complete.jar -Dlanguage=JavaScript AMOS.g4
 3. Save the file.
 4. Write a new Jest test in the `/tests` folder to verify your new statement generates the expected JavaScript.
 5. Restart the development server, type the new command into the UI, and click "Run code" to verify that the correct JavaScript is generated and executed in the iframe.
+
+## 6. Detailed Developer Documentation
+
+For a comprehensive breakdown of the core components of the transpiler system, please refer to the following developer documentation guides:
+* **Parser & Lexical Specification**: For details on custom rules, skipped whitespaces, and operator precedence levels, read [grammar.md](docs/grammar.md).
+* **Translation Mechanics**: For information on listener pattern traversal, code formatting indents, and async loop strategies, read [amos_to_js.md](docs/amos_to_js.md).
+* **Test Architecture & Regression Checks**: For understanding testing workflows, test templates, space normalization, and debugging walkers, read [tests.md](docs/tests.md).
+

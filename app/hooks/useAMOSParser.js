@@ -2,8 +2,8 @@
 import { useState, useEffect } from "react";
 import antlr4 from "antlr4";
 import AmosToJavaScriptTranslator from "@/src/transpiler/AmosToJavaScriptTranslator";
-import AMOSParser from "@/AMOSParser";
-import AMOSLexer from "@/AMOSLexer";
+import AMOSParser from "@/grammar/generated/AMOSParser";
+import AMOSLexer from "@/grammar/generated/AMOSLexer";
 import prettier from "prettier/standalone";
 import babelPlugin from "prettier/plugins/babel";
 import estreePlugin from "prettier/plugins/estree";
