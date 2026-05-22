@@ -1,4 +1,4 @@
-// Generated from grammar/AMOS.g4 by ANTLR 4.13.2
+// Generated from AMOS.g4 by ANTLR 4.13.2
 // jshint ignore: start
 import antlr4 from 'antlr4';
 

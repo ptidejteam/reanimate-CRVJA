@@ -327,8 +327,9 @@ statement:
     pen:
     'Pen' NUMBER
     ;
+    
     cls:
-    'Cls'
+    'Cls' expression1?
     ;
 
     paper:
