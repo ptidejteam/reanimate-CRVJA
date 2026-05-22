@@ -8,7 +8,7 @@ This document details the lexical analysis, grammatical structure, and parsing p
 
 To execute retro games written in AMOS Pro (a classic dialect of BASIC for the Commodore Amiga) within a modern, sandboxed web browser, CRVJA implements a **source-to-source compiler (transpiler)**. The compilation pipeline begins with a **front-end parser** guided by a Context-Free Grammar (CFG).
 
-The grammar is specified using **ANTLR4** (ANother Tool for Language Recognition) in the grammar file [grammar/AMOS.g4](file:///Users/viniciusmioto/Projects/reanimate-CRVJA/grammar/AMOS.g4).
+The grammar is specified using **ANTLR4** (ANother Tool for Language Recognition) in the grammar file [grammar/AMOS.g4](../grammar/AMOS.g4).
 
 ### The Compiler Front-End Pipeline
 ```mermaid
@@ -28,7 +28,7 @@ ANTLR4 separates the language processing front-end into two distinct phases:
 ### A. Lexical Analysis (The Lexer)
 The **Lexer** reads the raw AMOS source code as a stream of characters, groups them into semantically meaningful subsequences called **Tokens**, and discards irrelevant characters (like whitespace and comments).
 * **Naming Convention**: Lexer rules in ANTLR4 must begin with an **uppercase letter** (e.g., `NUMBER`, `IDENTIFIER`, `COMMA`).
-* **Example Lexer Rules** in [grammar/AMOS.g4](file:///Users/viniciusmioto/Projects/reanimate-CRVJA/grammar/AMOS.g4):
+* **Example Lexer Rules** in [grammar/AMOS.g4](../grammar/AMOS.g4):
   ```antlr
   NUMBER: [0-9]+ ;
   IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]* '$'? ;
@@ -65,7 +65,7 @@ In AMOS, developers can write spaces, tabs, or comments between expressions with
 
 ## 4. Syntax and Operators of `AMOS.g4`
 
-The [grammar/AMOS.g4](file:///Users/viniciusmioto/Projects/reanimate-CRVJA/grammar/AMOS.g4) file uses Extended Backus-Naur Form (EBNF) notation. The primary operators include:
+The [grammar/AMOS.g4](../grammar/AMOS.g4) file uses Extended Backus-Naur Form (EBNF) notation. The primary operators include:
 
 ### Key EBNF Operators
 1. **Alternation (`|`)**: Defines a logical choice between different rules.
@@ -153,11 +153,11 @@ This rule dictates that when the lexer identifies the literal token `'Cls'`, it 
 
 ## 7. Compiling the Grammar and Integrating Output
 
-When the grammar file [grammar/AMOS.g4](file:///Users/viniciusmioto/Projects/reanimate-CRVJA/grammar/AMOS.g4) is compiled using Java, ANTLR4 translates the EBNF specifications into three JavaScript files inside [grammar/generated/](file:///Users/viniciusmioto/Projects/reanimate-CRVJA/grammar/generated/):
+When the grammar file [grammar/AMOS.g4](../grammar/AMOS.g4) is compiled using Java, ANTLR4 translates the EBNF specifications into three JavaScript files inside [grammar/generated/](../grammar/generated/):
 
-1. [AMOSLexer.js](file:///Users/viniciusmioto/Projects/reanimate-CRVJA/grammar/generated/AMOSLexer.js): Automatically groups the character input stream into structured tokens.
-2. [AMOSParser.js](file:///Users/viniciusmioto/Projects/reanimate-CRVJA/grammar/generated/AMOSParser.js): Validates token structures and exposes the AST structure.
-3. [AMOSListener.js](file:///Users/viniciusmioto/Projects/reanimate-CRVJA/grammar/generated/AMOSListener.js): Contains traversal hooks (e.g., `enterCls(ctx)`, `exitCls(ctx)`) invoked when walking the AST.
+1. [AMOSLexer.js](../grammar/generated/AMOSLexer.js): Automatically groups the character input stream into structured tokens.
+2. [AMOSParser.js](../grammar/generated/AMOSParser.js): Validates token structures and exposes the AST structure.
+3. [AMOSListener.js](../grammar/generated/AMOSListener.js): Contains traversal hooks (e.g., `enterCls(ctx)`, `exitCls(ctx)`) invoked when walking the AST.
 
 ### Grammar Compilation Command
 To regenerate the parser after editing `grammar/AMOS.g4`, execute the following from the root directory:

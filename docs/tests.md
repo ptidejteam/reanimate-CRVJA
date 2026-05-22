@@ -32,8 +32,8 @@ In compiler development, tests are critical. Even small changes in the grammar o
 ## 2. Test Environment Configuration
 
 * **Test Framework**: Jest
-* **Environment**: Node/jsdom, configured in [jest.config.js](file:///Users/viniciusmioto/Projects/reanimate-CRVJA/jest.config.js).
-* **Test Location**: All test files are located in the [tests/](file:///Users/viniciusmioto/Projects/reanimate-CRVJA/tests) directory and follow the naming convention `*.spec.js`.
+* **Environment**: Node/jsdom, configured in [jest.config.js](../jest.config.js).
+* **Test Location**: All test files are located in the [tests/](../tests) directory and follow the naming convention `*.spec.js`.
 
 ---
 

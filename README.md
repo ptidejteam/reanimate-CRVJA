@@ -97,7 +97,7 @@ java -jar ../antlr-4.13.2-complete.jar -Dlanguage=JavaScript -o generated AMOS.g
 ## 6. Detailed Developer Documentation
 
 For a comprehensive breakdown of the core components of the transpiler system, please refer to the following developer documentation guides:
-* **Parser & Lexical Specification**: For details on custom rules, skipped whitespaces, and operator precedence levels, read [grammar.md](file:///Users/viniciusmioto/Projects/reanimate-CRVJA/docs/grammar.md).
-* **Translation Mechanics**: For information on listener pattern traversal, code formatting indents, and async loop strategies, read [amos_to_js.md](file:///Users/viniciusmioto/Projects/reanimate-CRVJA/docs/amos_to_js.md).
-* **Test Architecture & Regression Checks**: For understanding testing workflows, test templates, space normalization, and debugging walkers, read [tests.md](file:///Users/viniciusmioto/Projects/reanimate-CRVJA/docs/tests.md).
+* **Parser & Lexical Specification**: For details on custom rules, skipped whitespaces, and operator precedence levels, read [grammar.md](docs/grammar.md).
+* **Translation Mechanics**: For information on listener pattern traversal, code formatting indents, and async loop strategies, read [amos_to_js.md](docs/amos_to_js.md).
+* **Test Architecture & Regression Checks**: For understanding testing workflows, test templates, space normalization, and debugging walkers, read [tests.md](docs/tests.md).
 

@@ -8,7 +8,7 @@ This document details the architectural design, core translation mechanics, and 
 
 The CRVJA compiler is a **source-to-source compiler (transpiler)** that maps the syntax structure of AMOS Pro to execution-ready modern JavaScript. Instead of compiling code into an Intermediate Representation (IR) or machine bytecode, it translates the AST directly into Javascript.
 
-The core transpiler logic resides in [AmosToJavaScriptTranslator.js](file:///Users/viniciusmioto/Projects/reanimate-CRVJA/src/transpiler/AmosToJavaScriptTranslator.js), which extends `AMOSListener` (found in the generated [AMOSListener.js](file:///Users/viniciusmioto/Projects/reanimate-CRVJA/grammar/generated/AMOSListener.js)).
+The core transpiler logic resides in [AmosToJavaScriptTranslator.js](../src/transpiler/AmosToJavaScriptTranslator.js), which extends `AMOSListener` (found in the generated [AMOSListener.js](../grammar/generated/AMOSListener.js)).
 
 ### The Listener Pattern Execution Flow
 As the ANTLR4 `ParseTreeWalker` performs a depth-first traversal of the AST, it triggers two hooks for each node corresponding to a grammar rule:
@@ -144,7 +144,7 @@ ${this.indent()}document.getElementById('amos-screen').style.backgroundColor = c
 
 ## 6. Integration with React and Next.js
 
-The compiler is integrated into the web client through the custom React hook [useAMOSParser.js](file:///Users/viniciusmioto/Projects/reanimate-CRVJA/app/hooks/useAMOSParser.js).
+The compiler is integrated into the web client through the custom React hook [useAMOSParser.js](../app/hooks/useAMOSParser.js).
 
 When the user types AMOS code:
 1. **Debouncing**: The hook waits 250ms after the last keystroke to avoid CPU spikes.
