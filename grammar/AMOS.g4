@@ -329,7 +329,7 @@ statement:
     ;
     
     cls:
-    'Cls' expression1?
+    'Cls' (expression1 (COMMA expression1 COMMA expression1 'To' expression1 COMMA expression1)?)?
     ;
 
     paper:
