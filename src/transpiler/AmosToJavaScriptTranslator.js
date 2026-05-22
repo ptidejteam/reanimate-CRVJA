@@ -972,27 +972,65 @@ ${this.indent()}closeChannel(${channel});
   }
 
   enterCls(ctx) {
-    const colorExpr = ctx.expression1();
-    if (colorExpr) {
-      // Case A: Cls color_number
-      const color = colorExpr.getText();
+    const exprs = ctx.expression1();
+
+    if (exprs.length === 0) {
+      // Case 1: Parameterless Cls (clear entire screen)
+      this.output += `
+${this.indent()}const amosScreen = document.getElementById('amos-screen');
+${this.indent()}if (amosScreen) {
+${this.indent()}  amosScreen.innerHTML = '';
+${this.indent()}}
+      `;
+    } else if (exprs.length === 1) {
+      // Case 2: Cls colour (clear entire screen + set background color)
+      const color = exprs[0].getText();
       this.output += `
 ${this.indent()}const amosScreen = document.getElementById('amos-screen');
 ${this.indent()}if (amosScreen) {
 ${this.indent()}  amosScreen.innerHTML = '';
 ${this.indent()}  amosScreen.style.backgroundColor = colorMapping[${color}];
-${this.indent()}  console.log("Cls with parameter");
 ${this.indent()}}
-`;
-      console.log("Cls with parameter.");
-    } else {
-      // Case B: Cls (no parameter)
-    this.output += `
-${this.indent()}const amosScreen = document.getElementById('amos-screen');
-${this.indent()}if (amosScreen) {
-${this.indent()}  amosScreen.innerHTML = '';
+      `;
+    } else if (exprs.length >= 5) {
+      // Case 3: Cls colour, x1, y1 To x2, y2 (clear rectangular block + fill with color)
+      const color = exprs[0].getText();
+      const x1 = exprs[1].getText();
+      const y1 = exprs[2].getText();
+      const x2 = exprs[3].getText();
+      const y2 = exprs[4].getText();
+
+      this.output += `
+${this.indent()}{
+${this.indent()}  const clearColor = colorMapping[${color}];
+${this.indent()}  const clearX1 = ${x1};
+${this.indent()}  const clearY1 = ${y1};
+${this.indent()}  const clearX2 = ${x2};
+${this.indent()}  const clearY2 = ${y2};
+${this.indent()}  const screen = document.getElementById('amos-screen');
+${this.indent()}  if (screen) {
+${this.indent()}    // 1. Remove child elements that fall inside the bounding box coordinates
+${this.indent()}    const children = Array.from(screen.children);
+${this.indent()}    children.forEach(child => {
+${this.indent()}      const left = parseInt(child.style.left) || 0;
+${this.indent()}      const top = parseInt(child.style.top) || 0;
+${this.indent()}      if (left >= clearX1 && left <= clearX2 && top >= clearY1 && top <= clearY2) {
+${this.indent()}        child.remove();
+${this.indent()}      }
+${this.indent()}    });
+${this.indent()}    // 2. Add a filled background div to cover the cleared area
+${this.indent()}    const fillDiv = document.createElement('div');
+${this.indent()}    fillDiv.style.position = 'absolute';
+${this.indent()}    fillDiv.style.left = clearX1 + 'px';
+${this.indent()}    fillDiv.style.top = clearY1 + 'px';
+${this.indent()}    fillDiv.style.width = (clearX2 - clearX1) + 'px';
+${this.indent()}    fillDiv.style.height = (clearY2 - clearY1) + 'px';
+${this.indent()}    fillDiv.style.backgroundColor = clearColor;
+${this.indent()}    fillDiv.style.zIndex = 1;
+${this.indent()}    screen.appendChild(fillDiv);
+${this.indent()}  }
 ${this.indent()}}
-    `;
+      `;
     }
   }
 
