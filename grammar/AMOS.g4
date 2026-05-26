@@ -32,13 +32,13 @@ BAR: 'Bar';
 WAITKEY: 'Wait Key';
 KEYSTATE: 'Key State';
 IDENTIFIER: [a-zA-Z_] [a-zA-Z_0-9]* '$'?;
-COMPARISON: '=' | '<>' | '>=' | '>' | '<=' | '<'; // Comparison operators
-BRACKETOPEN_PROP: '(';
-BRACKETCLOSE_PROP: ')';
-BRACKETOPEN_ARRAY: '[';
-BRACKETCLOSE_ARRAY: ']';
-BRACKETOPEN_FUNCTION: '{';
-BRACKETCLOSE_FUNCTION: '}';
+COMPARISON: '=' | '<>' | '>=' | '>' | '<=' | '<';
+ROUND_BRACKET_OPEN: '(';
+ROUND_BRACKET_CLOSE: ')';
+SQUARE_BRACKET_OPEN: '[';
+SQUARE_BRACKET_CLOSE: ']';
+CURLY_BRACKET_OPEN: '{';
+CURLY_BRACKET_CLOSE: '}';
 HEX_NUMBER: '$' [0-9A-Fa-f]+;
 
 // Operators for arithmetic
@@ -67,7 +67,7 @@ term:
     ;
 
 array_index_get:
-    IDENTIFIER BRACKETOPEN_PROP expression1 BRACKETCLOSE_PROP
+    IDENTIFIER ROUND_BRACKET_OPEN expression1 ROUND_BRACKET_CLOSE
     ;
 
 factor:
@@ -100,9 +100,8 @@ statement:
     | if_then
     | if_statement_key_state
     | if_statement
-    | function_starter
     | bar
-    | function_call_or_array_access // New rule for function calls or array access
+    | procedure_call
     | variable_starter
     | while_wend
     | wait_key_break
@@ -186,7 +185,7 @@ circle:
     ;
 
 on_gosub:
-    'On' IDENTIFIER BRACKETOPEN_PROP (NUMBER | IDENTIFIER | expression1) BRACKETCLOSE_PROP 'Gosub' IDENTIFIER (COMMA IDENTIFIER)*
+    'On' IDENTIFIER ROUND_BRACKET_OPEN (NUMBER | IDENTIFIER | expression1) ROUND_BRACKET_CLOSE 'Gosub' IDENTIFIER (COMMA IDENTIFIER)*
     ;
 
 screen_offset:
@@ -300,7 +299,7 @@ input_variable:
     ;
 
 btst:
-    'Btst' BRACKETOPEN_PROP expression1 COMMA expression1 BRACKETCLOSE_PROP
+    'Btst' ROUND_BRACKET_OPEN expression1 COMMA expression1 ROUND_BRACKET_CLOSE
     ;
 
 repeat_key:
@@ -382,11 +381,11 @@ flash_on:
     ;
 
 sin_function:
-    'Sin' BRACKETOPEN_PROP (NUMBER | IDENTIFIER | expression1) BRACKETCLOSE_PROP
+    'Sin' ROUND_BRACKET_OPEN (NUMBER | IDENTIFIER | expression1) ROUND_BRACKET_CLOSE
     ;
 
 cos_function:
-    'Cos' BRACKETOPEN_PROP (NUMBER | IDENTIFIER | expression1) BRACKETCLOSE_PROP
+    'Cos' ROUND_BRACKET_OPEN (NUMBER | IDENTIFIER | expression1) ROUND_BRACKET_CLOSE
     ;
 
 play_sound:
@@ -401,19 +400,13 @@ variable_starter:
     IDENTIFIER '=' (expression1 | btst | '""') // Now captures only variable assignments
     ;
 
-function_starter:
-    IDENTIFIER BRACKETOPEN_ARRAY (NUMBER | IDENTIFIER) BRACKETCLOSE_ARRAY
-    ;
-
-function_call_or_array_access:
-    IDENTIFIER BRACKETOPEN_ARRAY expression1 BRACKETCLOSE_ARRAY // Array access
-    | IDENTIFIER BRACKETOPEN_PROP expression1? (COMMA expression1)* BRACKETCLOSE_PROP // Function calls with or without parameters
-    | IDENTIFIER BRACKETOPEN_PROP BRACKETCLOSE_PROP
+procedure_call:
+    IDENTIFIER SQUARE_BRACKET_OPEN expression1 (COMMA expression1)* SQUARE_BRACKET_CLOSE
     | IDENTIFIER
     ;
 
 array_structure:
-    IDENTIFIER BRACKETOPEN_PROP ((NUMBER | expression1) COMMA? (NUMBER | expression1)?) BRACKETCLOSE_PROP
+    IDENTIFIER ROUND_BRACKET_OPEN ((NUMBER | expression1) COMMA? (NUMBER | expression1)?) ROUND_BRACKET_CLOSE
     ;
 
 array_create:
@@ -421,7 +414,7 @@ array_create:
     ;
 
 array_update:
-    IDENTIFIER BRACKETOPEN_PROP (NUMBER | IDENTIFIER | expression1) (COMMA (NUMBER | IDENTIFIER | expression1))? BRACKETCLOSE_PROP '=' expression1
+    IDENTIFIER ROUND_BRACKET_OPEN (NUMBER | IDENTIFIER | expression1) (COMMA (NUMBER | IDENTIFIER | expression1))? ROUND_BRACKET_CLOSE '=' expression1
     ;
 
 screen_open:
@@ -485,13 +478,13 @@ bar:
     ;
 
 procedure:
-    PROC IDENTIFIER (BRACKETOPEN_ARRAY IDENTIFIER? BRACKETCLOSE_ARRAY)?
+    PROC IDENTIFIER (SQUARE_BRACKET_OPEN IDENTIFIER (COMMA IDENTIFIER)* SQUARE_BRACKET_CLOSE)?
     (statement)*
     ENDPROC
     ;
 
 current_Key_State:
-    KEYSTATE BRACKETOPEN_PROP expression1 BRACKETCLOSE_PROP
+    KEYSTATE ROUND_BRACKET_OPEN expression1 ROUND_BRACKET_CLOSE
     ;
 
 print_options:

@@ -1392,21 +1392,13 @@ ${this.indent()}}`;
   enterProcedure(ctx) {
     this.id++;
     let name = ctx.children[1]?.getText();
-    let props = "";
-    if (ctx.IDENTIFIER(1)) {
-      for (let i = 3; i < ctx.children.length; i++) {
-        if (ctx.children[i]?.getText() === "]") {
-          break;
-        }
-        props += ctx.children[i]?.getText();
-        if (ctx.children[i + 1]?.getText() !== "]") {
-          props += " ";
-          props += ",";
-        }
-      }
-    } else {
+    
+    let params = [];
+    // Collect all IDENTIFIER tokens after the procedure name (which is index 0 in the parser context)
+    for (let i = 1; i < ctx.IDENTIFIER().length; i++) {
+      params.push(ctx.IDENTIFIER(i).getText());
     }
-
+    let props = params.join(", ");
     this.output += `
     let lastTime${name} = 0; 
     let timeoutId${name} = null; // Track the timeout ID
@@ -1421,7 +1413,6 @@ ${this.indent()}const ${name} = (${props}) => {
     }, 100 - timeSinceLastCall);
     return;
   }
-
   lastTime${name} = currentTime;
   timeoutId${name} = null; // Clear the timeout ID after execution
         `;
@@ -1774,40 +1765,17 @@ ${this.indent()}if (${leftExpression} ${comparator} ${rightExpression}) {
 ${this.indent()}}`;
   }
 
-  enterFunction_starter(ctx) {
-    let name = ctx.children[0]?.getText() || "";
-    let value = ctx.children[2]?.getText() || 0;
-    if (this.indentLevel == 0) {
-      this.functionStarters += `
-  ${this.indent()}${name}(${value}); // Function call
-          `;
-    } else {
-      this.output += `
-  ${this.indent()}${name}(${value}); // Function call
-          `;
-    }
-  }
-
-  enterFunction_call_or_array_access(ctx) {
+  enterProcedure_call(ctx) {
     const name = ctx.IDENTIFIER().getText();
     let callCode = "";
-    
-    // Case 1: Calling a procedure with just its name (e.g., HELLO)
-    if (!ctx.BRACKETOPEN_ARRAY() && !ctx.BRACKETOPEN_PROP()) {
+
+    // Case 1: Calling a procedure with just its name 
+    if (!ctx.SQUARE_BRACKET_OPEN()) {
       callCode = `${this.indent()}${name}();\n`;
-    }
-    
-    // Case 2: Bracket parameters (e.g., HELLO[2])
-    else if (ctx.BRACKETOPEN_ARRAY()) {
-      const arg = ctx.expression1(0)?.getText() || "";
-      callCode = `${this.indent()}${name}(${arg});\n`;
-    }
-    
-    // Case 3: Parentheses parameters (e.g., HELLO(2) or HELLO())
-    else if (ctx.BRACKETOPEN_PROP()) {
+    } else { // Case 2: Square bracket parameters
       const args = ctx.expression1().map(expr => expr.getText()).join(", ");
       callCode = `${this.indent()}${name}(${args});\n`;
-    }
+    } 
 
     // Direct the generated code to the correct buffer to avoid hoisting errors
     if (this.indentLevel === 0) {
