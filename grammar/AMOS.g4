@@ -1,36 +1,36 @@
 grammar AMOS;
 
 // Lexer rules
-SCREENOPEN: 'Screen Open'; 
+SCREENOPEN: 'Screen Open';
 NUMBER: [0-9]+;
-LOWRES: 'Lowres'; 
-HIRES: 'Hires'; 
-COMMA: ','; 
-COMMENT: '\'' ~[\n\r]* -> skip; 
+LOWRES: 'Lowres';
+HIRES: 'Hires';
+COMMA: ',';
+COMMENT: '\'' ~[\n\r]* -> skip;
 REM: 'Rem' ~[\n\r]* -> skip;
-WS: [ \t\n\r]+ -> skip; 
-CURSOFF: 'Curs Off'; 
-CURSON: 'Curs On'; 
-INK: 'Ink'; 
-TEXT: 'Text'; 
-STRING: '"' (~["\r\n])* '"'; 
+WS: [ \t\n\r]+ -> skip;
+CURSOFF: 'Curs Off';
+CURSON: 'Curs On';
+INK: 'Ink';
+TEXT: 'Text';
+STRING: '"' (~["\r\n])* '"';
 
-DO: 'Do'; 
-LOOP: 'Loop'; 
-FOR: 'For'; 
-TO: 'To'; 
-NEXT: 'Next'; 
-IF: 'If'; 
-ELSE: 'Else'; 
-ENDIF: 'End If'; 
-WHILE: 'While'; 
-WEND: 'Wend'; 
-PLAY: 'Play'; 
-PROC: 'Procedure'; 
-ENDPROC: 'End Proc'; 
-BAR: 'Bar'; 
-WAITKEY: 'Wait Key'; 
-KEYSTATE: 'Key State'; 
+DO: 'Do';
+LOOP: 'Loop';
+FOR: 'For';
+TO: 'To';
+NEXT: 'Next';
+IF: 'If';
+ELSE: 'Else';
+ENDIF: 'End If';
+WHILE: 'While';
+WEND: 'Wend';
+PLAY: 'Play';
+PROC: 'Procedure';
+ENDPROC: 'End Proc';
+BAR: 'Bar';
+WAITKEY: 'Wait Key';
+KEYSTATE: 'Key State';
 IDENTIFIER: [a-zA-Z_] [a-zA-Z_0-9]* '$'?;
 COMPARISON: '=' | '<>' | '>=' | '>' | '<=' | '<'; // Comparison operators
 BRACKETOPEN_PROP: '(';
@@ -53,12 +53,11 @@ HASHTAG: '#';
 PERCENT: '%';
 QUESTION: '?';
 
-
-
 // Expression captures more complex expressions
 expression2:
     term ((ADD | SUBTRACT) term)* // Handle addition and subtraction
     ;
+
 expression1:
     term ((ADD | SUBTRACT) term)* NUMBER? // Handle addition and subtraction
     ;
@@ -66,9 +65,11 @@ expression1:
 term:
     SUBTRACT? factor ((MULTIPLY | DIVIDE) factor)* // Handle multiplication and division
     ;
+
 array_index_get:
-    IDENTIFIER BRACKETOPEN_PROP (expression1) BRACKETCLOSE_PROP
+    IDENTIFIER BRACKETOPEN_PROP expression1 BRACKETCLOSE_PROP
     ;
+
 factor:
     NUMBER                     // A number
     | array_index_get
@@ -78,15 +79,12 @@ factor:
     | IDENTIFIER                // A variable
     | '(' expression1 ')'        // Parentheses for grouping
     | HEX_NUMBER
-
     ;
-
 
 // Parser rules
 
 program:
     (statement)* EOF
-    
     ;
 
 statement:
@@ -104,7 +102,7 @@ statement:
     | if_statement
     | function_starter
     | bar
-    | function_call_or_array_access // Nova regra para chamadas de função ou acesso a array
+    | function_call_or_array_access // New rule for function calls or array access
     | variable_starter
     | while_wend
     | wait_key_break
@@ -142,7 +140,7 @@ statement:
     | led_off
     | sam_bank
     | sam_loop
-    | key_speed 
+    | key_speed
     | label_title
     | set_rainbow
     | use_rainbow
@@ -161,194 +159,225 @@ statement:
     | wait_vbl
     | wait_key
     | screen_swap
-
-    
-   
-
-
-
-    
     ;
 
-    
-    rndFunction: 'Rnd' '(' expression1 ')';
+rndFunction:
+    'Rnd' '(' expression1 ')'
+    ;
 
-    screen_swap:
+screen_swap:
     'Screen' 'Swap'
     ;
-    wait_vbl:
+
+wait_vbl:
     'Wait' 'Vbl'
     ;
-    wait_key:
+
+wait_key:
     'Wait' NUMBER
     ;
-    box:
+
+box:
     'Box' expression1 COMMA expression1 'To' expression1 COMMA expression1
     ;
-    circle:
+
+circle:
     'Circle' expression1 COMMA expression1 COMMA expression1
     ;
-    on_gosub:
+
+on_gosub:
     'On' IDENTIFIER BRACKETOPEN_PROP (NUMBER | IDENTIFIER | expression1) BRACKETCLOSE_PROP 'Gosub' IDENTIFIER (COMMA IDENTIFIER)*
     ;
-    screen_offset:
+
+screen_offset:
     'Screen' 'Offset' NUMBER COMMA NUMBER COMMA NUMBER
     ;
-    choose_Screen:
+
+choose_Screen:
     'Screen' NUMBER
     ;
-    data_statement:
+
+data_statement:
     'Data' expression1 (COMMA expression1)*
     ;
-    read_statement:
-    'Read' read_target (COMMA read_target)* ;
 
-    read_target:
+read_statement:
+    'Read' read_target (COMMA read_target)*
+    ;
+
+read_target:
     array_structure
     | IDENTIFIER
     ;
-    goto_label:
+
+goto_label:
     'Goto' IDENTIFIER
     ;
-    gosub:
+
+gosub:
     'Gosub' IDENTIFIER
     ;
 
-    bob_update_on:
+bob_update_on:
     'Bob' 'Update' 'On'
     ;
 
-
-    clear_key:
+clear_key:
     'Clear' 'Key'
     ;
 
-    bob_off:
+bob_off:
     'Bob' 'Off'
     ;
-    value: 
-    expression1 | STRING
-    ;
-    set_rainbow:
-    'Set' 'Rainbow' (expression1 | NUMBER | STRING) COMMA ( expression1 | NUMBER | STRING) COMMA ( expression1 | NUMBER | STRING) COMMA (expression1 | NUMBER | STRING) COMMA (expression1 | NUMBER | STRING)? COMMA? (expression1 | NUMBER | STRING)?
+
+value:
+    expression1
+    | STRING
     ;
 
-    use_rainbow:
+set_rainbow:
+    'Set' 'Rainbow' (expression1 | NUMBER | STRING) COMMA (expression1 | NUMBER | STRING) COMMA (expression1 | NUMBER | STRING) COMMA (expression1 | NUMBER | STRING) COMMA (expression1 | NUMBER | STRING)? COMMA? (expression1 | NUMBER | STRING)?
+    ;
+
+use_rainbow:
     'Rainbow' (expression1 | NUMBER | STRING) COMMA (expression1 | NUMBER | STRING) COMMA (expression1 | NUMBER | STRING) COMMA (expression1 | NUMBER | STRING) COMMA? (expression1 | NUMBER | STRING)? COMMA? (expression1 | NUMBER | STRING)?
     ;
-    label_title:
+
+label_title:
     IDENTIFIER ':'
     ;
-    key_speed:
+
+key_speed:
     'Key' 'Speed' NUMBER COMMA NUMBER
     ;
-    sam_loop:
+
+sam_loop:
     'SAM' 'LOOP' 'OFF'
     ;
-    sam_bank:
+
+sam_bank:
     'SAM' 'BANK' NUMBER
     ;
-    led_off:
+
+led_off:
     'LED' 'OFF'
     ;
 
-    loadBank:
+loadBank:
     'Load' STRING (COMMA (IDENTIFIER | NUMBER))?
     ;
-    
-    loadBankImgToSprite:
-    'Sprite' (NUMBER COMMA (IDENTIFIER | NUMBER) COMMA (IDENTIFIER | NUMBER) COMMA (IDENTIFIER | NUMBER) | 'Off' )
+
+loadBankImgToSprite:
+    'Sprite' (NUMBER COMMA (IDENTIFIER | NUMBER) COMMA (IDENTIFIER | NUMBER) COMMA (IDENTIFIER | NUMBER) | 'Off')
     ;
-    expressions_comparators:
+
+expressions_comparators:
     '=' | '<>' | '>=' | '>' | '<=' | '<'
     ;
-    or_and:
+
+or_and:
     'or' | 'and'
     ;
-    if_then:
+
+if_then:
     IF expression1 expressions_comparators? expression2 (or_and expression1 expressions_comparators expression2)? 'then' statement
     ;
-    open_out_readfile:
+
+open_out_readfile:
     'Open' 'Out' NUMBER COMMA IDENTIFIER
     ;
-    open_in_writefile:
+
+open_in_writefile:
     'Open' 'In' NUMBER COMMA IDENTIFIER
     ;
-    close_file:
+
+close_file:
     'Close' NUMBER
     ;
 
-    input_variable:
+input_variable:
     'Input' HASHTAG NUMBER COMMA IDENTIFIER HEX_NUMBER?
     ;
 
-
-    btst:
+btst:
     'Btst' BRACKETOPEN_PROP expression1 COMMA expression1 BRACKETCLOSE_PROP
     ;
-    repeat_key:
+
+repeat_key:
     'Repeat'
     (statement)*
     'Until' 'Mouse' 'Key' '=' NUMBER
     ;
-    set_buffer:
-    'Set' 'Buffers' NUMBER
+
+set_buffer:
+    'Set' 'Buffer' NUMBER
     ;
-    global:
+
+global:
     'Global' (array_structure | IDENTIFIER) (COMMA (array_structure | IDENTIFIER))*?
     ;
-    turbo_draw:
+
+turbo_draw:
     'Turbo' 'Draw' expression1 COMMA expression1 'To' expression1 COMMA expression1 COMMA expression1 COMMA expression1
     ;
-    locate:
+
+locate:
     'Locate' NUMBER COMMA? NUMBER?
     ;
-    add:
+
+add:
     'Add' IDENTIFIER COMMA expression1 (COMMA expression1 'To' expression1)?
     ;
-    blitter_copy:
-    'Blitter' 'Copy'  'Limit'? NUMBER COMMA NUMBER 'To' NUMBER COMMA NUMBER
+
+blitter_copy:
+    'Blitter' 'Copy' 'Limit'? NUMBER COMMA NUMBER 'To' NUMBER COMMA NUMBER
     ;
-     blitter_fill:
+
+blitter_fill:
     'Blitter' 'Fill' NUMBER COMMA NUMBER (COMMA expression1 COMMA expression1 COMMA expression1 COMMA expression1)?
     ;
-     blitter_clear:
-    'Blitter' 'Clear'  NUMBER COMMA NUMBER (COMMA expression1 COMMA expression1 'To' expression1 COMMA expression1)?
+
+blitter_clear:
+    'Blitter' 'Clear' NUMBER COMMA NUMBER (COMMA expression1 COMMA expression1 'To' expression1 COMMA expression1)?
     ;
-    autoback:
+
+autoback:
     'Autoback' NUMBER
     ;
-    palette:
+
+palette:
     'Palette' (HEX_NUMBER COMMA?)*
     ;
-    double_buffer:
+
+double_buffer:
     'Double' 'Buffer'
     ;
-    pen:
+
+pen:
     'Pen' NUMBER
     ;
-    
-    cls:
+
+cls:
     'Cls' (expression1 (COMMA expression1 COMMA expression1 'To' expression1 COMMA expression1)?)?
     ;
 
-    paper:
+paper:
     'Paper' NUMBER
     ;
 
-    degree:
+degree:
     'Degree'
     ;
 
-    hide:
+hide:
     'Hide' 'On'?
     ;
 
-    flash_off:
+flash_off:
     'Flash' 'Off'
     ;
 
-     flash_on:
+flash_on:
     'Flash' 'On'
     ;
 
@@ -363,24 +392,29 @@ cos_function:
 play_sound:
     'Play' ((HEX_NUMBER NUMBER) | expression1 | IDENTIFIER) COMMA NUMBER
     ;
+
 wait_key_break:
     WAITKEY
     ;
+
 variable_starter:
-    IDENTIFIER '=' (expression1 | btst | '""') // Agora captura apenas atribuições de variáveis
+    IDENTIFIER '=' (expression1 | btst | '""') // Now captures only variable assignments
     ;
+
 function_starter:
     IDENTIFIER BRACKETOPEN_ARRAY (NUMBER | IDENTIFIER) BRACKETCLOSE_ARRAY
     ;
 
 function_call_or_array_access:
-    IDENTIFIER BRACKETOPEN_ARRAY expression1 BRACKETCLOSE_ARRAY // Acesso a array
-    | IDENTIFIER BRACKETOPEN_PROP expression1? (COMMA expression1)* BRACKETCLOSE_PROP // Chamadas de função com ou sem parâmetros
+    IDENTIFIER BRACKETOPEN_ARRAY expression1 BRACKETCLOSE_ARRAY // Array access
+    | IDENTIFIER BRACKETOPEN_PROP expression1? (COMMA expression1)* BRACKETCLOSE_PROP // Function calls with or without parameters
     | IDENTIFIER BRACKETOPEN_PROP BRACKETCLOSE_PROP
     ;
+
 array_structure:
-  IDENTIFIER BRACKETOPEN_PROP ((NUMBER | expression1) COMMA? (NUMBER | expression1)?) BRACKETCLOSE_PROP
-  ;
+    IDENTIFIER BRACKETOPEN_PROP ((NUMBER | expression1) COMMA? (NUMBER | expression1)?) BRACKETCLOSE_PROP
+    ;
+
 array_create:
     'Dim' array_structure (COMMA? array_structure)*
     ;
@@ -388,9 +422,10 @@ array_create:
 array_update:
     IDENTIFIER BRACKETOPEN_PROP (NUMBER | IDENTIFIER | expression1) (COMMA (NUMBER | IDENTIFIER | expression1))? BRACKETCLOSE_PROP '=' expression1
     ;
+
 screen_open:
     SCREENOPEN NUMBER COMMA NUMBER COMMA NUMBER COMMA NUMBER COMMA (LOWRES | HIRES)
-    ; 
+    ;
 
 curs_off:
     CURSOFF
@@ -413,33 +448,35 @@ do_loop:
     (statement)*
     LOOP
     ;
+
 while_wend:
     WHILE current_Key_State
     (statement)*
-    WEND;
+    WEND
+    ;
 
 for_loop:
     FOR IDENTIFIER '=' expression1 TO expression1
     (statement)*
-    (NEXT IDENTIFIER | NEXT) 
+    (NEXT IDENTIFIER | NEXT)
     ;
 
-// If-End If statement that compares a variable to an expression
 if_statement:
     (IF expression1 | IF read_target) ('=' | '<>' | '>=' | '>' | '<=' | '<') expression2
-    (statement)* 
-    (('End' 'if') | else_statement | ENDIF )
+    (statement)*
+    (('End' 'if') | else_statement | ENDIF)
     ;
+
 else_statement:
     ELSE
     (statement)*
     ENDIF
     ;
-// If-End If statement for key state comparison
+
 if_statement_key_state:
     IF current_Key_State
     (statement)*
-    (else_statement | ENDIF )
+    (else_statement | ENDIF)
     ;
 
 bar:
@@ -447,20 +484,21 @@ bar:
     ;
 
 procedure:
-    PROC IDENTIFIER (BRACKETOPEN_ARRAY IDENTIFIER? BRACKETCLOSE_ARRAY)? // Modified to properly capture the brackets and optional parameter
-    (statement)* 
+    PROC IDENTIFIER (BRACKETOPEN_ARRAY IDENTIFIER? BRACKETCLOSE_ARRAY)?
+    (statement)*
     ENDPROC
     ;
 
 current_Key_State:
     KEYSTATE BRACKETOPEN_PROP expression1 BRACKETCLOSE_PROP
     ;
+
 print_options:
     expression1
     | STRING
     | HASHTAG NUMBER
     ;
+
 print_something:
     'Print' print_options ((COMMA | FINISH_AND_ADD_OTHER_STATEMENT) print_options)*?
     ;
-
