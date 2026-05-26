@@ -599,21 +599,12 @@ export default class AMOSListener extends antlr4.tree.ParseTreeListener {
 	}
 
 
-	// Enter a parse tree produced by AMOSParser#function_starter.
-	enterFunction_starter(ctx) {
+	// Enter a parse tree produced by AMOSParser#procedure_call.
+	enterProcedure_call(ctx) {
 	}
 
-	// Exit a parse tree produced by AMOSParser#function_starter.
-	exitFunction_starter(ctx) {
-	}
-
-
-	// Enter a parse tree produced by AMOSParser#function_call_or_array_access.
-	enterFunction_call_or_array_access(ctx) {
-	}
-
-	// Exit a parse tree produced by AMOSParser#function_call_or_array_access.
-	exitFunction_call_or_array_access(ctx) {
+	// Exit a parse tree produced by AMOSParser#procedure_call.
+	exitProcedure_call(ctx) {
 	}
 
 

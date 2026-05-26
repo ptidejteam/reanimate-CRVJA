@@ -43,3 +43,37 @@ test("procedures", () => {
 
 
 });
+
+test("procedure calls translation with and without parameters", () => {
+  const amosBasicCode = `
+  Procedure HELLO
+    Text 10,10,"Hello World"
+  End Proc
+  
+  Procedure TWINS[A,B]
+    Text 10,20,"Twins"
+  End Proc
+  
+  HELLO
+  TWINS[6,9]
+  `;
+
+  const chars = new antlr4.InputStream(amosBasicCode);
+  const lexer = new AMOSLexer(chars);
+  const tokens = new antlr4.CommonTokenStream(lexer);
+  const parser = new AMOSParser(tokens);
+  const tree = parser.program();
+
+  const translator = new AmosToJavaScriptTranslator();
+  const walker = new antlr4.tree.ParseTreeWalker();
+  walker.walk(translator, tree);
+  const translatedJsCode = translator.getJavaScript();
+
+  const normalized = translatedJsCode.replace(/\s+/g, ' ').trim();
+
+  // Assert that HELLO was called
+  expect(normalized).toContain("HELLO();");
+
+  // Assert that TWINS was called with arguments 6 and 9
+  expect(normalized).toContain("TWINS(6, 9);");
+});

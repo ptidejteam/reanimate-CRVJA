@@ -69,8 +69,7 @@ Adding support for a new AMOS command involves modifying both the grammar defini
 ### Step 2: Generate the ANTLR Parser
 Run the following commands in the terminal to rebuild the JavaScript lexer, parser, and listener files under the unified target directory:
 ```bash
-cd grammar
-java -jar ../antlr-4.13.2-complete.jar -Dlanguage=JavaScript -o generated AMOS.g4
+npm run compile-grammar
 ```
 *(Ensure you have Java installed and the ANTLR `.jar` file in the root directory)*
 

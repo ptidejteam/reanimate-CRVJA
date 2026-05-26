@@ -319,12 +319,13 @@ export default class AMOSLexer extends antlr4.Lexer {
                           "INK", "TEXT", "STRING", "DO", "LOOP", "FOR", 
                           "TO", "NEXT", "IF", "ELSE", "ENDIF", "WHILE", 
                           "WEND", "PLAY", "PROC", "ENDPROC", "BAR", "WAITKEY", 
-                          "KEYSTATE", "IDENTIFIER", "COMPARISON", "BRACKETOPEN_PROP", 
-                          "BRACKETCLOSE_PROP", "BRACKETOPEN_ARRAY", "BRACKETCLOSE_ARRAY", 
-                          "BRACKETOPEN_FUNCTION", "BRACKETCLOSE_FUNCTION", 
-                          "HEX_NUMBER", "MULTIPLY", "DIVIDE", "ADD", "SUBTRACT", 
-                          "STATEMENT_SEPARATOR", "FINISH_AND_ADD_OTHER_STATEMENT", 
-                          "DOT", "HASHTAG", "PERCENT", "QUESTION" ];
+                          "KEYSTATE", "IDENTIFIER", "COMPARISON", "ROUND_BRACKET_OPEN", 
+                          "ROUND_BRACKET_CLOSE", "SQUARE_BRACKET_OPEN", 
+                          "SQUARE_BRACKET_CLOSE", "CURLY_BRACKET_OPEN", 
+                          "CURLY_BRACKET_CLOSE", "HEX_NUMBER", "MULTIPLY", 
+                          "DIVIDE", "ADD", "SUBTRACT", "STATEMENT_SEPARATOR", 
+                          "FINISH_AND_ADD_OTHER_STATEMENT", "DOT", "HASHTAG", 
+                          "PERCENT", "QUESTION" ];
 	static ruleNames = [ "T__0", "T__1", "T__2", "T__3", "T__4", "T__5", "T__6", 
                       "T__7", "T__8", "T__9", "T__10", "T__11", "T__12", 
                       "T__13", "T__14", "T__15", "T__16", "T__17", "T__18", 
@@ -342,8 +343,8 @@ export default class AMOSLexer extends antlr4.Lexer {
                       "DO", "LOOP", "FOR", "TO", "NEXT", "IF", "ELSE", "ENDIF", 
                       "WHILE", "WEND", "PLAY", "PROC", "ENDPROC", "BAR", 
                       "WAITKEY", "KEYSTATE", "IDENTIFIER", "COMPARISON", 
-                      "BRACKETOPEN_PROP", "BRACKETCLOSE_PROP", "BRACKETOPEN_ARRAY", 
-                      "BRACKETCLOSE_ARRAY", "BRACKETOPEN_FUNCTION", "BRACKETCLOSE_FUNCTION", 
+                      "ROUND_BRACKET_OPEN", "ROUND_BRACKET_CLOSE", "SQUARE_BRACKET_OPEN", 
+                      "SQUARE_BRACKET_CLOSE", "CURLY_BRACKET_OPEN", "CURLY_BRACKET_CLOSE", 
                       "HEX_NUMBER", "MULTIPLY", "DIVIDE", "ADD", "SUBTRACT", 
                       "STATEMENT_SEPARATOR", "FINISH_AND_ADD_OTHER_STATEMENT", 
                       "DOT", "HASHTAG", "PERCENT", "QUESTION" ];
@@ -458,12 +459,12 @@ AMOSLexer.WAITKEY = 100;
 AMOSLexer.KEYSTATE = 101;
 AMOSLexer.IDENTIFIER = 102;
 AMOSLexer.COMPARISON = 103;
-AMOSLexer.BRACKETOPEN_PROP = 104;
-AMOSLexer.BRACKETCLOSE_PROP = 105;
-AMOSLexer.BRACKETOPEN_ARRAY = 106;
-AMOSLexer.BRACKETCLOSE_ARRAY = 107;
-AMOSLexer.BRACKETOPEN_FUNCTION = 108;
-AMOSLexer.BRACKETCLOSE_FUNCTION = 109;
+AMOSLexer.ROUND_BRACKET_OPEN = 104;
+AMOSLexer.ROUND_BRACKET_CLOSE = 105;
+AMOSLexer.SQUARE_BRACKET_OPEN = 106;
+AMOSLexer.SQUARE_BRACKET_CLOSE = 107;
+AMOSLexer.CURLY_BRACKET_OPEN = 108;
+AMOSLexer.CURLY_BRACKET_CLOSE = 109;
 AMOSLexer.HEX_NUMBER = 110;
 AMOSLexer.MULTIPLY = 111;
 AMOSLexer.DIVIDE = 112;
