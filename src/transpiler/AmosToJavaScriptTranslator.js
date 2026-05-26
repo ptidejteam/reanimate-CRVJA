@@ -1787,6 +1787,36 @@ ${this.indent()}}`;
           `;
     }
   }
+
+  enterFunction_call_or_array_access(ctx) {
+    const name = ctx.IDENTIFIER().getText();
+    let callCode = "";
+    
+    // Case 1: Calling a procedure with just its name (e.g., HELLO)
+    if (!ctx.BRACKETOPEN_ARRAY() && !ctx.BRACKETOPEN_PROP()) {
+      callCode = `${this.indent()}${name}();\n`;
+    }
+    
+    // Case 2: Bracket parameters (e.g., HELLO[2])
+    else if (ctx.BRACKETOPEN_ARRAY()) {
+      const arg = ctx.expression1(0)?.getText() || "";
+      callCode = `${this.indent()}${name}(${arg});\n`;
+    }
+    
+    // Case 3: Parentheses parameters (e.g., HELLO(2) or HELLO())
+    else if (ctx.BRACKETOPEN_PROP()) {
+      const args = ctx.expression1().map(expr => expr.getText()).join(", ");
+      callCode = `${this.indent()}${name}(${args});\n`;
+    }
+
+    // Direct the generated code to the correct buffer to avoid hoisting errors
+    if (this.indentLevel === 0) {
+      this.functionStarters += `\n${callCode}`;
+    } else {
+      this.output += `\n${callCode}`;
+    }
+  }
+
   enterIf_statement_key_state(ctx) {
     let leftExpression = ctx.current_Key_State(0)?.expression1(0)?.getText();
 

@@ -409,6 +409,7 @@ function_call_or_array_access:
     IDENTIFIER BRACKETOPEN_ARRAY expression1 BRACKETCLOSE_ARRAY // Array access
     | IDENTIFIER BRACKETOPEN_PROP expression1? (COMMA expression1)* BRACKETCLOSE_PROP // Function calls with or without parameters
     | IDENTIFIER BRACKETOPEN_PROP BRACKETCLOSE_PROP
+    | IDENTIFIER
     ;
 
 array_structure:
