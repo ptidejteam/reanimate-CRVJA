@@ -72,6 +72,7 @@ array_index_get:
 
 factor:
     NUMBER                     // A number
+    | STRING
     | array_index_get
     | sin_function
     | cos_function
@@ -231,7 +232,6 @@ bob_off:
 
 value:
     expression1
-    | STRING
     ;
 
 set_rainbow:
@@ -489,7 +489,6 @@ current_Key_State:
 
 print_options:
     expression1
-    | STRING
     | HASHTAG NUMBER
     ;
 
