@@ -899,11 +899,12 @@ ${this.indent()}openFile('${fileName}', ${channel}, 'r');
   }
 
   enterInput_variable(ctx) {
-    let channel = ctx.children[1]?.getText();
-    channel += ctx.children[2]?.getText();
+    let channel = ctx.children[1]?.getText() || '';
+    if (ctx.children[2]) channel += ctx.children[2].getText();
 
-    let variable = ctx.children[4]?.getText();
-    variable += ctx.children[5]?.getText();
+    let variable = ctx.children[4]?.getText() || '';
+    if (ctx.children[5]) variable += ctx.children[5].getText();
+    
     this.output += `
     let ${variable} = '';
     readFromChannel(${channel}, (data) => {

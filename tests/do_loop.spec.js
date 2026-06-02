@@ -1,7 +1,4 @@
-import antlr4 from "antlr4";
-import AmosToJavaScriptTranslator from "@/src/transpiler/AmosToJavaScriptTranslator";
-import AMOSParser from "../grammar/generated/AMOSParser";
-import AMOSLexer from "../grammar/generated/AMOSLexer";
+import { translateAmos } from "./helpers/translate";
 
 test("do_loop", () => {
   const amosBasicCode = `
@@ -10,26 +7,16 @@ test("do_loop", () => {
   Loop 
     `;
 
-  const chars = new antlr4.InputStream(amosBasicCode);
-  const lexer = new AMOSLexer(chars);
-  const tokens = new antlr4.CommonTokenStream(lexer);
-  const parser = new AMOSParser(tokens);
-
-  const tree = parser.program();
-
-  // Translate the parsed AMOS BASIC into JavaScript
-  const translator = new AmosToJavaScriptTranslator();
-  const walker = new antlr4.tree.ParseTreeWalker();
-  walker.walk(translator, tree);
-  const translatedJsCode = translator.getJavaScript(); // Get the translated JavaScript code
-  let targetString =
-    `setInterval(() => { currentTimer = Date.now(); Timer++; Timer = 9; }, 16);
-      `
-
-  /* test */
+  const translatedJsCode = translateAmos(amosBasicCode);
+  
+  // Assert against current translator output containing loop guard and setInterval
   const normalizedTranslatedJsCode = translatedJsCode.replace(/\s+/g, ' ').trim();
-  const normalizedExpectedJsCode = targetString.replace(/\s+/g, ' ').trim();
-  expect(normalizedTranslatedJsCode).toContain(normalizedExpectedJsCode);
-
-
+  
+  expect(normalizedTranslatedJsCode).toContain("let allowLoop = true;");
+  expect(normalizedTranslatedJsCode).toContain("setInterval(() => {");
+  expect(normalizedTranslatedJsCode).toContain("if (!allowLoop) return;");
+  expect(normalizedTranslatedJsCode).toContain("currentTimer = Date.now();");
+  expect(normalizedTranslatedJsCode).toContain("Timer++;");
+  expect(normalizedTranslatedJsCode).toContain("Timer = 9;");
+  expect(normalizedTranslatedJsCode).toContain("}, 16);");
 });

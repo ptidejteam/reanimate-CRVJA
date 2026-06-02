@@ -2,12 +2,6 @@
 
 This document details the testing architecture, validation patterns, and writing guidelines for the CRVJA transpiler test suite.
 
-> [!WARNING]
-> **Deprecation Notice & Test Suite Status**: 
-> Many of the legacy tests in this suite are currently out-of-date or deprecated due to recent modifications to the compiler structure (e.g., changes in loop structure, array bound conversions). Consequently, several tests will fail when running the full test suite. 
-> 
-> Currently, only a subset of tests are fully updated (such as `tests/cls.spec.js`). Refactoring the remaining legacy tests to align with the current transpiler output is planned for a future task.
-
 ---
 
 ## 1. Overview of the Testing Strategy
@@ -18,14 +12,16 @@ In compiler development, tests are critical. Even small changes in the grammar o
 
 ### The Parsing & Compilation Testing Pipeline
 ```
-  [Mock AMOS Code] -> [InputStream] -> [Lexer] -> [TokenStream] -> [Parser] -> [AST Tree]
-                                                                                   │
-                                                                           [ParseTreeWalker]
-                                                                                   │
-                                                                           [Listener Traversal]
-                                                                                   │
-   [Jest Assertions] <----------------- [Assert JS Output] <--------- [Translated JS Code]
+  [Mock AMOS Code] -> [translateAmos Helper] -> [InputStream] -> [Lexer] -> [TokenStream] -> [Parser] -> [AST Tree]
+                                                                                                      │
+                                                                                              [ParseTreeWalker]
+                                                                                                      │
+                                                                                              [Listener Traversal]
+                                                                                                      │
+    [Jest Assertions] <----------------- [Assert JS Output] <-------------------------- [Translated JS Code]
 ```
+
+To keep tests clean and DRY, we use a shared helper [translate.js](../tests/helpers/translate.js) inside the `tests/helpers` folder which automates the ANTLR lexer, parser, walker, and translator setup.
 
 ---
 
@@ -39,13 +35,10 @@ In compiler development, tests are critical. Even small changes in the grammar o
 
 ## 3. Template: How to Write a New Test
 
-When implementing a new AMOS command (e.g., `Cls`), you should write a matching unit test to verify its compilation. Here is the standard template for writing a test:
+When implementing a new AMOS command (e.g., `Cls`), you should write a matching unit test to verify its compilation. Here is the standard template using the shared helper:
 
 ```javascript
-import antlr4 from "antlr4";
-import AmosToJavaScriptTranslator from "@/src/transpiler/AmosToJavaScriptTranslator";
-import AMOSParser from "@/grammar/generated/AMOSParser";
-import AMOSLexer from "@/grammar/generated/AMOSLexer";
+import { translateAmos } from "./helpers/translate";
 
 test("cls translation", () => {
   // 1. Mock AMOS Code
@@ -53,23 +46,13 @@ test("cls translation", () => {
         Cls
     `;
 
-  // 2. Setup ANTLR parsing pipeline
-  const chars = new antlr4.InputStream(amosBasicCode);
-  const lexer = new AMOSLexer(chars);
-  const tokens = new antlr4.CommonTokenStream(lexer);
-  const parser = new AMOSParser(tokens);
-  const tree = parser.program();
+  // 2. Translate AMOS code using the shared helper
+  const translatedJsCode = translateAmos(amosBasicCode);
 
-  // 3. Translate AST into JS code
-  const translator = new AmosToJavaScriptTranslator();
-  const walker = new antlr4.tree.ParseTreeWalker();
-  walker.walk(translator, tree);
-  const translatedJsCode = translator.getJavaScript();
-
-  // 4. Run Assertions (using normalized whitespace)
+  // 3. Run Assertions (using normalized whitespace)
   const normalizedTranslated = translatedJsCode.replace(/\s+/g, " ").trim();
   expect(normalizedTranslated).toContain("const amosScreen = document.getElementById('amos-screen');");
-  expect(normalizedTranslated).toContain("if (amosScreen) { amosScreen.innerHTML = ''; }");
+  expect(normalizedTranslated).toContain("amosScreen.innerHTML = '';");
 });
 ```
 
@@ -129,3 +112,17 @@ You can run test commands directly from the repository root:
   ```bash
   npx jest --watch
   ```
+
+---
+
+## 7. Untested AMOS Statements (Future Work)
+
+While the core functionality and commonly used statements have robust test coverage, several complex graphics, logical, and specific AMOS statements are not yet covered by the test suite. We plan to write tests for these in the future as their behavior stabilizes:
+
+* **Graphics & Rendering**: \`Bar\`, \`Box\`, \`Circle\`, \`Flash Off/On\`, \`Hide\`, \`Paper\`, \`Palette\`, \`Pen\`, \`Double Buffer\`, \`Autoback\`, \`Blitter Copy/Fill/Clear\`, \`Locate\`, \`Turbo Draw\`, \`Set Buffer\`, \`Screen Offset/Swap\`, \`Choose Screen\`.
+* **Logic & Flow Control**: \`If/Then\` and \`If\` with complex logic, \`While...Wend\`, \`Gosub/On Gosub\`, \`Goto\`, \`Data/Read\`, \`Repeat/Until\`.
+* **Hardware & Sound**: \`Play\` (complex usages), \`Wait Vbl\`, \`Wait\`, \`Key Speed\`, \`Clear Key\`, \`Led Off\`.
+* **Sprites & Effects**: \`LoadBankImgToSprite\` (Sprite commands), \`Sam Bank/Loop\`, \`Bob Off/Update On\`, \`Set/Use Rainbow\`.
+* **State & Data**: \`Ink\`, \`Global\`, \`Btst\`, \`Degree\`, \`Add\`.
+
+When implementing these missing tests, please follow the guidelines defined in section 3 of this document.
