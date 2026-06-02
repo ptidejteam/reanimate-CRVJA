@@ -434,7 +434,7 @@ ink:
     ;
 
 text:
-    TEXT NUMBER COMMA NUMBER COMMA (STRING | IDENTIFIER)
+    TEXT expression1 COMMA expression1 COMMA (STRING | IDENTIFIER)
     ;
 
 do_loop:
