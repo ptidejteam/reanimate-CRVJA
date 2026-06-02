@@ -406,7 +406,7 @@ procedure_call:
     ;
 
 array_structure:
-    IDENTIFIER ROUND_BRACKET_OPEN ((NUMBER | expression1) COMMA? (NUMBER | expression1)?) ROUND_BRACKET_CLOSE
+    IDENTIFIER ROUND_BRACKET_OPEN ((NUMBER | expression1) COMMA? (NUMBER | expression1)?)? ROUND_BRACKET_CLOSE
     ;
 
 array_create:
@@ -434,7 +434,7 @@ ink:
     ;
 
 text:
-    TEXT NUMBER COMMA NUMBER COMMA (STRING | IDENTIFIER)
+    TEXT expression1 COMMA expression1 COMMA (STRING | IDENTIFIER)
     ;
 
 do_loop:

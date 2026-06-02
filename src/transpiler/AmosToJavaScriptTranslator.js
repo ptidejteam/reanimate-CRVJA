@@ -1426,44 +1426,54 @@ ${this.indent()}const ${name} = (${props}) => {
 ${this.indent()}}\n`;
   }
 
-  enterText(ctx) {
-    const x = ctx.children[1]?.getText();
-    const y = ctx.children[3]?.getText();
-    const text = ctx.children[5]?.getText();
+    enterText(ctx) {
+    const x = ctx.expression1(0)?.getText();
+    const y = ctx.expression1(1)?.getText();
+    const text = (ctx.STRING() || ctx.IDENTIFIER())?.getText();
+
+    const cleanX = x.replace(/[^a-zA-Z0-9]/g, "");
+    const cleanY = y.replace(/[^a-zA-Z0-9]/g, "");
+    const varName = `textDiv${cleanX}${cleanY}`;
+
+    const isNumeric = (str) => /^\d+$/.test(str);
+    const xValue = isNumeric(x) ? `'${x}px'` : `(${x}) + 'px'`;
+    const yValue = isNumeric(y) ? `'${y}px'` : `(${y}) + 'px'`;
+
     if (!text || !text.includes('"')) {
       this.output += `
-       
-${this.indent()}const textDiv${x}${y} = document.createElement('div');
-${this.indent()}textDiv${x}${y}.innerText = ${text};
-${this.indent()}textDiv${x}${y}.id = 'textDiv' + '${x}' + '${y}';
-${this.indent()}textDiv${x}${y}.style.position = 'fixed';
-${this.indent()}textDiv${x}${y}.style.left = '${x}px';
-${this.indent()}textDiv${x}${y}.style.top = '${y}px';
-${this.indent()}textDiv${x}${y}.style.fontSize = '14px';
-${this.indent()}textDiv${x}${y}.style.color = Ink;
+        
+${this.indent()}const ${varName} = document.createElement('div');
+${this.indent()}${varName}.innerText = ${text};
+${this.indent()}${varName}.id = 'textDiv' + '${x}' + '${y}';
+${this.indent()}${varName}.style.position = 'fixed';
+${this.indent()}${varName}.style.left = ${xValue};
+${this.indent()}${varName}.style.top = ${yValue};
+${this.indent()}${varName}.style.fontSize = '14px';
+${this.indent()}${varName}.style.color = Ink;
 
-${this.indent()}textDiv${x}${y}.style.zIndex = 99;
-${this.indent()}document.getElementById('amos-screen').appendChild(textDiv${x}${y});
+${this.indent()}${varName}.style.zIndex = 99;
+${this.indent()}document.getElementById('amos-screen').appendChild(${varName});
       setInterval(() => {
-  textDiv${x}${y}.innerText = ${text}; // Function that returns updated value
+  ${varName}.innerText = ${text}; // Function that returns updated value
 }, 100); 
         `;
     } else {
       this.output += `
-${this.indent()}const textDiv${x}${y} = document.createElement('div');
-${this.indent()}textDiv${x}${y}.innerText = '${text.replace(/"/g, "")}';
-${this.indent()}textDiv${x}${y}.id = 'textDiv' + '${x}' + '${y}';
-${this.indent()}textDiv${x}${y}.style.position = 'absolute';
-${this.indent()}textDiv${x}${y}.style.left = '${x}px';
-${this.indent()}textDiv${x}${y}.style.top = '${y}px';
-${this.indent()}textDiv${x}${y}.style.fontSize = '14px';
-${this.indent()}textDiv${x}${y}.style.color = Ink;
-${this.indent()}textDiv${x}${y}.style.position = "Relative";
-${this.indent()}textDiv${x}${y}.style.zIndex = 99;
-${this.indent()}document.getElementById('amos-screen').appendChild(textDiv${x}${y});
+${this.indent()}const ${varName} = document.createElement('div');
+${this.indent()}${varName}.innerText = '${text.replace(/"/g, "")}';
+${this.indent()}${varName}.id = 'textDiv' + '${x}' + '${y}';
+${this.indent()}${varName}.style.position = 'absolute';
+${this.indent()}${varName}.style.left = ${xValue};
+${this.indent()}${varName}.style.top = ${yValue};
+${this.indent()}${varName}.style.fontSize = '14px';
+${this.indent()}${varName}.style.color = Ink;
+${this.indent()}${varName}.style.position = "Relative";
+${this.indent()}${varName}.style.zIndex = 99;
+${this.indent()}document.getElementById('amos-screen').appendChild(${varName});
         `;
     }
   }
+
   enterWait_key(ctx) {
     const waitTicks = ctx.NUMBER().getText();
     const ms = parseInt(waitTicks) * 20; // AMOS = ~50fps

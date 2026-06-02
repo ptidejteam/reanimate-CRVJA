@@ -34,3 +34,22 @@ This document lists known syntax and behavior inconsistencies between the CRVJA 
 ## 4. Lack of String Conversion Functions
 * **Real AMOS Pro**: Functions like `Str$(A)` (convert integer to string), `Val(A$)` (convert string to number), or string concatenation `A$ + B$` are fully supported.
 * **CRVJA**: These built-in AMOS functions are not implemented in the transpiler or grammar.
+
+---
+
+## 5. Dynamic JavaScript Arrays vs. Fixed AMOS Arrays
+* **Real AMOS Pro**: Arrays are strictly bound by their dimension limits declared via `Dim`. Assigning or reading an index outside the declared bounds (e.g., accessing index `5` on a `Dim C(2)`) throws an out-of-bounds error.
+* **CRVJA**: Since JavaScript arrays are dynamically sized, assigning elements outside the initial allocated bounds will succeed and automatically expand the array. For example, the following program works in CRVJA despite `Dim C(2)` allocating only indices 0 to 2:
+  ```amos
+  Screen Open 1,720,720,8,Hires
+  Dim C(2)
+  Global C()
+
+  For I=0 To 5
+    C(I)=I*10
+    Text 0, I*10, "oi"
+  Next I
+
+  Print C
+  ```
+
