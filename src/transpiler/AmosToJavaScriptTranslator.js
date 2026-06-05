@@ -1365,10 +1365,18 @@ ${this.indent()}}`;
         // Variable doesn't exist at this indent level, so create it
         value = value.replace(/\bRnd\s*\(([^)]+)\)/g, "randomInt($1)");
         let defaultValue = name.endsWith('$') ? '""' : 0;
-        this.output += `
+        
+        if (this.scopes.length === 1) {
+          this.globalVariables += `let ${name} = ${defaultValue};\n`;
+          this.output += `
+        ${this.indent()}${name} = ${value};
+          `;
+        } else {
+          this.output += `
         ${this.indent()}let ${name} = ${defaultValue};
         ${this.indent()}${name} = ${value};
           `;
+        }
         // Store the variable in the current scope
         currentScope[name] = defaultValue;
       }
@@ -1383,7 +1391,11 @@ ${this.indent()}}`;
 
     if (!isDeclared) {
       let defaultValue = variable.endsWith('$') ? '""' : 0;
-      this.output += `${this.indent()}let ${variable} = ${defaultValue};\n`;
+      if (this.scopes.length === 1) {
+        this.globalVariables += `let ${variable} = ${defaultValue};\n`;
+      } else {
+        this.output += `${this.indent()}let ${variable} = ${defaultValue};\n`;
+      }
       currentScope[variable] = defaultValue;
     }
 
@@ -1566,7 +1578,11 @@ ${this.indent()}}, 16); \n
 
     if (!isDeclared) {
       let defaultValue = variable.endsWith('$') ? '""' : 0;
-      this.output += `${this.indent()}let ${variable} = ${defaultValue};\n`;
+      if (this.scopes.length === 1) {
+        this.globalVariables += `let ${variable} = ${defaultValue};\n`;
+      } else {
+        this.output += `${this.indent()}let ${variable} = ${defaultValue};\n`;
+      }
       currentScope[variable] = defaultValue;
     }
 

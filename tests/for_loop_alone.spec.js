@@ -23,7 +23,7 @@ test("for_loop_alone", () => {
   const translatedJsCode = translator.getJavaScript(); // Get the translated JavaScript code
 
   const normalizedTranslatedJsCode = translatedJsCode.replace(/\s+/g, ' ').trim();
-  const testTarget = `let I = 0; for (I = 0; I <= 10; I++) {}`;
+  const testTarget = `for (I = 0; I <= 10; I++) {}`;
 
   expect(normalizedTranslatedJsCode).toContain(testTarget);
 
