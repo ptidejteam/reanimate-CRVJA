@@ -94,16 +94,16 @@ End
    const walker = new antlr4.tree.ParseTreeWalker();
    walker.walk(translator, tree);
    const translatedJsCode = translator.getJavaScript(); // Get the translated JavaScript code
-   let targetString =
+let targetString =
       `  
-let XW = 70;
-let YW = 70;
-let WW = 50;
-let HW = 100;
-let XB = XW+WW;
-let YB = 70;
-let WB = 30;
-let HB = 60;
+let XW = 0; XW = 70;
+let YW = 0; YW = 70;
+let WW = 0; WW = 50;
+let HW = 0; HW = 100;
+let XB = 0; XB = XW+WW;
+let YB = 0; YB = 70;
+let WB = 0; WB = 30;
+let HB = 0; HB = 60;
   `
    /* test */
    const normalizedTranslatedJsCode = translatedJsCode.replace(/\s+/g, ' ').trim();

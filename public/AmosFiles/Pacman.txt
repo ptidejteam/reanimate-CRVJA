@@ -72,6 +72,12 @@ P_GHOST_TWO_X = 14 : P_GHOST_TWO_Y = 15
 points = 0
 POWER_PELLET = 0
 POWER_PELLET_COUNTDOWN = 0
+ghostOneDirection = 0
+AlreaDYDied = 0
+GHOST_TIMER = 1
+CURRENT_GHOST_TIMER = GHOST_TIMER
+
+Global MAP_SIZE, PACMAN_CURRENT_SPRITE, PACMAN_DIRECTION, PACMAN_TURN_TO_DIRECTION, PLAYER_DIED, GHOST_COUNTER, TILE_SIZE, PX, PY, P_GHOST_ONE_X, P_GHOST_ONE_Y, P_GHOST_TWO_X, P_GHOST_TWO_Y, points, POWER_PELLET, POWER_PELLET_COUNTDOWN, ghostOneDirection, AlreaDYDied, GHOST_TIMER, CURRENT_GHOST_TIMER
 
 ' Display UI
 Ink 3
@@ -364,10 +370,6 @@ Procedure MoveGhosts[a]
    End If
 End Proc
 
-ghostOneDirection = 0
-AlreaDYDied = 0
-
-
 ' ==========================================
 ' Map Drawing Procedure
 ' ==========================================
@@ -584,9 +586,7 @@ End Proc
 ' ==========================================
 ' Main Game Loop
 ' ==========================================
-GHOST_TIMER = 1
 
-CURRENT_GHOST_TIMER = GHOST_TIMER
 Ink 3
 
 Text 430,820, CURRENT_GHOST_TIMER
