@@ -53,3 +53,8 @@ This document lists known syntax and behavior inconsistencies between the CRVJA 
   Print C
   ```
 
+---
+
+## 6. The `Print` Command
+* **Real AMOS Pro**: The `Print` command prints text or variables to the standard output/screen console, respecting cursor positions, and scrolling the screen if necessary.
+* **CRVJA**: The `Print` command is not well implemented yet and its behavior might differ significantly or lack features compared to real AMOS.

@@ -26,7 +26,8 @@ class AmosToJavaScriptTranslator extends AMOSListener {
     this.globalVariables = "";
     this.globalVariablesStorage = {};
     this.functionStarters = ``;
-    this.variables = {};
+    this.scopes = [{}];
+    this.globalVariablesSet = new Set();
     this.output += `
     
       const keyMapping = {
@@ -1299,6 +1300,15 @@ ${this.indent()}soundPlayer(${soundIndex}, ${duration}*1000);
     this.output += `
 ${this.indent()}}`;
   }
+
+  enterGlobal(ctx) {
+    for (let i = 0; i < ctx.IDENTIFIER().length; i++) {
+       this.globalVariablesSet.add(ctx.IDENTIFIER(i).getText());
+    }
+    for (let i = 0; i < ctx.array_structure().length; i++) {
+       this.globalVariablesSet.add(ctx.array_structure(i).IDENTIFIER(0).getText());
+    }
+  }
   enterVariable_starter(ctx) {
     let name = ctx.children[0]?.getText() || "";
     let value = ctx.children[2]?.getText() || 0;
@@ -1311,7 +1321,10 @@ ${this.indent()}}`;
         );
       }
 
-      if (this.variables[name]) {
+      let currentScope = this.scopes[this.scopes.length - 1];
+      let isDeclared = currentScope[name] !== undefined || this.globalVariablesSet.has(name);
+
+      if (isDeclared) {
         // Iterate over all terms and factors in expression1
         for (let j = 0; ctx.expression1(0)?.term(j); j++) {
           for (let i = 0; ctx.expression1(0)?.term(j)?.factor(i); i++) {
@@ -1351,11 +1364,13 @@ ${this.indent()}}`;
         }
         // Variable doesn't exist at this indent level, so create it
         value = value.replace(/\bRnd\s*\(([^)]+)\)/g, "randomInt($1)");
+        let defaultValue = name.endsWith('$') ? '""' : 0;
         this.output += `
-        ${this.indent()}let ${name} = ${value};
+        ${this.indent()}let ${name} = ${defaultValue};
+        ${this.indent()}${name} = ${value};
           `;
-        // Store the variable in the current indent level
-        this.variables[name] = value;
+        // Store the variable in the current scope
+        currentScope[name] = defaultValue;
       }
     }
   }
@@ -1363,15 +1378,17 @@ ${this.indent()}}`;
     let variable = ctx.children[1]?.getText();
     let valueExpression = ctx.children[3]?.getText();
 
+    let currentScope = this.scopes[this.scopes.length - 1];
+    let isDeclared = currentScope[variable] !== undefined || this.globalVariablesSet.has(variable);
+
+    if (!isDeclared) {
+      let defaultValue = variable.endsWith('$') ? '""' : 0;
+      this.output += `${this.indent()}let ${variable} = ${defaultValue};\n`;
+      currentScope[variable] = defaultValue;
+    }
+
     let valueStarter;
     let valueEndIteration;
-    if (
-      !this.variables[variable] &&
-      !this.globalVariables.includes(`let ${variable}`)
-    ) {
-      this.variables[variable] = 0;
-      this.globalVariables += `${this.indent()}let ${variable} = 0;`;
-    }
 
     if (ctx.expression1().length > 1) {
       valueStarter = ctx.expression1(1)?.getText();
@@ -1400,6 +1417,17 @@ ${this.indent()}}`;
       params.push(ctx.IDENTIFIER(i).getText());
     }
     let props = params.join(", ");
+
+    this.scopes.push({});
+    let localDeclarations = "";
+    for (let varName of Object.keys(this.scopes[0])) {
+      if (!this.globalVariablesSet.has(varName) && !params.includes(varName)) {
+        let defaultValue = varName.endsWith('$') ? '""' : 0;
+        localDeclarations += `\n${this.indent()}  let ${varName} = ${defaultValue};`;
+        this.scopes[this.scopes.length - 1][varName] = defaultValue;
+      }
+    }
+
     this.output += `
     let lastTime${name} = 0; 
     let timeoutId${name} = null; // Track the timeout ID
@@ -1415,13 +1443,14 @@ ${this.indent()}const ${name} = (${props}) => {
     return;
   }
   lastTime${name} = currentTime;
-  timeoutId${name} = null; // Clear the timeout ID after execution
+  timeoutId${name} = null; // Clear the timeout ID after execution${localDeclarations}
         `;
     this.indentLevel++;
   }
 
   exitProcedure(ctx) {
     this.indentLevel--;
+    this.scopes.pop();
     this.output += `
 ${this.indent()}}\n`;
   }
@@ -1528,14 +1557,20 @@ ${this.indent()}}, 16); \n
   }
 
   enterFor_loop(ctx) {
-    let variable;
-    let start;
-    let end;
-    variable = ctx.children[1]?.getText();
-    start = ctx.children[3]?.getText();
-    end = ctx.children[5]?.getText();
+    let variable = ctx.children[1]?.getText();
+    let start = ctx.children[3]?.getText();
+    let end = ctx.children[5]?.getText();
 
-    this.output += `${this.indent()}for (let ${variable} = ${start}; ${variable} <= ${end}; ${variable}++) {`;
+    let currentScope = this.scopes[this.scopes.length - 1];
+    let isDeclared = currentScope[variable] !== undefined || this.globalVariablesSet.has(variable);
+
+    if (!isDeclared) {
+      let defaultValue = variable.endsWith('$') ? '""' : 0;
+      this.output += `${this.indent()}let ${variable} = ${defaultValue};\n`;
+      currentScope[variable] = defaultValue;
+    }
+
+    this.output += `${this.indent()}for (${variable} = ${start}; ${variable} <= ${end}; ${variable}++) {`;
     this.indentLevel++; // Increase indentation inside the loop
   }
 

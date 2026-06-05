@@ -30,7 +30,7 @@ TWINS[A$]
   const normalized = translatedJsCode.replace(/\s+/g, ' ').trim();
 
   // Check that A$ is correctly defined as a string variable
-  expect(normalized).toContain('let A$ = "Twins";');
+  expect(normalized).toContain('let A$ = ""; A$ = "Twins";');
 
   // Check that procedure definition accepts A$ parameter
   expect(normalized).toContain('const TWINS = (A$) => {');
