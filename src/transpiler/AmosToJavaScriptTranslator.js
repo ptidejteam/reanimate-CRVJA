@@ -535,6 +535,14 @@ function Sin(angle) {
 function Tan(angle) {
     return Math.tan(angle * Math.PI / 180);
 }
+
+function Qsin(angle, radius) {
+    return Math.round(radius * Math.sin(angle * Math.PI / 512));
+}
+
+function Qcos(angle, radius) {
+    return Math.round(radius * Math.cos(angle * Math.PI / 512));
+}
 let bankData = {
   1: {
   sprites: [],
@@ -1733,14 +1741,8 @@ ${this.indent()}}, 16); \n
     const exprCount = ctx.expression1().length;
     let arrayTargetValue = ctx.expression1(exprCount - 1).getText();
 
-    // ----------- Qcos/Qsin Processing -----------
-    if (arrayTargetValue.includes("Qcos") || arrayTargetValue.includes("Qsin")) {
-      const m = arrayTargetValue.match(/(Qcos|Qsin)\(([^,]+),([^)]+)\)/);
-      if (m) {
-        arrayTargetValue =
-          (m[1] === "Qcos" ? "Cos" : "Sin") + `(${m[2]}) * ${m[3]}`;
-      }
-    }
+    // ----------- Qcos/Qsin Native Processing -----------
+    // Qsin and Qcos are now properly handled by the parser and JS prelude.
 
     // ----------- OUTPUT JS -----------
     if (index2) {

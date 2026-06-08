@@ -76,6 +76,8 @@ factor:
     | array_index_get
     | sin_function
     | cos_function
+    | qsin_function
+    | qcos_function
     | rndFunction
     | IDENTIFIER                // A variable
     | '(' expression1 ')'        // Parentheses for grouping
@@ -386,6 +388,14 @@ sin_function:
 
 cos_function:
     'Cos' ROUND_BRACKET_OPEN (NUMBER | IDENTIFIER | expression1) ROUND_BRACKET_CLOSE
+    ;
+
+qsin_function:
+    'Qsin' ROUND_BRACKET_OPEN expression1 COMMA expression1 ROUND_BRACKET_CLOSE
+    ;
+
+qcos_function:
+    'Qcos' ROUND_BRACKET_OPEN expression1 COMMA expression1 ROUND_BRACKET_CLOSE
     ;
 
 play_sound:
