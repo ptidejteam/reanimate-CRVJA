@@ -86,7 +86,7 @@ export default function BankEditor({ bankCreator, setBankCreator }) {
       depth: 4, // Default depth (4 color planes for 16 colors)
       hotspotX: 0,
       hotspotY: 0,
-      planarGraphicData: [], // Initialize planarGraphicData with zeros for an 8x8 sprite
+      planarGraphicData: Array(128).fill(0), // Initialize planarGraphicData with zeros for 16x16 sprite
     };
     const updatedSprites = [...sprites, newSprite];
     setSprites(updatedSprites);
@@ -372,19 +372,7 @@ export default function BankEditor({ bankCreator, setBankCreator }) {
         <h2>Sprites</h2>
         <button onClick={duplicateSprite}>Duplicate Sprite selected</button>
 
-        <button onClick={() => {
-            const newSprite = {
-              width: 1,
-              height: 16,
-              depth: 4,
-              hotspotX: 0,
-              hotspotY: 0,
-              planarGraphicData: [],
-            };
-            const updatedSprites = [...sprites, newSprite];
-            setSprites(updatedSprites);
-            setBankCreator({ ...bankCreator, sprites: updatedSprites });
-        }}>Add New Sprite</button>
+        <button onClick={addNewSprite}>Add New Sprite</button>
         <button
           onClick={() => {
             localStorage.removeItem("bankCreator");

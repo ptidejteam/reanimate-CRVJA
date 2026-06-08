@@ -2,7 +2,7 @@
 
 Welcome to CRVJA! This tutorial is designed for beginners who want to learn how to create simple visual programs and games using AMOS, a programming language originally created for the Amiga computer and now brought to the modern web.
 
-In this tutorial, you will learn the basics of setting up a screen, changing colors, printing text, and drawing shapes. You can test all the code examples by running CRVJA in your browser (usually at `https://crvja.reanimate.school/`), typing the code into the editor, and clicking "Run code".
+In this tutorial, you will learn the basics of setting up a screen, changing colors, printing text, and drawing shapes. You can test all the code examples by running CRVJA in your browser (usually at `https://crvja.reanimate.school/`), typing the code into the editor.
 
 ---
 
@@ -51,7 +51,7 @@ Cls
 
 ## 3. Printing Text on the Screen
 
-Now that we have a nice black screen, let's write something on it! We can use the `Text` command to place words anywhere on the screen. 
+We can use the `Text` command to place words anywhere on the screen. 
 
 First, we need to pick a color for our text using the `Ink` command. Colors are represented by numbers (for example, `1`, `2`, `3`).
 
@@ -81,48 +81,22 @@ Drawing shapes is just as easy as writing text. Let's draw a circle. We will use
 ```amos
 Screen Open 1, 600, 400, 8, Hires
 Curs Off
-Paper 0
-Cls
 
-' Pick color #3 for our circle
-Ink 3
-
-' Draw a circle at X=300, Y=200, with a radius of 50
-Circle 300, 200, 50
-```
-
-Since our screen is 600 pixels wide and 400 pixels tall, placing the circle at X=300 and Y=200 puts it right in the middle!
-
----
-
-## 5. Putting It All Together
-
-Let's combine everything we've learned into one complete program that sets up a screen, paints it black, writes a title, and draws a few circles.
-
-```amos
-' 1. Setup the screen
-Screen Open 1, 600, 400, 8, Hires
-Curs Off
-
-' 2. Paint the background black
-Paper 0
+' 2. Setup the background
+Paper 1
 Cls
 
 ' 3. Write a title
 Ink 2
-Text 200, 30, "My First CRVJA Program!"
+Text 150, 30, "My First CRVJA Program!"
 
 ' 4. Draw a big circle in the middle
-Ink 3
+Ink 5
 Circle 300, 200, 80
 
-' 5. Draw two smaller circles
-Ink 4
-Circle 250, 180, 20
-Circle 350, 180, 20
 ```
 
-Copy and paste this code into CRVJA and hit "Run code" to see your creation!
+Since our screen is 600 pixels wide and 400 pixels tall, placing the circle at X=300 and Y=200 puts it right in the middle!
 
 ---
 

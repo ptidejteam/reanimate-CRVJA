@@ -880,7 +880,21 @@ ${this.indent()}}
   }
 
   enterLoadBankImgToSprite(ctx) {
-    const spriteNumber = ctx.children[1]?.getText();
+    const option = ctx.children[1]?.getText();
+    if (option === 'Off') {
+      this.output += `
+      // Turn off all sprites
+      {
+        const screen = document.getElementById('amos-screen');
+        if (screen) {
+          const sprites = screen.querySelectorAll('[id^="sprite"]');
+          sprites.forEach(sprite => sprite.remove());
+        }
+      }
+      `;
+      return;
+    }
+    const spriteNumber = option;
     const x = ctx.children[3]?.getText();
     const y = ctx.children[5]?.getText();
     const bankImgIndex = ctx.children[7]?.getText();
