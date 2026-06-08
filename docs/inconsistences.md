@@ -58,3 +58,6 @@ This document lists known syntax and behavior inconsistencies between the CRVJA 
 ## 6. The `Print` Command
 * **Real AMOS Pro**: The `Print` command prints text or variables to the standard output/screen console, respecting cursor positions, and scrolling the screen if necessary.
 * **CRVJA**: The `Print` command is not well implemented yet and its behavior might differ significantly or lack features compared to real AMOS.
+
+## 7. AMCAF Commands
+* We have implemented a few AMCAF commands directly in CRVJA, they should not be implemented as they are not part of the official AMOS Pro specification. For future work, we should remove these commands from the transpiler and grammar to maintain consistency with the official AMOS Pro language. Also, we need to add the possibility of loading extensions (like AMCAF) in the transpiler, so users can choose to use them if they want to.

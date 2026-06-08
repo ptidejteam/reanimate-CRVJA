@@ -572,6 +572,24 @@ export default class AMOSListener extends antlr4.tree.ParseTreeListener {
 	}
 
 
+	// Enter a parse tree produced by AMOSParser#qsin_function.
+	enterQsin_function(ctx) {
+	}
+
+	// Exit a parse tree produced by AMOSParser#qsin_function.
+	exitQsin_function(ctx) {
+	}
+
+
+	// Enter a parse tree produced by AMOSParser#qcos_function.
+	enterQcos_function(ctx) {
+	}
+
+	// Exit a parse tree produced by AMOSParser#qcos_function.
+	exitQcos_function(ctx) {
+	}
+
+
 	// Enter a parse tree produced by AMOSParser#play_sound.
 	enterPlay_sound(ctx) {
 	}
