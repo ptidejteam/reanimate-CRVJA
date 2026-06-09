@@ -83,7 +83,7 @@ Screen Open 1, 600, 400, 8, Hires
 Curs Off
 
 ' 2. Setup the background
-Paper 1
+Paper 0
 Cls
 
 ' 3. Write a title

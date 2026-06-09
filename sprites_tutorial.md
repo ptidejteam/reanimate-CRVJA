@@ -28,7 +28,7 @@ For a sprite with a color **depth of 4** (which means 4 bitplanes), each pixel's
 CRVJA includes a built-in sprite editor so you can draw your sprites directly in your browser.
 
 ### How to Open the Editor
-1. Open the CRVJA Workbench interface in your browser (usually at `http://localhost:3000/`).
+1. Open the CRVJA Workbench interface in your browser (usually at `https://crvja.reanimate.school/`).
 2. Double-click the **Sprites** icon on the desktop. This opens the **Bank Editor** window.
 
 ### Anatomy of the Bank Editor
