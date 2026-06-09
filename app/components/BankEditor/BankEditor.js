@@ -70,6 +70,8 @@ export default function BankEditor({ bankCreator, setBankCreator }) {
     } else if (event.button === 0) {
       console.log("Current color: ", index);
       setCurrentColorIndex(index);
+      console.log("Current color index: ", currentColorIndex);
+      console.log("Current color value: ", palette[currentColorIndex]);
     }
   };
 
@@ -91,6 +93,7 @@ export default function BankEditor({ bankCreator, setBankCreator }) {
     const updatedSprites = [...sprites, newSprite];
     setSprites(updatedSprites);
     setBankCreator({ ...bankCreator, sprites: updatedSprites });
+    setSpriteSelected(updatedSprites.length - 1);
   };
 
   const selectSprite = (index) => {
@@ -238,6 +241,11 @@ export default function BankEditor({ bankCreator, setBankCreator }) {
           Save Bank to Local Storage
         </button>
         <h2>Palette</h2>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          Selected color: 
+<div style={{ height: "30px", marginBottom: "10px", width: "30px", backgroundColor: `${palette[currentColorIndex]}` }} />
+        </div>
+        First color below is the transparent background
         <div
           style={{
             display: "grid",
@@ -332,9 +340,8 @@ export default function BankEditor({ bankCreator, setBankCreator }) {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: `repeat(${
-                sprites[spriteSelected].width * 16
-              }, 20px)`,
+              gridTemplateColumns: `repeat(${sprites[spriteSelected].width * 16
+                }, 20px)`,
               gap: "1px",
             }}
           >
@@ -376,9 +383,11 @@ export default function BankEditor({ bankCreator, setBankCreator }) {
         <button
           onClick={() => {
             localStorage.removeItem("bankCreator");
+            setSpriteSelected(null);
             setBankCreator({ sprites: [], palette: Array(32).fill("#000000") });
             setSprites([]);
             setPalette(Array(32).fill("#000000"));
+
           }}
           style={{
             marginTop: "10px",
