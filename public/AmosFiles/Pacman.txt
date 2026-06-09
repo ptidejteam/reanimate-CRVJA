@@ -3,7 +3,7 @@
 Screen Open 1,747,847,1,Hires
 Curs Off
 
-Paper 0 : Palette $0,$666,$FF0,$888,$BBB,$AAA,$BBB,$CCC
+Paper 0 : Palette $0,$00A,$FF0,$FF0,$BBB,$AAA,$BBB,$CCC
 
 Load "pacman.abk"
 
@@ -453,6 +453,8 @@ Procedure P_DRAWMAP[a]
             End If
             
             If renderPoints = 1
+               Ink 1
+               Bar x13, y13 To x23, y23
                RENDER_TYPE_FIVE_X= x* TILE_SIZE + 4
                RENDER_TYPE_FIVE_Y= y* TILE_SIZE + 4
                Sprite 4, RENDER_TYPE_FIVE_X, RENDER_TYPE_FIVE_Y, 27
@@ -473,6 +475,8 @@ Procedure P_DRAWMAP[a]
             End If
             
             If renderPoints = 1
+               Ink 1
+               Bar x13, y13 To x23, y23
                RENDER_TYPE_SIX_X= x* TILE_SIZE + 4
                RENDER_TYPE_SIX_Y= y* TILE_SIZE + 4
                Sprite 5, RENDER_TYPE_SIX_X, RENDER_TYPE_SIX_Y, 28
@@ -493,6 +497,8 @@ Procedure P_DRAWMAP[a]
             End If
             
             If renderPoints = 1
+               Ink 1
+               Bar x13, y13 To x23, y23
                RENDER_TYPE_SEVEN_X= x* TILE_SIZE + 4
                RENDER_TYPE_SEVEN_Y= y* TILE_SIZE + 4
                Sprite 6, RENDER_TYPE_SEVEN_X, RENDER_TYPE_SEVEN_Y, 29
@@ -514,6 +520,8 @@ Procedure P_DRAWMAP[a]
             End If
             
             If renderPoints = 1
+               Ink 1
+               Bar x13, y13 To x23, y23
                RENDER_TYPE_EIGHT_X= x* TILE_SIZE + 4
                RENDER_TYPE_EIGHT_Y= y* TILE_SIZE + 4
                Sprite 7, RENDER_TYPE_EIGHT_X, RENDER_TYPE_EIGHT_Y, 30

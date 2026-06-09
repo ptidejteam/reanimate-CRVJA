@@ -46,7 +46,7 @@ test("cls with color translation", () => {
     expect(translatedJsCode).toContain("amosScreen.innerHTML = '';");
     
     // Check if it sets the background color using the colorMapping dictionary
-    expect(translatedJsCode).toContain("amosScreen.style.backgroundColor = colorMapping[2];");
+    expect(translatedJsCode).toContain("amosScreen.style.backgroundColor = colorMapping[2 + 1] || \"black\";");
 });
 
 test("cls with block area translation", () => {
@@ -65,7 +65,7 @@ test("cls with block area translation", () => {
     walker.walk(translator, tree);
     const translatedJsCode = translator.getJavaScript();
 
-    expect(translatedJsCode).toContain("const clearColor = colorMapping[2];");
+    expect(translatedJsCode).toContain("const clearColor = colorMapping[2 + 1] || \"black\";");
     expect(translatedJsCode).toContain("const clearX1 = 10;");
     expect(translatedJsCode).toContain("const clearY1 = 20;");
     expect(translatedJsCode).toContain("const clearX2 = 100;");

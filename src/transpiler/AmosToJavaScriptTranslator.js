@@ -13,9 +13,13 @@ class AmosToJavaScriptTranslator extends AMOSListener {
     this.colorMapping = {
       1: "black",
       2: "white",
-      3: "red",
+      3: "white",
+      4: "red",
       5: "green",
+      6: "green",
+      7: "rgb(160, 64, 0)",
       8: "rgb(160, 64, 0)",
+      9: "rgb(160, 64, 0)",
     };
     this.pallette = `const colorMapping = ${JSON.stringify(
       this.colorMapping,
@@ -275,6 +279,8 @@ class AmosToJavaScriptTranslator extends AMOSListener {
     this.output += `
     let currentTimer = Date.now();
   let Ink = "black";
+  let Paper = 1;
+  let Pen = 2;
   let Timer = 0;
   let currentPressedKey = null;
   let isPressed = false;
@@ -999,21 +1005,22 @@ ${this.indent()}closeChannel(${channel});
     const exprs = ctx.expression1();
 
     if (exprs.length === 0) {
-      // Case 1: Parameterless Cls (clear entire screen)
+      // Case 1: Parameterless Cls (clear entire screen + set background color to current paper color)
       this.output += `
 ${this.indent()}const amosScreen = document.getElementById('amos-screen');
 ${this.indent()}if (amosScreen) {
 ${this.indent()}  amosScreen.innerHTML = '';
+${this.indent()}  amosScreen.style.backgroundColor = colorMapping[Paper + 1] || "black";
 ${this.indent()}}
       `;
     } else if (exprs.length === 1) {
-      // Case 2: Cls colour (clear entire screen + set background color)
+      // Case 2: Cls colour (clear entire screen + set background color to specified color index)
       const color = exprs[0].getText();
       this.output += `
 ${this.indent()}const amosScreen = document.getElementById('amos-screen');
 ${this.indent()}if (amosScreen) {
 ${this.indent()}  amosScreen.innerHTML = '';
-${this.indent()}  amosScreen.style.backgroundColor = colorMapping[${color}];
+${this.indent()}  amosScreen.style.backgroundColor = colorMapping[${color} + 1] || "black";
 ${this.indent()}}
       `;
     } else if (exprs.length >= 5) {
@@ -1026,7 +1033,7 @@ ${this.indent()}}
 
       this.output += `
 ${this.indent()}{
-${this.indent()}  const clearColor = colorMapping[${color}];
+${this.indent()}  const clearColor = colorMapping[${color} + 1] || "black";
 ${this.indent()}  const clearX1 = ${x1};
 ${this.indent()}  const clearY1 = ${y1};
 ${this.indent()}  const clearX2 = ${x2};
@@ -1064,6 +1071,20 @@ ${this.indent()}document.getElementById('amos-screen').style.cursor = 'none';
         `;
   }
 
+  enterPaper(ctx) {
+    const color = ctx.children[1]?.getText();
+    this.output += `
+${this.indent()}Paper = ${color};
+    `;
+  }
+
+  enterPen(ctx) {
+    const color = ctx.children[1]?.getText();
+    this.output += `
+${this.indent()}Pen = ${color};
+    `;
+  }
+
   enterCurs_on(ctx) {
     this.output += `
 ${this.indent()}document.getElementById('amos-screen').style.cursor = 'auto';
@@ -1080,9 +1101,9 @@ ${this.indent()}soundPlayer(${soundIndex}, ${duration}*1000);
   }
 
   enterInk(ctx) {
-    const colorIndex = ctx.children[1]?.getText();
+    const colorIndex = parseInt(ctx.children[1]?.getText(), 10);
 
-    const color = this.colorMapping[colorIndex] || "black";
+    const color = this.colorMapping[colorIndex + 1] || "black";
     this.current_Ink = color;
     this.output += `Ink = "${color}";`;
   }
@@ -1095,6 +1116,7 @@ ${this.indent()}soundPlayer(${soundIndex}, ${duration}*1000);
     for (const child of ctx.children) {
       const text = child.getText().trim();
 
+      if (text.toLowerCase() === "palette") continue;
       if (text === "$") {
         // Start of a new hex color, initialize currentHex
         currentHex = "$";
@@ -1151,7 +1173,7 @@ ${this.indent()}soundPlayer(${soundIndex}, ${duration}*1000);
     let y1 = ctx.expression1(1)?.getText();
     let x2 = ctx.expression1(2)?.getText();
     let y2 = ctx.expression1(3)?.getText();
-    let color = `colorMapping[${ctx.expression1(4)?.getText()}]`;
+    let color = `colorMapping[(${ctx.expression1(4)?.getText()}) + 1]`;
     let the_ID = generateRandomID();
     let index = ctx.expression1(5)?.getText();
 
