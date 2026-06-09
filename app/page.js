@@ -103,7 +103,7 @@ function App() {
           position: "absolute",
 
           display: "grid",
-          gridTemplateColumns: "repeat(4, 1fr)",
+          gridTemplateColumns: "repeat(5, 1fr)",
           gap: "60px",
           margin: "20px"
         }}>
@@ -115,6 +115,8 @@ function App() {
         <WorkbenchIcon id="clock" label="Clock" icon="/icons/clock.png" onOpen={() => setShowClock(true)} selected={selectedIcon === "clock"}
           setSelectedIcon={setSelectedIcon} />
         <WorkbenchIcon id="tutorial" label="Tutorial" icon="/icons/book.png" onOpen={() => setShowTutorial(true)} selected={selectedIcon === "tutorial"}
+          setSelectedIcon={setSelectedIcon} />
+        <WorkbenchIcon id="manual" label="AMOS Manual" icon="/icons/manual.png" onOpen={() => window.open("https://amospromanual.dev/", "_blank")} selected={selectedIcon === "manual"}
           setSelectedIcon={setSelectedIcon} />
       </div>
 
@@ -480,6 +482,23 @@ function App() {
                       {children}
                     </code>
                   )
+                },
+                img({node, ...props}) {
+                  return (
+                    <img
+                      {...props}
+                      style={{
+                        maxWidth: '100%',
+                        height: 'auto',
+                        display: 'block',
+                        marginTop: '15px',
+                        marginBottom: '15px',
+                        borderRadius: '4px',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                        border: '1px solid #ccc'
+                      }}
+                    />
+                  );
                 }
               }}
             >

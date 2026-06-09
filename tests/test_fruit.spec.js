@@ -4,10 +4,10 @@ import AMOSParser from "../grammar/generated/AMOSParser";
 import AMOSLexer from "../grammar/generated/AMOSLexer";
 import fs from "fs";
 
-test("compile catch the cherry example", () => {
+test("compile catch the fruit example", () => {
   const code = `
 ' ==========================================================
-' CATCH THE CHERRY - A Simple CRVJA Game
+' CATCH THE FRUIT - A Simple CRVJA Game
 ' ==========================================================
 
 ' 1. Screen and Palette Setup
@@ -23,19 +23,12 @@ PLAYER_X = 100
 PLAYER_Y = 150
 PLAYER_SPEED = 6
 
-' Spawn the Cherry
-CHERRY_X = 300
-CHERRY_Y = 200
-
-SCORE = 0
+' Spawn the Fruit
+FRUIT_X = 300
+FRUIT_Y = 200
 
 ' 4. Main Game Loop
 Do
-   ' Redraw HUD (Score)
-   Ink 3
-   Text 10, 20, "SCORE:"
-   Text 80, 20, SCORE
-   
    ' Read Keyboard Controls (W/S/A/D or Arrow Keys)
    ' A Key ($1E) or Left Arrow ($70)
    If Key State($1E)
@@ -87,34 +80,23 @@ Do
    ' Draw Player (Sprite ID 1, using frame 0)
    Sprite 1, PLAYER_X, PLAYER_Y, 0
    
-   ' Draw Cherry (Sprite ID 2, using frame 1)
-   Sprite 2, CHERRY_X, CHERRY_Y, 1
+   ' Draw Fruit (Sprite ID 2, using frame 1)
+   Sprite 2, FRUIT_X, FRUIT_Y, 1
    
-   ' 6. Collision Detection (Bounding Box)
-   ' Calculate absolute distances in X and Y coordinates
-   DIST_X = PLAYER_X - CHERRY_X
-   If DIST_X < 0
-      DIST_X = 0 - DIST_X
-   End If
-   
-   DIST_Y = PLAYER_Y - CHERRY_Y
-   If DIST_Y < 0
-      DIST_Y = 0 - DIST_Y
-   End If
-   
-   ' Check if player and cherry overlap (within 16 pixels)
-   If DIST_X < 16
-      If DIST_Y < 16
-         ' Collision! Earn points and relocate Cherry
-         SCORE = SCORE + 10
-         CHERRY_X = 50 + Rnd(500)
-         CHERRY_Y = 50 + Rnd(300)
-         
-         ' Play note 37 (middle C area) for 1 second as sound effect
-         Play 37, 1
-         
-         ' Clean previous score text by clearing HUD area
-         Cls 0, 10, 5 To 200, 25
+   ' 6. Collision Detection (Overlap within 16 pixels)
+   ' Check if player and fruit overlap
+   If PLAYER_X > FRUIT_X - 16
+      If PLAYER_X < FRUIT_X + 16
+         If PLAYER_Y > FRUIT_Y - 16
+            If PLAYER_Y < FRUIT_Y + 16
+               ' Collision! Relocate Fruit inside boundaries
+               FRUIT_X = 10 + Rnd(560)
+               FRUIT_Y = 30 + Rnd(340)
+               
+               ' Play note 37 (middle C area) for 1 second as sound effect
+               Play 37, 1
+            End If
+         End If
       End If
    End If
    
@@ -135,10 +117,10 @@ Loop
   walker.walk(translator, tree);
 
   const jsOutput = translator.getJavaScript();
-  console.log("Transpiled Catch the Cherry:", jsOutput);
+  console.log("Transpiled Catch the Fruit:", jsOutput);
   expect(jsOutput).toContain("loadBank");
   expect(jsOutput).toContain("renderSprite(1, PLAYER_X, PLAYER_Y, 0)");
-  expect(jsOutput).toContain("renderSprite(2, CHERRY_X, CHERRY_Y, 1)");
+  expect(jsOutput).toContain("renderSprite(2, FRUIT_X, FRUIT_Y, 1)");
 });
 
 test("compile sprite off statement", () => {
