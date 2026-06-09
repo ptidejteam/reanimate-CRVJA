@@ -3,6 +3,8 @@
 ## 1. Main Idea
 The core concept of Reanimate-CRVJA is to bring retro Amiga AMOS BASIC games and applications to the modern web. It achieves this by functioning as a parser and transpiler that converts AMOS BASIC code into executable JavaScript code that relies on the DOM and HTML5 APIs. The project also provides an Amiga Workbench-styled web interface where users can load AMOS code, parse it, and execute it within a sandboxed environment. Additionally, it offers tools to load, extract, and visually edit AMOS sprite banks (`.abk` files).
 
+- For a beginner-friendly introduction to using CRVJA, please refer to the [CRVJA Tutorial](tutorial.md).
+
 ## 2. How the Project Works (Technical Aspect)
 The system is built as a Next.js web application and relies heavily on **ANTLR4** (ANother Tool for Language Recognition) for the language processing phase.
 

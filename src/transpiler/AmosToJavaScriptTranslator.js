@@ -1387,6 +1387,7 @@ ${this.indent()}}`;
         }
 
         // Variable already exists at this indent level
+        value = value.replace(/\bRnd\s*\(([^)]+)\)/g, "randomInt($1)");
         this.output += `
      ${this.indent()}${name} = ${value};
           `;
@@ -1936,13 +1937,14 @@ ${this.indent()}
     this.output += ``;
   }
   getJavaScript() {
-    return (
+    let result = (
       this.imports +
       this.pallette +
       this.globalVariables +
       this.output +
       this.functionStarters
     );
+    return result.replace(/\bRnd\s*\(([^)]+)\)/g, "randomInt($1)");
   }
 }
 
