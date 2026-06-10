@@ -722,15 +722,19 @@ function loadBank(bankName, bank) {
 
   reader.readAsArrayBuffer(file); // Use readAsArrayBuffer for binary data
 }
-function renderSprite(spriteNumber, x, y, bankImgIndex, retries = 0) {
-  if(retries > 40){
-   console.error("Bank not found or could not be loaded for sprite", spriteNumber);
+let tries = 0;
+function renderSprite(spriteNumber, x, y, bankImgIndex) {
+  if(tries > 40){
+
+   console.error("Bank not found or could not be loaded");
+   location.reload();
    return;
   }
    if (!bankData[1].sprites[bankImgIndex]) {
     
+    tries++;
     setTimeout(() => {
-        renderSprite(spriteNumber, x, y, bankImgIndex, retries + 1);
+        renderSprite(spriteNumber, x, y, bankImgIndex);
       }, 200);
       
     return;
@@ -882,7 +886,8 @@ ${this.indent()}}
   }
 
   enterLoadBankImgToSprite(ctx) {
-    if (ctx.children[1]?.getText() === 'Off') {
+    const option = ctx.children[1]?.getText();
+    if (option === 'Off') {
       this.output += `
       // Turn off all sprites
       {
@@ -895,10 +900,10 @@ ${this.indent()}}
       `;
       return;
     }
-    const spriteNumber = ctx.expression1(0)?.getText();
-    const x = ctx.expression1(1)?.getText();
-    const y = ctx.expression1(2)?.getText();
-    const bankImgIndex = ctx.expression1(3)?.getText();
+    const spriteNumber = option;
+    const x = ctx.children[3]?.getText();
+    const y = ctx.children[5]?.getText();
+    const bankImgIndex = ctx.children[7]?.getText();
     this.output += `
     renderSprite(${spriteNumber}, ${x}, ${y}, ${bankImgIndex});
     `;
@@ -1096,12 +1101,14 @@ ${this.indent()}soundPlayer(${soundIndex}, ${duration}*1000);
   }
 
   enterInk(ctx) {
-    let exprCtx = ctx.expression1();
-    let exprText = exprCtx ? exprCtx.getText() : ctx.children[1]?.getText();
-    
-    exprText = this.rewriteArrayAccesses(exprCtx || ctx.children[1], exprText);
-    
-    this.output += `\n${this.indent()}Ink = colorMapping[(${exprText}) + 1] || "black";\n`;
+    const colorIndex = parseInt(ctx.children[1]?.getText(), 10);
+    const variable = ctx.children[2]?.getText();
+    if(variable || colorIndex){
+      console.log(variable,colorIndex);
+    }
+    const color = this.colorMapping[colorIndex + 1] || "black";
+    this.current_Ink = color;
+    this.output += `Ink = "${color}";`;
   }
   enterPalette(ctx) {
     // Array to collect complete hex color values from the Palette
