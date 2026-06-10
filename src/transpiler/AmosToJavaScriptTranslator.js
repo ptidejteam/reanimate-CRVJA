@@ -882,8 +882,7 @@ ${this.indent()}}
   }
 
   enterLoadBankImgToSprite(ctx) {
-    const option = ctx.children[1]?.getText();
-    if (option === 'Off') {
+    if (ctx.children[1]?.getText() === 'Off') {
       this.output += `
       // Turn off all sprites
       {
@@ -896,10 +895,10 @@ ${this.indent()}}
       `;
       return;
     }
-    const spriteNumber = option;
-    const x = ctx.children[3]?.getText();
-    const y = ctx.children[5]?.getText();
-    const bankImgIndex = ctx.children[7]?.getText();
+    const spriteNumber = ctx.expression1(0)?.getText();
+    const x = ctx.expression1(1)?.getText();
+    const y = ctx.expression1(2)?.getText();
+    const bankImgIndex = ctx.expression1(3)?.getText();
     this.output += `
     renderSprite(${spriteNumber}, ${x}, ${y}, ${bankImgIndex});
     `;

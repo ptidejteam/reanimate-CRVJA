@@ -269,7 +269,7 @@ loadBank:
     ;
 
 loadBankImgToSprite:
-    'Sprite' (NUMBER COMMA (IDENTIFIER | NUMBER) COMMA (IDENTIFIER | NUMBER) COMMA (IDENTIFIER | NUMBER) | 'Off')
+    'Sprite' (expression1 COMMA expression1 COMMA expression1 COMMA expression1 | 'Off')
     ;
 
 expressions_comparators:
