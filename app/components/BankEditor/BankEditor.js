@@ -19,8 +19,6 @@ export default function BankEditor({ bankCreator, setBankCreator }) {
   });
   const [selectedColorIndex, setSelectedColorIndex] = useState(null);
   const [currentColorIndex, setCurrentColorIndex] = useState(0);
-  const [spriteWidth, setSpriteWidth] = useState(0);
-  const [spriteHeight, setSpriteHeight] = useState(0);
 
   useEffect(() => {
     const handleMouseUp = () => setIsMouseDown(false);
@@ -29,6 +27,20 @@ export default function BankEditor({ bankCreator, setBankCreator }) {
       window.removeEventListener("mouseup", handleMouseUp);
     };
   }, []);
+
+  useEffect(() => {
+    if (bankCreator) {
+      setPalette(bankCreator.palette || Array(32).fill("#000000"));
+      const newSprites = bankCreator.sprites || [];
+      setSprites(newSprites);
+      setSpriteSelected((prev) => {
+        if (prev !== null && prev < newSprites.length) {
+          return prev;
+        }
+        return null;
+      });
+    }
+  }, [bankCreator]);
 
   const handlePixelPaint = (index) => {
     if (spriteSelected !== null) {
@@ -144,18 +156,15 @@ export default function BankEditor({ bankCreator, setBankCreator }) {
         const newSprite = {
           ...selectedSprite,
           [dimension]: newSize,
-          planarGraphicData: Array(
-            spriteHeight * spriteWidth * selectedSprite.depth * 2
-          ).fill(0), // Reset planar data based on new size
         };
 
         if (dimension === "width") {
           newSprite.planarGraphicData = Array(
-            newSize * spriteHeight * selectedSprite.depth * 2
+            newSize * selectedSprite.height * selectedSprite.depth * 2
           ).fill(0);
         } else {
           newSprite.planarGraphicData = Array(
-            spriteWidth * newSize * selectedSprite.depth * 2
+            selectedSprite.width * newSize * selectedSprite.depth * 2
           ).fill(0);
         }
 
@@ -183,13 +192,12 @@ export default function BankEditor({ bankCreator, setBankCreator }) {
       const updatedSprites = [...sprites, duplicatedSprite];
       setSprites(updatedSprites);
       setBankCreator({ ...bankCreator, sprites: updatedSprites });
+      setSpriteSelected(updatedSprites.length - 1);
     }
   };
 
   const handleSpriteClick = (index) => {
     setSpriteSelected(index);
-    setSpriteHeight(sprites[index].height);
-    setSpriteWidth(sprites[index].width);
   };
 
   // Save bank data to local storage
