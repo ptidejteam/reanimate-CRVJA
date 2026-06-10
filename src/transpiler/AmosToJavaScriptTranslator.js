@@ -1101,11 +1101,12 @@ ${this.indent()}soundPlayer(${soundIndex}, ${duration}*1000);
   }
 
   enterInk(ctx) {
-    const colorIndex = parseInt(ctx.children[1]?.getText(), 10);
-
-    const color = this.colorMapping[colorIndex + 1] || "black";
-    this.current_Ink = color;
-    this.output += `Ink = "${color}";`;
+    let exprCtx = ctx.expression1();
+    let exprText = exprCtx ? exprCtx.getText() : ctx.children[1]?.getText();
+    
+    exprText = this.rewriteArrayAccesses(exprCtx || ctx.children[1], exprText);
+    
+    this.output += `\n${this.indent()}Ink = colorMapping[(${exprText}) + 1] || "black";\n`;
   }
   enterPalette(ctx) {
     // Array to collect complete hex color values from the Palette

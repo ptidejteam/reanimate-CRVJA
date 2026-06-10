@@ -440,7 +440,7 @@ curs_on:
     ;
 
 ink:
-    INK NUMBER
+    INK expression1
     ;
 
 text:

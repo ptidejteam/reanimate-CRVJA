@@ -67,11 +67,11 @@ test("compilation of user's sample program", () => {
   expect(jsCode).toContain("amosScreen.style.backgroundColor = colorMapping[Paper + 1] || \"black\";");
 
   // Check Ink and Text
-  expect(jsCode).toContain("Ink = \"white\";"); // default color index 2 maps to white in CRVJA (colorMapping[3])
+  expect(jsCode).toContain("Ink = colorMapping[(2) + 1] || \"black\";"); 
   expect(jsCode).toContain("textDiv15030.innerText = 'My First CRVJA Program!';");
 
   // Check Ink and Circle
-  expect(jsCode).toContain("Ink = \"black\";"); // default color index 5 maps to black in CRVJA (colorMapping[6] is undefined, defaults to black)
+  expect(jsCode).toContain("Ink = colorMapping[(5) + 1] || \"black\";");
   expect(jsCode).toContain("const circleId = \"Circle_\" + (300) + \"_\" + (200) + \"_\" + (80);");
 });
 

@@ -289,7 +289,7 @@ const serializedATN = [4,1,122,996,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,
 0,843,844,5,75,0,0,844,845,5,76,0,0,845,846,5,79,0,0,846,847,5,76,0,0,847,
 848,5,79,0,0,848,849,5,76,0,0,849,850,5,79,0,0,850,851,5,76,0,0,851,852,
 5,79,0,0,852,853,7,5,0,0,853,145,1,0,0,0,854,855,5,83,0,0,855,147,1,0,0,
-0,856,857,5,84,0,0,857,149,1,0,0,0,858,859,5,85,0,0,859,860,5,76,0,0,860,
+0,856,857,5,84,0,0,857,149,1,0,0,0,858,859,5,85,0,0,859,860,3,2,1,0,860,
 151,1,0,0,0,861,862,5,86,0,0,862,863,3,2,1,0,863,864,5,79,0,0,864,865,3,
 2,1,0,865,866,5,79,0,0,866,867,3,2,1,0,867,153,1,0,0,0,868,872,5,88,0,0,
 869,871,3,12,6,0,870,869,1,0,0,0,871,874,1,0,0,0,872,870,1,0,0,0,872,873,
@@ -3894,7 +3894,7 @@ export default class AMOSParser extends antlr4.Parser {
 	        this.state = 858;
 	        this.match(AMOSParser.INK);
 	        this.state = 859;
-	        this.match(AMOSParser.NUMBER);
+	        this.expression1();
 	    } catch (re) {
 	    	if(re instanceof antlr4.error.RecognitionException) {
 		        localctx.exception = re;
@@ -8625,8 +8625,8 @@ class InkContext extends antlr4.ParserRuleContext {
 	    return this.getToken(AMOSParser.INK, 0);
 	};
 
-	NUMBER() {
-	    return this.getToken(AMOSParser.NUMBER, 0);
+	expression1() {
+	    return this.getTypedRuleContext(Expression1Context,0);
 	};
 
 	enterRule(listener) {

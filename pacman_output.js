@@ -907,7 +907,9 @@ for (y = 0; y <= MAP_SIZE; y++) {  for (x = 0; x <= MAP_SIZE; x++) {    map[y][x
         GHOST_TIMER = 1;
           
         CURRENT_GHOST_TIMER = GHOST_TIMER;
-          Ink = "rgb(255, 255, 0)";
+          
+Ink = colorMapping[(3) + 1] || "black";
+
 const textDiv10780 = document.createElement('div');
 textDiv10780.innerText = 'Points:';
 textDiv10780.id = 'textDiv' + '10' + '780';
@@ -991,7 +993,9 @@ document.getElementById('amos-screen').appendChild(textDiv430790);
       setInterval(() => {
   textDiv430790.innerText = PY; // Function that returns updated value
 }, 100); 
-        Ink = "rgb(0, 0, 170)";
+        
+Ink = colorMapping[(1) + 1] || "black";
+
 const textDiv10691 = document.createElement('div');
 textDiv10691.innerText = 'Power pellet!';
 textDiv10691.id = 'textDiv' + '10' + '691';
@@ -1003,7 +1007,9 @@ textDiv10691.style.color = Ink;
 textDiv10691.style.position = "Relative";
 textDiv10691.style.zIndex = 99;
 document.getElementById('amos-screen').appendChild(textDiv10691);
-        Ink = "rgb(255, 255, 0)";
+        
+Ink = colorMapping[(3) + 1] || "black";
+
     let lastTimeMoveGhosts = 0; 
     let timeoutIdMoveGhosts = null; // Track the timeout ID
 const MoveGhosts = (a) => {
@@ -1518,7 +1524,9 @@ const P_DRAWMAP = (a) => {
           
     
       if (map[y][x] == 1) {
-        Ink = "rgb(0, 0, 0)";
+        
+        Ink = colorMapping[(0) + 1] || "black";
+
     const idBar = "Bar_" + (x13) + "_" + (y13);
     const x1 = x13;
     const y1 = y13;
@@ -1549,7 +1557,9 @@ const P_DRAWMAP = (a) => {
       }
     
       if (map[y][x] == 3) {
-        Ink = "rgb(0, 0, 170)";
+        
+        Ink = colorMapping[(1) + 1] || "black";
+
                 let renderPoints = 0;
                 renderPoints = 1;
           
@@ -1586,7 +1596,9 @@ const P_DRAWMAP = (a) => {
     screenBarDiv.style.width = width + 'px';
     screenBarDiv.style.height = height + 'px';
     screenBarDiv.style.zIndex = 10;
-  Ink = "rgb(255, 255, 0)";
+  
+          Ink = colorMapping[(3) + 1] || "black";
+
     const circleId = "Circle_" + (x*TILE_SIZE+12) + "_" + (y*TILE_SIZE+12) + "_" + (2);
     let circleDiv = document.getElementById(circleId);
     if (!circleDiv) {
@@ -1604,7 +1616,9 @@ const P_DRAWMAP = (a) => {
     circleDiv.style.height = (2 * 2) + 'px';
     circleDiv.style.zIndex = 10;
     circleDiv.style.backgroundColor = Ink; 
-  }else {Ink = "rgb(0, 0, 170)";
+  }else {
+            Ink = colorMapping[(1) + 1] || "black";
+
     const idBar = "Bar_" + (x13) + "_" + (y13);
     const x1 = x13;
     const y1 = y13;
@@ -1665,7 +1679,9 @@ const P_DRAWMAP = (a) => {
         }
     
         if (renderPoints == 1) {
-        Ink = "rgb(0, 0, 170)";
+        
+          Ink = colorMapping[(1) + 1] || "black";
+
     const idBar = "Bar_" + (x13) + "_" + (y13);
     const x1 = x13;
     const y1 = y13;
@@ -1690,7 +1706,9 @@ const P_DRAWMAP = (a) => {
     screenBarDiv.style.width = width + 'px';
     screenBarDiv.style.height = height + 'px';
     screenBarDiv.style.zIndex = 10;
-  Ink = "rgb(255, 255, 0)";
+  
+          Ink = colorMapping[(3) + 1] || "black";
+
     const circleId = "Circle_" + (x*TILE_SIZE+12) + "_" + (y*TILE_SIZE+12) + "_" + (8);
     let circleDiv = document.getElementById(circleId);
     if (!circleDiv) {
@@ -1708,7 +1726,9 @@ const P_DRAWMAP = (a) => {
     circleDiv.style.height = (8 * 2) + 'px';
     circleDiv.style.zIndex = 10;
     circleDiv.style.backgroundColor = Ink; 
-  }else {Ink = "rgb(0, 0, 170)";
+  }else {
+            Ink = colorMapping[(1) + 1] || "black";
+
     const idBar = "Bar_" + (x13) + "_" + (y13);
     const x1 = x13;
     const y1 = y13;
@@ -1769,7 +1789,9 @@ const P_DRAWMAP = (a) => {
         }
     
         if (renderPoints == 1) {
-        Ink = "rgb(0, 0, 170)";
+        
+          Ink = colorMapping[(1) + 1] || "black";
+
     const idBar = "Bar_" + (x13) + "_" + (y13);
     const x1 = x13;
     const y1 = y13;
@@ -1802,7 +1824,9 @@ const P_DRAWMAP = (a) => {
                   RENDER_TYPE_FIVE_Y = y*TILE_SIZE+4;
           
     renderSprite(4, RENDER_TYPE_FIVE_X, RENDER_TYPE_FIVE_Y, 27);
-    }else {Ink = "rgb(0, 0, 170)";
+    }else {
+            Ink = colorMapping[(1) + 1] || "black";
+
     const idBar = "Bar_" + (x13) + "_" + (y13);
     const x1 = x13;
     const y1 = y13;
@@ -1865,7 +1889,9 @@ const P_DRAWMAP = (a) => {
         }
     
         if (renderPoints == 1) {
-        Ink = "rgb(0, 0, 170)";
+        
+          Ink = colorMapping[(1) + 1] || "black";
+
     const idBar = "Bar_" + (x13) + "_" + (y13);
     const x1 = x13;
     const y1 = y13;
@@ -1898,7 +1924,9 @@ const P_DRAWMAP = (a) => {
                   RENDER_TYPE_SIX_Y = y*TILE_SIZE+4;
           
     renderSprite(5, RENDER_TYPE_SIX_X, RENDER_TYPE_SIX_Y, 28);
-    }else {Ink = "rgb(0, 0, 170)";
+    }else {
+            Ink = colorMapping[(1) + 1] || "black";
+
     const idBar = "Bar_" + (x13) + "_" + (y13);
     const x1 = x13;
     const y1 = y13;
@@ -1961,7 +1989,9 @@ const P_DRAWMAP = (a) => {
         }
     
         if (renderPoints == 1) {
-        Ink = "rgb(0, 0, 170)";
+        
+          Ink = colorMapping[(1) + 1] || "black";
+
     const idBar = "Bar_" + (x13) + "_" + (y13);
     const x1 = x13;
     const y1 = y13;
@@ -1994,7 +2024,9 @@ const P_DRAWMAP = (a) => {
                   RENDER_TYPE_SEVEN_Y = y*TILE_SIZE+4;
           
     renderSprite(6, RENDER_TYPE_SEVEN_X, RENDER_TYPE_SEVEN_Y, 29);
-    }else {Ink = "rgb(0, 0, 170)";
+    }else {
+            Ink = colorMapping[(1) + 1] || "black";
+
     const idBar = "Bar_" + (x13) + "_" + (y13);
     const x1 = x13;
     const y1 = y13;
@@ -2057,7 +2089,9 @@ const P_DRAWMAP = (a) => {
         }
     
         if (renderPoints == 1) {
-        Ink = "rgb(0, 0, 170)";
+        
+          Ink = colorMapping[(1) + 1] || "black";
+
     const idBar = "Bar_" + (x13) + "_" + (y13);
     const x1 = x13;
     const y1 = y13;
@@ -2090,7 +2124,9 @@ const P_DRAWMAP = (a) => {
                   RENDER_TYPE_EIGHT_Y = y*TILE_SIZE+4;
           
     renderSprite(7, RENDER_TYPE_EIGHT_X, RENDER_TYPE_EIGHT_Y, 30);
-    }else {Ink = "rgb(0, 0, 170)";
+    }else {
+            Ink = colorMapping[(1) + 1] || "black";
+
     const idBar = "Bar_" + (x13) + "_" + (y13);
     const x1 = x13;
     const y1 = y13;
@@ -2142,7 +2178,9 @@ const P_DRAWMAP = (a) => {
       }
     
       if (tileRendered == 0) {
-        Ink = "rgb(0, 0, 170)";
+        
+        Ink = colorMapping[(1) + 1] || "black";
+
     const idBar = "Bar_" + (x13) + "_" + (y13);
     const x1 = x13;
     const y1 = y13;
@@ -2189,7 +2227,9 @@ const P_DRAWMAP = (a) => {
       }
     
       if (x == PX) {
-        Ink = "rgb(255, 255, 0)";
+        
+        Ink = colorMapping[(3) + 1] || "black";
+
     
         if (y == PY) {
         
@@ -2205,7 +2245,9 @@ const P_DRAWMAP = (a) => {
       }
     
       if (x == P_GHOST_ONE_X) {
-        Ink = "rgb(187, 187, 187)";
+        
+        Ink = colorMapping[(4) + 1] || "black";
+
     
         if (y == P_GHOST_ONE_Y) {
         
@@ -2227,7 +2269,9 @@ const P_DRAWMAP = (a) => {
       }
     
       if (x == P_GHOST_TWO_X) {
-        Ink = "rgb(170, 170, 170)";
+        
+        Ink = colorMapping[(5) + 1] || "black";
+
     
         if (y == P_GHOST_TWO_Y) {
         
@@ -2252,7 +2296,9 @@ const P_DRAWMAP = (a) => {
         
     
     if (AlreaDYDied == 0) {
-        Ink = "rgb(255, 255, 0)";
+        
+      Ink = colorMapping[(3) + 1] || "black";
+
       const textDiv1010 = document.createElement('div');
       textDiv1010.innerText = 'You Died!';
       textDiv1010.id = 'textDiv' + '10' + '10';
@@ -2270,7 +2316,9 @@ const P_DRAWMAP = (a) => {
     }
   }
 }
-Ink = "rgb(255, 255, 0)";
+
+Ink = colorMapping[(3) + 1] || "black";
+
         
 const textDiv430820 = document.createElement('div');
 textDiv430820.innerText = CURRENT_GHOST_TIMER;
@@ -2323,7 +2371,9 @@ setInterval(() => {
 
     
   if (POWER_PELLET > 0) {
-        Ink = "rgb(255, 255, 0)";
+        
+    Ink = colorMapping[(2) + 1] || "black";
+
     const idBar = "Bar_" + (10) + "_" + (745);
     const x1 = 10;
     const y1 = 745;
@@ -2356,7 +2406,9 @@ setInterval(() => {
         
            POWER_PELLET = 0;
           
-    }}else {Ink = "rgb(0, 0, 170)";
+    }}else {
+      Ink = colorMapping[(1) + 1] || "black";
+
     const idBar = "Bar_" + (10) + "_" + (745);
     const x1 = 10;
     const y1 = 745;
