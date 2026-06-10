@@ -104,7 +104,7 @@ export default function BankEditor({ bankCreator, setBankCreator }) {
     };
     const updatedSprites = [...sprites, newSprite];
     setSprites(updatedSprites);
-    setBankCreator({ ...bankCreator, sprites: updatedSprites });
+    setBankCreator({ ...bankCreator, sprites: updatedSprites, palette });
     setSpriteSelected(updatedSprites.length - 1);
   };
 
@@ -158,15 +158,27 @@ export default function BankEditor({ bankCreator, setBankCreator }) {
           [dimension]: newSize,
         };
 
-        if (dimension === "width") {
-          newSprite.planarGraphicData = Array(
-            newSize * selectedSprite.height * selectedSprite.depth * 2
-          ).fill(0);
-        } else {
-          newSprite.planarGraphicData = Array(
-            selectedSprite.width * newSize * selectedSprite.depth * 2
-          ).fill(0);
+        const oldWidthPixels = selectedSprite.width * 16;
+        const newWidthPixels = newSprite.width * 16;
+        const oldHeight = selectedSprite.height;
+        const newHeight = newSprite.height;
+        const depth = selectedSprite.depth;
+
+        const newPlanarData = Array(newSprite.width * newHeight * depth * 2).fill(0);
+
+        const oldBytesPerRow = Math.ceil(oldWidthPixels / 8);
+        const newBytesPerRow = Math.ceil(newWidthPixels / 8);
+
+        for (let plane = 0; plane < depth; plane++) {
+          for (let y = 0; y < Math.min(oldHeight, newHeight); y++) {
+            for (let xBytes = 0; xBytes < Math.min(oldBytesPerRow, newBytesPerRow); xBytes++) {
+              const oldByteIndex = y * oldBytesPerRow + plane * (oldHeight * oldBytesPerRow) + xBytes;
+              const newByteIndex = y * newBytesPerRow + plane * (newHeight * newBytesPerRow) + xBytes;
+              newPlanarData[newByteIndex] = selectedSprite.planarGraphicData[oldByteIndex] || 0;
+            }
+          }
         }
+        newSprite.planarGraphicData = newPlanarData;
 
         console.log(newSprite);
         const updatedSprites = sprites.map((sprite, i) =>
@@ -191,7 +203,7 @@ export default function BankEditor({ bankCreator, setBankCreator }) {
 
       const updatedSprites = [...sprites, duplicatedSprite];
       setSprites(updatedSprites);
-      setBankCreator({ ...bankCreator, sprites: updatedSprites });
+      setBankCreator({ ...bankCreator, sprites: updatedSprites, palette });
       setSpriteSelected(updatedSprites.length - 1);
     }
   };
@@ -202,7 +214,7 @@ export default function BankEditor({ bankCreator, setBankCreator }) {
 
   // Save bank data to local storage
   const saveBankToLocalStorage = () => {
-    const bankData = JSON.stringify(bankCreator);
+    const bankData = JSON.stringify({ ...bankCreator, sprites, palette });
     localStorage.setItem("bankCreator", bankData);
   };
 
@@ -218,8 +230,9 @@ export default function BankEditor({ bankCreator, setBankCreator }) {
       <div>
         <button
           onClick={() => {
-            console.log(bankCreator);
-            generateAmosBankFile(bankCreator);
+            const currentBank = { ...bankCreator, sprites, palette };
+            setBankCreator(currentBank);
+            generateAmosBankFile(currentBank);
           }}
         >
           GENERATE BANK FILE
@@ -289,7 +302,7 @@ export default function BankEditor({ bankCreator, setBankCreator }) {
           >
             <button
               onClick={() => {
-                setBankCreator({ ...bankCreator, palette: palette });
+                setBankCreator({ ...bankCreator, palette, sprites });
                 setShowColorPicker(false);
               }}
             >
@@ -307,17 +320,25 @@ export default function BankEditor({ bankCreator, setBankCreator }) {
       <div>
         <h2>Pixel Editor</h2>
         <div>
-          <label>Width:</label>
+          <label>Width (pixels):</label>
           <input
             type="number"
-            value={spriteSelected !== null ? sprites[spriteSelected].width : ""}
-            onChange={(e) => updateSpriteSize("width", e.target.value)}
+            step="16"
+            min="16"
+            value={spriteSelected !== null ? sprites[spriteSelected].width * 16 : ""}
+            onChange={(e) => {
+              const val = Number(e.target.value);
+              if (!isNaN(val) && val >= 16 && val % 16 === 0) {
+                updateSpriteSize("width", val / 16);
+              }
+            }}
           />
         </div>
         <div>
-          <label>Height:</label>
+          <label>Height (pixels):</label>
           <input
             type="number"
+            min="1"
             value={
               spriteSelected !== null ? sprites[spriteSelected].height : ""
             }
@@ -328,7 +349,7 @@ export default function BankEditor({ bankCreator, setBankCreator }) {
           <button
             onClick={() => {
               console.log(sprites[spriteSelected]);
-              setBankCreator({ ...bankCreator, sprites: sprites });
+              setBankCreator({ ...bankCreator, sprites, palette });
             }}
           >
             Save
@@ -338,7 +359,7 @@ export default function BankEditor({ bankCreator, setBankCreator }) {
               console.log(sprites[spriteSelected]);
               const spritesCopy = [...sprites];
               spritesCopy.splice(spriteSelected, 1);
-              setBankCreator({ ...bankCreator, sprites: spritesCopy });
+              setBankCreator({ ...bankCreator, sprites: spritesCopy, palette });
             }}
           >
             Delete
@@ -442,7 +463,7 @@ export default function BankEditor({ bankCreator, setBankCreator }) {
                     console.log(sprites[index]);
                     const spritesCopy = [...sprites];
                     spritesCopy.splice(index, 1);
-                    setBankCreator({ ...bankCreator, sprites: spritesCopy });
+                    setBankCreator({ ...bankCreator, sprites: spritesCopy, palette });
                     setSpriteSelected(null);
                   }}
                   style={{
