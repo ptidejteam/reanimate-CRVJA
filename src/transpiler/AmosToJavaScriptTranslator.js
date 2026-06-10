@@ -722,19 +722,15 @@ function loadBank(bankName, bank) {
 
   reader.readAsArrayBuffer(file); // Use readAsArrayBuffer for binary data
 }
-let tries = 0;
-function renderSprite(spriteNumber, x, y, bankImgIndex) {
-  if(tries > 40){
-
-   console.error("Bank not found or could not be loaded");
-   location.reload();
+function renderSprite(spriteNumber, x, y, bankImgIndex, retries = 0) {
+  if(retries > 40){
+   console.error("Bank not found or could not be loaded for sprite", spriteNumber);
    return;
   }
    if (!bankData[1].sprites[bankImgIndex]) {
     
-    tries++;
     setTimeout(() => {
-        renderSprite(spriteNumber, x, y, bankImgIndex);
+        renderSprite(spriteNumber, x, y, bankImgIndex, retries + 1);
       }, 200);
       
     return;
