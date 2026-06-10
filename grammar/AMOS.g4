@@ -67,7 +67,7 @@ term:
     ;
 
 array_index_get:
-    IDENTIFIER ROUND_BRACKET_OPEN expression1 ROUND_BRACKET_CLOSE
+    IDENTIFIER ROUND_BRACKET_OPEN expression1 (COMMA expression1)* ROUND_BRACKET_CLOSE
     ;
 
 factor:
@@ -416,7 +416,7 @@ procedure_call:
     ;
 
 array_structure:
-    IDENTIFIER ROUND_BRACKET_OPEN ((NUMBER | expression1) COMMA? (NUMBER | expression1)?)? ROUND_BRACKET_CLOSE
+    IDENTIFIER ROUND_BRACKET_OPEN (expression1 (COMMA expression1)*)? ROUND_BRACKET_CLOSE
     ;
 
 array_create:
@@ -424,7 +424,7 @@ array_create:
     ;
 
 array_update:
-    IDENTIFIER ROUND_BRACKET_OPEN (NUMBER | IDENTIFIER | expression1) (COMMA (NUMBER | IDENTIFIER | expression1))? ROUND_BRACKET_CLOSE '=' expression1
+    IDENTIFIER ROUND_BRACKET_OPEN expression1 (COMMA expression1)* ROUND_BRACKET_CLOSE '=' expression1
     ;
 
 screen_open:
@@ -444,7 +444,7 @@ ink:
     ;
 
 text:
-    TEXT expression1 COMMA expression1 COMMA (STRING | IDENTIFIER)
+    TEXT expression1 COMMA expression1 COMMA expression1
     ;
 
 do_loop:

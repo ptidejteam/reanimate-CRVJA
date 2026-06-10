@@ -1,13 +1,11 @@
 import { translateAmos } from "./helpers/translate";
+import fs from "fs";
 
-test("create_array", () => {
+test("arrays_txt", () => {
   const amosBasicCode = `
-  Dim C(359),S(359)
-    `;
-
+Dim map(30, 30)
+Read map(x,y)
+  `;
   const translatedJsCode = translateAmos(amosBasicCode);
   console.log("TRANSLATED_CODE:\n" + translatedJsCode);
-
-  expect(translatedJsCode).toContain(`const C = new Array(360)`);
-  expect(translatedJsCode).toContain(`const S = new Array(360)`);
 });

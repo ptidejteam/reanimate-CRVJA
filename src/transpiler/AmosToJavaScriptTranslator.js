@@ -1353,9 +1353,32 @@ ${this.indent()}}`;
        this.globalVariablesSet.add(ctx.array_structure(i).IDENTIFIER(0).getText());
     }
   }
+  rewriteArrayAccesses(ctx, valueStr) {
+    if (!ctx) return valueStr;
+    if (ctx.constructor.name === "Array_index_getContext" || ctx.constructor.name === "Array_structureContext") {
+      let originalText = ctx.getText();
+      let name = ctx.IDENTIFIER().getText();
+      let exprs = ctx.expression1();
+      let modifiedText;
+      if (exprs.length >= 2) {
+          modifiedText = `${name}[${exprs[1].getText()}][${exprs[0].getText()}]`;
+      } else if (exprs.length === 1) {
+          modifiedText = `${name}[${exprs[0].getText()}]`;
+      } else {
+          modifiedText = name;
+      }
+      return valueStr.replace(originalText, modifiedText);
+    }
+    for (let i = 0; i < ctx.getChildCount(); i++) {
+      valueStr = this.rewriteArrayAccesses(ctx.getChild(i), valueStr);
+    }
+    return valueStr;
+  }
+
   enterVariable_starter(ctx) {
     let name = ctx.children[0]?.getText() || "";
-    let value = ctx.children[2]?.getText() || 0;
+    let valueCtx = ctx.children[2];
+    let value = valueCtx?.getText() || 0;
 
     let lineNumber = ctx.start.line;
     if (name !== "Timer") {
@@ -1368,47 +1391,18 @@ ${this.indent()}}`;
       let currentScope = this.scopes[this.scopes.length - 1];
       let isDeclared = currentScope[name] !== undefined || this.globalVariablesSet.has(name);
 
-      if (isDeclared) {
-        // Iterate over all terms and factors in expression1
-        for (let j = 0; ctx.expression1(0)?.term(j); j++) {
-          for (let i = 0; ctx.expression1(0)?.term(j)?.factor(i); i++) {
-            let arrayIndexGet = ctx
-              .expression1(0)
-              ?.term(j)
-              ?.factor(i)
-              ?.array_index_get(0);
-            if (arrayIndexGet) {
-              // Get the text and replace parentheses with square brackets
-              let text = arrayIndexGet.getText();
-              let modifiedText = text.replace(/\(/g, "[").replace(/\)/g, "]");
-              value = value.replace(text, modifiedText);
-            }
-          }
-        }
+      value = this.rewriteArrayAccesses(valueCtx, value);
+      if (typeof value === "string") {
+        value = value.replace(/\\bRnd\\s*\\(([^)]+)\\)/g, "randomInt($1)");
+      }
 
+      if (isDeclared) {
         // Variable already exists at this indent level
-        value = value.replace(/\bRnd\s*\(([^)]+)\)/g, "randomInt($1)");
         this.output += `
      ${this.indent()}${name} = ${value};
           `;
       } else {
-        for (let j = 0; ctx.expression1(0)?.term(j); j++) {
-          for (let i = 0; ctx.expression1(0)?.term(j)?.factor(i); i++) {
-            let arrayIndexGet = ctx
-              .expression1(0)
-              ?.term(j)
-              ?.factor(i)
-              ?.array_index_get(0);
-            if (arrayIndexGet) {
-              // Get the text and replace parentheses with square brackets
-              let text = arrayIndexGet.getText();
-              let modifiedText = text.replace(/\(/g, "[").replace(/\)/g, "]");
-              value = value.replace(text, modifiedText);
-            }
-          }
-        }
         // Variable doesn't exist at this indent level, so create it
-        value = value.replace(/\bRnd\s*\(([^)]+)\)/g, "randomInt($1)");
         let defaultValue = name.endsWith('$') ? '""' : 0;
         
         if (this.scopes.length === 1) {
@@ -1511,17 +1505,24 @@ ${this.indent()}const ${name} = (${props}) => {
     this.output += `
 ${this.indent()}}\n`;
   }
+  enterText(ctx) {
+    const xCtx = ctx.expression1(0);
+    const yCtx = ctx.expression1(1);
+    const textCtx = ctx.expression1(2);
 
-    enterText(ctx) {
-    const x = ctx.expression1(0)?.getText();
-    const y = ctx.expression1(1)?.getText();
-    const text = (ctx.STRING() || ctx.IDENTIFIER())?.getText();
+    let x = xCtx?.getText();
+    let y = yCtx?.getText();
+    let text = textCtx?.getText();
+
+    x = this.rewriteArrayAccesses(xCtx, x);
+    y = this.rewriteArrayAccesses(yCtx, y);
+    text = this.rewriteArrayAccesses(textCtx, text);
 
     const cleanX = x.replace(/[^a-zA-Z0-9]/g, "");
     const cleanY = y.replace(/[^a-zA-Z0-9]/g, "");
     const varName = `textDiv${cleanX}${cleanY}`;
 
-    const isNumeric = (str) => /^\d+$/.test(str);
+    const isNumeric = (str) => /^[0-9]+$/.test(str);
     const xValue = isNumeric(x) ? `'${x}px'` : `(${x}) + 'px'`;
     const yValue = isNumeric(y) ? `'${y}px'` : `(${y}) + 'px'`;
 
@@ -1672,41 +1673,26 @@ ${this.indent()}}, 16); \n
   enterArray_create(ctx) {
     for (let i = 0; i < ctx.array_structure().length; i++) {
       const struct = ctx.array_structure(i);
-      const name = struct.IDENTIFIER(0)?.getText();
+      const name = struct.IDENTIFIER().getText();
 
-      // Check if we have 2 dimensions (either NUMBER or expression1)
-      const hasTwoDimensions =
-        struct.NUMBER().length > 1 ||
-        struct.expression1().length > 1;
+      const exprs = struct.expression1();
+      const hasTwoDimensions = exprs.length > 1;
 
       if (hasTwoDimensions) {
-        // Get dimensions (could be numbers or variables)
-        const dim0 = struct.NUMBER(0)?.getText() ||
-          struct.expression1(0)?.getText() ||
-          "0";
-        const dim1 = struct.NUMBER(1)?.getText() ||
-          struct.expression1(1)?.getText();
+        const dim0 = exprs[0].getText();
+        const dim1 = exprs[1].getText();
 
-        if (dim1) {
-          // 2D Matrix - need to add 1 to dimensions
-          // Check if dimensions are numeric literals or variables
-          const xSize = struct.NUMBER(0) ? `${parseInt(dim0) + 1}` : `(${dim0} + 1)`;
-          const ySize = struct.NUMBER(1) ? `${parseInt(dim1) + 1}` : `(${dim1} + 1)`;
+        const xSize = /^\d+$/.test(dim0) ? `${parseInt(dim0) + 1}` : `(${dim0} + 1)`;
+        const ySize = /^\d+$/.test(dim1) ? `${parseInt(dim1) + 1}` : `(${dim1} + 1)`;
 
-          this.output += `${this.indent()}const ${name} = new Array(${ySize});\n`;
-          this.output += `${this.indent()}for (let i = 0; i < ${ySize}; i++) ${name}[i] = new Array(${xSize});\n`;
-        } else {
-          // 1D Array
-          const size = struct.NUMBER(0) ? `${parseInt(dim0) + 1}` : `(${dim0} + 1)`;
-          this.output += `${this.indent()}const ${name} = new Array(${size});\n`;
-        }
-      } else {
-        // Single dimension array
-        const dim0 = struct.NUMBER(0)?.getText() ||
-          struct.expression1(0)?.getText() ||
-          "0";
-        const size = struct.NUMBER(0) ? `${parseInt(dim0) + 1}` : `(${dim0} + 1)`;
+        this.output += `${this.indent()}const ${name} = new Array(${ySize});\n`;
+        this.output += `${this.indent()}for (let i = 0; i < ${ySize}; i++) ${name}[i] = new Array(${xSize});\n`;
+      } else if (exprs.length === 1) {
+        const dim0 = exprs[0].getText();
+        const size = /^\d+$/.test(dim0) ? `${parseInt(dim0) + 1}` : `(${dim0} + 1)`;
         this.output += `${this.indent()}const ${name} = new Array(${size});\n`;
+      } else {
+        this.output += `${this.indent()}let ${name} = [];\n`;
       }
     }
   }
@@ -1727,59 +1713,52 @@ ${this.indent()}}, 16); \n
   }
 
   enterRead_statement(ctx) {
-    function convertAMOSArrayAccess(text) {
-      const match = text.match(
-        /^(\w+)\s*\(\s*([^\s,]+)\s*,\s*([^\s,)]+)\s*\)$/
-      );
-      if (match) {
-        const [, name, x, y] = match;
-        return { name, x, y };
-      }
-      return null;
-    }
-
     const targets = ctx.children.filter(
       (child) => child.getText() !== "Read" && child.getText() !== ","
     );
 
     for (let i = 0; i < targets.length; i++) {
-      const rawText = targets[i].getText();
-      const access = convertAMOSArrayAccess(rawText);
+      const targetCtx = targets[i];
+      let name, x, y;
+      
+      const arrayStruct = targetCtx.array_structure ? targetCtx.array_structure() : null;
+      if (arrayStruct) {
+          name = arrayStruct.IDENTIFIER().getText();
+          let exprs = arrayStruct.expression1();
+          if (exprs.length >= 2) {
+              x = exprs[0].getText();
+              y = exprs[1].getText();
+          }
+      }
 
-      if (access) {
-        const { name, x, y } = access;
+      if (x && y) {
         this.output += `${this.indent()}${name}[${y}][${x}] = dataMatrix[${y}][${x}];\n`;
       } else {
-        this.output += `${this.indent()}${rawText} = dataMatrix[0][${i}];\n`;
+        let rawText = targetCtx.getText();
+        let processedText = this.rewriteArrayAccesses(targetCtx, rawText);
+        this.output += `${this.indent()}${processedText} = dataMatrix[0][${i}];\n`;
       }
     }
   }
 
   enterArray_update(ctx) {
-    const arrayName = ctx.IDENTIFIER(0).getText();
+    const arrayName = ctx.IDENTIFIER().getText();
 
-    // ----------- INDEX -----------
-    let index1 =
-      ctx.NUMBER(0)?.getText() ||
-      ctx.IDENTIFIER(1)?.getText() ||
-      ctx.expression1(0)?.getText(); // only if index is an expression
-
-    // ----------- SECOND INDEX (2D array) -----------
-    let index2 = null;
-
-    if (ctx.COMMA()) {
-      index2 =
-        ctx.NUMBER(1)?.getText() ||
-        ctx.IDENTIFIER(2)?.getText() ||
-        ctx.expression1(1)?.getText();
-    }
-
-    // ----------- VALUE (ALWAYS final expression1) -----------
     const exprCount = ctx.expression1().length;
-    let arrayTargetValue = ctx.expression1(exprCount - 1).getText();
+    let arrayTargetValueCtx = ctx.expression1(exprCount - 1);
+    let arrayTargetValue = arrayTargetValueCtx.getText();
+    arrayTargetValue = this.rewriteArrayAccesses(arrayTargetValueCtx, arrayTargetValue);
 
-    // ----------- Qcos/Qsin Native Processing -----------
-    // Qsin and Qcos are now properly handled by the parser and JS prelude.
+    let index1Ctx = ctx.expression1(0);
+    let index1 = index1Ctx.getText();
+    index1 = this.rewriteArrayAccesses(index1Ctx, index1);
+
+    let index2 = null;
+    if (exprCount > 2) {
+      let index2Ctx = ctx.expression1(1);
+      index2 = index2Ctx.getText();
+      index2 = this.rewriteArrayAccesses(index2Ctx, index2);
+    }
 
     // ----------- OUTPUT JS -----------
     if (index2) {
@@ -1790,69 +1769,18 @@ ${this.indent()}}, 16); \n
   }
 
   enterIf_statement(ctx) {
-    function convertAMOSArrayAccess(text) {
-      const match = text.match(
-        /^(\w+)\s*\(\s*([^\s,]+)\s*,\s*([^\s,)]+)\s*\)$/
-      );
-      if (match) {
-        const [, name, x, y] = match;
-        return { name, x, y };
-      }
-      return null;
-    }
+    let comparator = ctx.children[2]?.getText();
+    if (comparator === "=") comparator = "==";
+    if (comparator === "<>") comparator = "!=";
 
-    function convertAMOSArrayAccessSimple(text) {
-      //format is <name>(<x>)
+    let leftExpressionCtx = ctx.expression1(0) || ctx.read_target(0);
+    let leftExpression = leftExpressionCtx?.getText();
+    leftExpression = this.rewriteArrayAccesses(leftExpressionCtx, leftExpression);
 
-      const match = text.match(/^(.*?)\s*\(\s*([^\s,]+)\s*\)$/);
-      if (match) {
-        const [, name, x] = match;
+    let rightExpressionCtx = ctx.expression2(0);
+    let rightExpression = rightExpressionCtx?.getText();
+    rightExpression = this.rewriteArrayAccesses(rightExpressionCtx, rightExpression);
 
-        return { name, x };
-      }
-      return null;
-    }
-    let leftExpression;
-    let comparator;
-    let rightExpression = "";
-
-    // Get the left-hand side expression (e.g., PRESSEDKEYNUMBER)
-    leftExpression = ctx.expression1(0)?.getText();
-
-    // Get the comparison operator (e.g., =, <>)
-    comparator = ctx.children[2]?.getText();
-    if (comparator === "=") {
-      comparator = "==";
-    }
-    if (comparator === "<>") {
-      comparator = "!=";
-    }
-
-    // This below is for matrix, array[x][y]
-
-    if (!leftExpression) {
-      const array = convertAMOSArrayAccess(ctx.read_target(0)?.getText());
-      const { name, x, y } = array;
-      leftExpression = `${this.indent()}${name}[${y}][${x}]`;
-    }
-
-    // And this is for usual array
-
-    if (
-      leftExpression &&
-      ctx.expression1(0)?.term(0)?.factor(0)?.array_index_get(0)?.getText()
-    ) {
-      const array = convertAMOSArrayAccessSimple(
-        ctx.expression1(0)?.term(0)?.factor(0)?.array_index_get(0)?.getText()
-      );
-
-      const { name, x } = array;
-      leftExpression = `${this.indent()}${name}[${x}]`;
-    }
-    // Get the right-hand side expression (e.g., 2 * I + 1)
-    rightExpression = ctx.expression2(0)?.getText();
-
-    // Output the if statement
     this.output += `
     
 ${this.indent()}if (${leftExpression} ${comparator} ${rightExpression}) {

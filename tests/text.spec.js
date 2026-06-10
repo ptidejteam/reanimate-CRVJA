@@ -6,6 +6,7 @@ test("Text", () => {
     `;
 
   const translatedJsCode = translateAmos(amosBasicCode);
+  console.log("TRANSLATED_CODE:\n" + translatedJsCode);
   const normalizedTranslatedJsCode = translatedJsCode.replace(/\s+/g, ' ').trim();
 
   expect(normalizedTranslatedJsCode).toContain("const textDiv1010 = document.createElement('div');");
