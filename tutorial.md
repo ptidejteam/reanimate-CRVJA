@@ -18,6 +18,7 @@ Here is the simplest way to start a program:
 Screen Open 1, 600, 400, 8, Hires
 ```
 
+
 **What does this mean?**
 - `1`: The ID of the screen. We use `1` for our main screen.
 - `600, 400`: The width and height of the screen in pixels. Here, our screen is 600 pixels wide and 400 pixels tall.
