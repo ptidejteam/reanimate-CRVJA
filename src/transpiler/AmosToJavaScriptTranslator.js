@@ -7,7 +7,6 @@ class AmosToJavaScriptTranslator extends AMOSListener {
 		this.imports = "";
 		this.output = "";
 		this.id = 0;
-		this.current_Ink = "black";
 		this.colorMapping = {
 			1: "black",
 			2: "white",
@@ -1068,16 +1067,9 @@ soundPlayer(${soundIndex}, ${duration}*1000);
 	}
 
 	enterInk(ctx) {
-		const colorIndex = parseInt(ctx.children[1]?.getText(), 10);
-		let color = this.colorMapping[colorIndex + 1] || "black";
-		
 		const colorIndexExp = this.handleExpression(ctx.children[1]);
 
-console.log(colorIndexExp);
-
-		this.current_Ink = color;
 		this.output += `Ink = getColour(${colorIndexExp});`;
-console.log(this.output);
 	}
 
 	enterPalette(ctx) {
