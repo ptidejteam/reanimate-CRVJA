@@ -628,7 +628,7 @@ export function WorkbenchShell({ children }) {
                     fontWeight: "bold",
                 }}
             >
-                AMOS Basic parser to JavaScript Version 1.0
+                CRVJA Tool Suite v1.1
             </div>
 
            {React.Children.map(children, child => {

@@ -66,14 +66,10 @@ term:
     SUBTRACT? factor ((MULTIPLY | DIVIDE) factor)* // Handle multiplication and division
     ;
 
-array_index_get:
-    IDENTIFIER ROUND_BRACKET_OPEN expression1 (COMMA expression1)* ROUND_BRACKET_CLOSE
-    ;
-
 factor:
     NUMBER                     // A number
     | STRING
-    | array_index_get
+    | array_structure
     | sin_function
     | cos_function
     | qsin_function
@@ -269,7 +265,7 @@ loadBank:
     ;
 
 loadBankImgToSprite:
-    'Sprite' (expression1 COMMA expression1 COMMA expression1 COMMA expression1 | 'Off')
+    'Sprite' (NUMBER COMMA (IDENTIFIER | NUMBER) COMMA (IDENTIFIER | NUMBER) COMMA (IDENTIFIER | NUMBER) | 'Off')
     ;
 
 expressions_comparators:
@@ -416,15 +412,15 @@ procedure_call:
     ;
 
 array_structure:
-    IDENTIFIER ROUND_BRACKET_OPEN (expression1 (COMMA expression1)*)? ROUND_BRACKET_CLOSE
+    IDENTIFIER ROUND_BRACKET_OPEN expression1 (COMMA expression1)* ROUND_BRACKET_CLOSE
     ;
 
 array_create:
-    'Dim' array_structure (COMMA? array_structure)*
+    'Dim' array_structure (COMMA array_structure)*
     ;
 
 array_update:
-    IDENTIFIER ROUND_BRACKET_OPEN expression1 (COMMA expression1)* ROUND_BRACKET_CLOSE '=' expression1
+    array_structure '=' expression1
     ;
 
 screen_open:
@@ -440,11 +436,11 @@ curs_on:
     ;
 
 ink:
-    INK expression1
+    INK NUMBER
     ;
 
 text:
-    TEXT expression1 COMMA expression1 COMMA expression1
+    TEXT expression1 COMMA expression1 COMMA (STRING | IDENTIFIER)
     ;
 
 do_loop:

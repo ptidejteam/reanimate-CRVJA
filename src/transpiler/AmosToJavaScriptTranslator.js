@@ -961,7 +961,6 @@ ${this.indent()}closeChannel(${channel});
     for (let i = 0; i < ctx.print_options().length; i++) {
       let text = ctx.print_options(i)?.getText();
 
-      console.log(typeof text);
       if (!text.includes('"')) {
         text = ctx
           .print_options(i)
@@ -1102,10 +1101,7 @@ ${this.indent()}soundPlayer(${soundIndex}, ${duration}*1000);
 
   enterInk(ctx) {
     const colorIndex = parseInt(ctx.children[1]?.getText(), 10);
-    const variable = ctx.children[2]?.getText();
-    if(variable || colorIndex){
-      console.log(variable,colorIndex);
-    }
+
     const color = this.colorMapping[colorIndex + 1] || "black";
     this.current_Ink = color;
     this.output += `Ink = "${color}";`;
@@ -1356,32 +1352,9 @@ ${this.indent()}}`;
        this.globalVariablesSet.add(ctx.array_structure(i).IDENTIFIER(0).getText());
     }
   }
-  rewriteArrayAccesses(ctx, valueStr) {
-    if (!ctx) return valueStr;
-    if (ctx.constructor.name === "Array_index_getContext" || ctx.constructor.name === "Array_structureContext") {
-      let originalText = ctx.getText();
-      let name = ctx.IDENTIFIER().getText();
-      let exprs = ctx.expression1();
-      let modifiedText;
-      if (exprs.length >= 2) {
-          modifiedText = `${name}[${exprs[1].getText()}][${exprs[0].getText()}]`;
-      } else if (exprs.length === 1) {
-          modifiedText = `${name}[${exprs[0].getText()}]`;
-      } else {
-          modifiedText = name;
-      }
-      return valueStr.replace(originalText, modifiedText);
-    }
-    for (let i = 0; i < ctx.getChildCount(); i++) {
-      valueStr = this.rewriteArrayAccesses(ctx.getChild(i), valueStr);
-    }
-    return valueStr;
-  }
-
   enterVariable_starter(ctx) {
     let name = ctx.children[0]?.getText() || "";
-    let valueCtx = ctx.children[2];
-    let value = valueCtx?.getText() || 0;
+    let value = ctx.children[2]?.getText() || 0;
 
     let lineNumber = ctx.start.line;
     if (name !== "Timer") {
@@ -1394,17 +1367,42 @@ ${this.indent()}}`;
       let currentScope = this.scopes[this.scopes.length - 1];
       let isDeclared = currentScope[name] !== undefined || this.globalVariablesSet.has(name);
 
-      value = this.rewriteArrayAccesses(valueCtx, value);
-      if (typeof value === "string") {
-        value = value.replace(/\\bRnd\\s*\\(([^)]+)\\)/g, "randomInt($1)");
-      }
-
       if (isDeclared) {
+        // Iterate over all terms and factors in expression1
+        for (let j = 0; ctx.expression1(0)?.term(j); j++) {
+          for (let i = 0; ctx.expression1(0)?.term(j)?.factor(i); i++) {
+            let arrayIndexGet = ctx
+              .expression1(0)
+              ?.term(j)
+              ?.factor(i);
+            if (arrayIndexGet) {
+              // Get the text and replace parentheses with square brackets
+              let text = arrayIndexGet.getText();
+              let modifiedText = text.replace(/\(/g, "[").replace(/\)/g, "]");
+              value = value.replace(text, modifiedText);
+            }
+          }
+        }
+
         // Variable already exists at this indent level
         this.output += `
      ${this.indent()}${name} = ${value};
           `;
       } else {
+        for (let j = 0; ctx.expression1(0)?.term(j); j++) {
+          for (let i = 0; ctx.expression1(0)?.term(j)?.factor(i); i++) {
+            let arrayIndexGet = ctx
+              .expression1(0)
+              ?.term(j)
+              ?.factor(i);
+            if (arrayIndexGet) {
+              // Get the text and replace parentheses with square brackets
+              let text = arrayIndexGet.getText();
+              let modifiedText = text.replace(/\(/g, "[").replace(/\)/g, "]");
+              value = value.replace(text, modifiedText);
+            }
+          }
+        }
         // Variable doesn't exist at this indent level, so create it
         let defaultValue = name.endsWith('$') ? '""' : 0;
         
@@ -1508,30 +1506,22 @@ ${this.indent()}const ${name} = (${props}) => {
     this.output += `
 ${this.indent()}}\n`;
   }
-  enterText(ctx) {
-    const xCtx = ctx.expression1(0);
-    const yCtx = ctx.expression1(1);
-    const textCtx = ctx.expression1(2);
 
-    let x = xCtx?.getText();
-    let y = yCtx?.getText();
-    let text = textCtx?.getText();
-
-    x = this.rewriteArrayAccesses(xCtx, x);
-    y = this.rewriteArrayAccesses(yCtx, y);
-    text = this.rewriteArrayAccesses(textCtx, text);
+    enterText(ctx) {
+    const x = ctx.expression1(0)?.getText();
+    const y = ctx.expression1(1)?.getText();
+    const text = (ctx.STRING() || ctx.IDENTIFIER())?.getText();
 
     const cleanX = x.replace(/[^a-zA-Z0-9]/g, "");
     const cleanY = y.replace(/[^a-zA-Z0-9]/g, "");
     const varName = `textDiv${cleanX}${cleanY}`;
 
-    const isNumeric = (str) => /^[0-9]+$/.test(str);
+    const isNumeric = (str) => /^\d+$/.test(str);
     const xValue = isNumeric(x) ? `'${x}px'` : `(${x}) + 'px'`;
     const yValue = isNumeric(y) ? `'${y}px'` : `(${y}) + 'px'`;
 
     if (!text || !text.includes('"')) {
       this.output += `
-        
 ${this.indent()}const ${varName} = document.createElement('div');
 ${this.indent()}${varName}.innerText = ${text};
 ${this.indent()}${varName}.id = 'textDiv' + '${x}' + '${y}';
@@ -1540,13 +1530,11 @@ ${this.indent()}${varName}.style.left = ${xValue};
 ${this.indent()}${varName}.style.top = ${yValue};
 ${this.indent()}${varName}.style.fontSize = '14px';
 ${this.indent()}${varName}.style.color = Ink;
-
 ${this.indent()}${varName}.style.zIndex = 99;
 ${this.indent()}document.getElementById('amos-screen').appendChild(${varName});
-      setInterval(() => {
-  ${varName}.innerText = ${text}; // Function that returns updated value
-}, 100); 
-        `;
+setInterval(() => {
+${varName}.innerText = ${text}; // Function that returns updated value
+}, 100);`;
     } else {
       this.output += `
 ${this.indent()}const ${varName} = document.createElement('div');
@@ -1669,36 +1657,30 @@ ${this.indent()}}, 16); \n
         finalIfStatement += " || ";
       }
     }
-
-    console.log(finalIfStatement);
   }
 
   enterArray_create(ctx) {
-    for (let i = 0; i < ctx.array_structure().length; i++) {
-      const struct = ctx.array_structure(i);
-      const name = struct.IDENTIFIER().getText();
+	for (let i = 0; i < ctx.array_structure().length; i++) {
+		const struct = ctx.array_structure(i);
+		const name   = struct.IDENTIFIER(0)?.getText();
 
-      const exprs = struct.expression1();
-      const hasTwoDimensions = exprs.length > 1;
+		// This code is wrong, it should generate something like
+		// Array(5).fill(0).map(x => Array(10).fill(0))
+		// Cf. https://stackoverflow.com/questions/966225/how-can-i-create-a-two-dimensional-array-in-javascript
 
-      if (hasTwoDimensions) {
-        const dim0 = exprs[0].getText();
-        const dim1 = exprs[1].getText();
+		const numberOfDimensions = struct.expression1().length;
+		if (numberOfDimensions == 1) {
+			this.output += `${this.indent()} const ${name} = new Array(100);`;
+		}
+		else if(numberOfDimensions == 2) {
+			this.output += `${this.indent()} const ${name} = Array(100).fill(0).map(x => Array(100).fill(0));`;
+		}
+		else {
+			console.log("XXX, I don't know how to handle matrix with d > 2");
+		}
+	}
+}
 
-        const xSize = /^\d+$/.test(dim0) ? `${parseInt(dim0) + 1}` : `(${dim0} + 1)`;
-        const ySize = /^\d+$/.test(dim1) ? `${parseInt(dim1) + 1}` : `(${dim1} + 1)`;
-
-        this.output += `${this.indent()}const ${name} = new Array(${ySize});\n`;
-        this.output += `${this.indent()}for (let i = 0; i < ${ySize}; i++) ${name}[i] = new Array(${xSize});\n`;
-      } else if (exprs.length === 1) {
-        const dim0 = exprs[0].getText();
-        const size = /^\d+$/.test(dim0) ? `${parseInt(dim0) + 1}` : `(${dim0} + 1)`;
-        this.output += `${this.indent()}const ${name} = new Array(${size});\n`;
-      } else {
-        this.output += `${this.indent()}let ${name} = [];\n`;
-      }
-    }
-  }
   exitFor_loop(ctx) {
     this.indentLevel--; // Decrease indentation after exiting the loop
     this.output += `${this.indent()}}`;
@@ -1715,86 +1697,178 @@ ${this.indent()}}, 16); \n
     this.output += `${this.indent()}dataMatrix.push(${row});\n`;
   }
 
-  enterRead_statement(ctx) {
-    const targets = ctx.children.filter(
-      (child) => child.getText() !== "Read" && child.getText() !== ","
-    );
+	enterRead_statement(ctx) {
+		const targets = ctx.children.filter((child) => child.getText() !== "Read" && child.getText() !== ",");
 
-    for (let i = 0; i < targets.length; i++) {
-      const targetCtx = targets[i];
-      let name, x, y;
-      
-      const arrayStruct = targetCtx.array_structure ? targetCtx.array_structure() : null;
-      if (arrayStruct) {
-          name = arrayStruct.IDENTIFIER().getText();
-          let exprs = arrayStruct.expression1();
-          if (exprs.length >= 2) {
-              x = exprs[0].getText();
-              y = exprs[1].getText();
-          }
-      }
+		for (let i = 0; i < targets.length; i++) {
+			const rawText = targets[i].getText();
 
-      if (x && y) {
-        this.output += `${this.indent()}${name}[${y}][${x}] = dataMatrix[${y}][${x}];\n`;
-      } else {
-        let rawText = targetCtx.getText();
-        let processedText = this.rewriteArrayAccesses(targetCtx, rawText);
-        this.output += `${this.indent()}${processedText} = dataMatrix[0][${i}];\n`;
-      }
-    }
-  }
+			const struct = targets[i].array_structure();
+			const name   = struct.IDENTIFIER(0)?.getText();
+			this.output += `${this.indent()} ${name}`;
+
+			const numberOfDimensions = struct.expression1().length;
+			
+			let indicesLeftToRight = "";
+			for(let j = 0; j < numberOfDimensions; j++)
+			{
+				const indexValue = struct.expression1(j).getText();
+				indicesLeftToRight += `[${indexValue}]`;
+			}
+
+			let indicesRightToLeft = "";
+			for(let j = numberOfDimensions - 1; j >= 0; j--)
+			{
+				const indexValue = struct.expression1(j).getText();
+				indicesRightToLeft += `[${indexValue}]`;
+			}
+
+			// Reading dataMatrix should be independent of x and y
+			this.output += `${indicesLeftToRight} = dataMatrix${indicesRightToLeft};\n`;
+		}
+	}
 
   enterArray_update(ctx) {
-    const arrayName = ctx.IDENTIFIER().getText();
+	// This is NOT a context, it's an Array_updateContext, which contains an array_structure
+	const struct = ctx.array_structure();
 
-    const exprCount = ctx.expression1().length;
-    let arrayTargetValueCtx = ctx.expression1(exprCount - 1);
-    let arrayTargetValue = arrayTargetValueCtx.getText();
-    arrayTargetValue = this.rewriteArrayAccesses(arrayTargetValueCtx, arrayTargetValue);
+	const name   = struct.IDENTIFIER(0)?.getText();
+	const firstIndex = struct.expression1(0).getText();
+	this.output += `${this.indent()} ${name}[${firstIndex}]`;
+	const numberOfDimensions = struct.expression1().length;
+	for(let j = 1; j < numberOfDimensions; j++)
+	{
+		const indexValue = struct.expression1(j).getText();
+		this.output += `[${indexValue}]`;
+	}
 
-    let index1Ctx = ctx.expression1(0);
-    let index1 = index1Ctx.getText();
-    index1 = this.rewriteArrayAccesses(index1Ctx, index1);
-
-    let index2 = null;
-    if (exprCount > 2) {
-      let index2Ctx = ctx.expression1(1);
-      index2 = index2Ctx.getText();
-      index2 = this.rewriteArrayAccesses(index2Ctx, index2);
-    }
-
-    // ----------- OUTPUT JS -----------
-    if (index2) {
-      this.output += `${this.indent()}${arrayName}[${index2}][${index1}] = ${arrayTargetValue};\n`;
-    } else {
-      this.output += `${this.indent()}${arrayName}[${index1}] = ${arrayTargetValue};\n`;
-    }
+	const expression1 = ctx.expression1();
+    const arrayValue = expression1.getText();
+	this.output += `= ${arrayValue};\n`;
   }
 
+	/*
+	NUMBER
+	| STRING
+	| array_structure
+	| sin_function
+	| cos_function
+	| qsin_function
+	| qcos_function
+	| rndFunction
+	| IDENTIFIER
+	| '(' expression1 ')'
+	| HEX_NUMBER
+	*/
+	handleFactor(accumulator, factorContext) {
+		const children  = factorContext.children;
+		for(let i = 0; i < children.length; i++) {
+			const child     = children[i];
+			const childName = child.constructor.name;
+
+			if(childName === 'Me') {
+				this.handleSymbol(accumulator, child);
+			}
+			else if(childName === 'Array_structureContext') {
+				this.handleArrayAccess(accumulator, child);
+			}
+			else if(childName === 'Expression1Context') {
+				this.handleExpr(accumulator, child);
+			}
+			else if(typeof factorContext.expression1() === 'function') {
+				accumulator.push('(');
+				this.handleExpression(accumulator, factorContext.expression());
+				accumulator.push(')');
+			}
+			else {
+				console.log("XXX, I don't know what to do with " + childName);
+				accumulator.push('XXX');
+			}
+		}
+	}
+
+	handleArrayAccess(accumulator, arrayStructure) {
+		const name = arrayStructure.IDENTIFIER(0)?.getText();
+
+		const firstIndex = arrayStructure.expression1(0).getText();
+		accumulator.push(`${name}[${firstIndex}]`);
+
+		const numberOfDimensions = arrayStructure.expression1().length;
+		for(let j = 1; j < numberOfDimensions; j++)
+		{
+			const indexValue = arrayStructure.expression1(j).getText();
+			accumulator.push(`[${indexValue}]`);
+		}
+	}
+
+	handleSymbol(accumulator, symbol) {
+		accumulator.push(symbol.getText());
+	}
+
+	handleTerm(accumulator, termContext) {
+		const children = termContext.children;
+		for(let i = 0; i < children.length; i++) {
+			const child     = children[i];
+			const childName = child.constructor.name;
+			if(childName === 'Me') {
+				this.handleSymbol(accumulator, child);
+			}
+			else if(childName === 'FactorContext') {
+				this.handleFactor(accumulator, child);
+			}
+		}
+	}
+
+	handleExpr(accumulator, expressionContext) {
+		this.handleTerm(accumulator, expressionContext.term(0));
+		if(expressionContext.term(1)) {
+			this.handleSymbol(accumulator, expressionContext.children[1]);
+			this.handleTerm(accumulator, expressionContext.term(1));
+		}
+	}
+
+	handleExpression(expressionContext) {
+		let accumulator = [];
+		this.handleTerm(accumulator, expressionContext.term(0));
+		if(expressionContext.term(1)) {
+			this.handleSymbol(accumulator, expressionContext.children[1]);
+			this.handleTerm(accumulator, expressionContext.term(1));
+		}
+		return accumulator.join("");
+	}
+
   enterIf_statement(ctx) {
-    let comparator = ctx.children[2]?.getText();
-    if (comparator === "=") comparator = "==";
-    if (comparator === "<>") comparator = "!=";
+    let leftExpression;
+    let comparator;
+    let rightExpression = "";
 
-    let leftExpressionCtx = ctx.expression1(0) || ctx.read_target(0);
-    let leftExpression = leftExpressionCtx?.getText();
-    leftExpression = this.rewriteArrayAccesses(leftExpressionCtx, leftExpression);
+    // Get the left-hand side expression (e.g., PRESSEDKEYNUMBER)
+	leftExpression = this.handleExpression(ctx.expression1());
 
-    let rightExpressionCtx = ctx.expression2(0);
-    let rightExpression = rightExpressionCtx?.getText();
-    rightExpression = this.rewriteArrayAccesses(rightExpressionCtx, rightExpression);
+    // Get the comparison operator (e.g., =, <>)
+    comparator = ctx.children[2]?.getText();
+    if (comparator === "=") {
+      comparator = "==";
+    }
+    if (comparator === "<>") {
+      comparator = "!=";
+    }
 
-    this.output += `
-    
-${this.indent()}if (${leftExpression} ${comparator} ${rightExpression}) {
-        `;
+    // Get the right-hand side expression (e.g., 2 * I + 1)
+	// console.log(ctx.expression2());
+    // rightExpression = ctx.expression2(0)?.getText();
+	// console.log(rightExpression);
+	rightExpression = this.handleExpression(ctx.expression2());
+	// console.log(rightExpression);
+
+    // Output the if statement
+    this.output += `${this.indent()}if (${leftExpression} ${comparator} ${rightExpression}) {`;
     this.indentLevel++; // Increase indentation for nested blocks
   }
 
   exitIf_statement(ctx) {
     this.indentLevel--; // Decrease indentation after exiting the if block
-    this.output += `
-${this.indent()}}`;
+    this.output += `${this.indent()}}`;
   }
 
   enterProcedure_call(ctx) {
@@ -1854,19 +1928,18 @@ ${this.indent()}if (currentPressedKey === ${leftExpression}]) {
 
   exitIf_statement_key_state(ctx) {
     this.indentLevel--; // Decrease indentation after exiting the if block
-    this.output += `
-${this.indent()}
-}`;
+    this.output += `${this.indent()}}`;
   }
 
   enterElse_statement(ctx) {
-    this.output += `}else {`;
+    this.output += `} else {`;
     this.indentLevel++;
   }
   exitElse_statement(ctx) {
     this.indentLevel--;
-    this.output += ``;
+    this.output += '';
   }
+
   getJavaScript() {
     let result = (
       this.imports +
@@ -1875,7 +1948,8 @@ ${this.indent()}
       this.output +
       this.functionStarters
     );
-    return result.replace(/\bRnd\s*\(([^)]+)\)/g, "randomInt($1)");
+    result = result.replace(/Rnd\s*\(([^)]+)\)/gi, "randomInt($1)");
+	return result;
   }
 }
 

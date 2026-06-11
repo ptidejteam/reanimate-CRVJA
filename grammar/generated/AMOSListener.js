@@ -32,15 +32,6 @@ export default class AMOSListener extends antlr4.tree.ParseTreeListener {
 	}
 
 
-	// Enter a parse tree produced by AMOSParser#array_index_get.
-	enterArray_index_get(ctx) {
-	}
-
-	// Exit a parse tree produced by AMOSParser#array_index_get.
-	exitArray_index_get(ctx) {
-	}
-
-
 	// Enter a parse tree produced by AMOSParser#factor.
 	enterFactor(ctx) {
 	}

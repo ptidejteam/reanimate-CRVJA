@@ -45,7 +45,7 @@ export function useAMOSParser(amosCode) {
         plugins: [babelPlugin, estreePlugin],
       });
       setJsCode(formatted);
-      console.log(formatted);
+      // console.log(formatted);
     } catch {
       setJsCode(translatedJsCode);
     }
