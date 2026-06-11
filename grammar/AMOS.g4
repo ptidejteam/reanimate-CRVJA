@@ -2,9 +2,13 @@ grammar AMOS;
 
 // Lexer rules
 SCREENOPEN: 'Screen Open';
+
+LOADIFF: 'Load Iff';
+
 NUMBER: [0-9]+;
 LOWRES: 'Lowres';
 HIRES: 'Hires';
+
 COMMA: ',';
 COMMENT: '\'' ~[\n\r]* -> skip;
 REM: 'Rem' ~[\n\r]* -> skip;
@@ -403,7 +407,7 @@ wait_key_break:
     ;
 
 variable_starter:
-    IDENTIFIER '=' (expression1 | btst | '""') // Now captures only variable assignments
+    IDENTIFIER '=' (expression1 | btst) // Now captures only variable assignments
     ;
 
 procedure_call:
@@ -425,6 +429,10 @@ array_update:
 
 screen_open:
     SCREENOPEN NUMBER COMMA NUMBER COMMA NUMBER COMMA NUMBER COMMA (LOWRES | HIRES)
+    ;
+
+load_iff:
+    LOADIFF IDENTIFIER expression1
     ;
 
 curs_off:
