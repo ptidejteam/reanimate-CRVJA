@@ -1339,45 +1339,9 @@ console.log(this.colorMapping);
 			let isDeclared = currentScope[name] !== undefined || this.globalVariablesSet.has(name);
 
 			if (isDeclared) {
-				// TODO: Test the code without this comment, and remove this comment when sure!
-				/*
-				for (let j = 0; ctx.expression1(0)?.term(j); j++) {
-					for (let i = 0; ctx.expression1(0)?.term(j)?.factor(i); i++) {
-						let arrayIndexGet = ctx
-							.expression1(0)
-							?.term(j)
-							?.factor(i);
-						if (arrayIndexGet) {
-							// Get the text and replace parentheses with square brackets
-							let text = arrayIndexGet.getText();
-							let modifiedText = text.replace(/\(/g, "[").replace(/\)/g, "]");
-							value = value.replace(text, modifiedText);
-						}
-					}
-				}
-				*/
-
 				// Variable already exists at this level
 				this.output += `${name} = ${value};`;
 			} else {
-				// TODO: Test the code without this comment, and remove this comment when sure!
-				/*
-				for (let j = 0; ctx.expression1(0)?.term(j); j++) {
-					for (let i = 0; ctx.expression1(0)?.term(j)?.factor(i); i++) {
-						let arrayIndexGet = ctx
-							.expression1(0)
-							?.term(j)
-							?.factor(i);
-						if (arrayIndexGet) {
-							// Get the text and replace parentheses with square brackets
-							let text = arrayIndexGet.getText();
-							let modifiedText = text.replace(/\(/g, "[").replace(/\)/g, "]");
-							value = value.replace(text, modifiedText);
-						}
-					}
-				}
-				*/
-
 				// Variable doesn't exist at this level, so create it
 				let defaultValue = name.endsWith('$') ? '""' : 0;
 				if (this.scopes.length === 1) {
