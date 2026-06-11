@@ -7,16 +7,24 @@ class AmosToJavaScriptTranslator extends AMOSListener {
 		this.imports = "";
 		this.output = "";
 		this.id = 0;
+		// https://www.rapidtables.com/web/color/RGB_Color.html
 		this.colorMapping = {
-			1: "black",
-			2: "white",
-			3: "white",
-			4: "red",
-			5: "green",
-			6: "green",
-			7: "rgb(160, 64, 0)",
-			8: "rgb(160, 64, 0)",
-			9: "rgb(160, 64, 0)",
+			0: "rgb(0,0,0)",
+			1: "rgb(255,255,255)",
+			2: "rgb(255,0,0)",
+			3: "rgb(0,255,0)",
+			4: "rgb(0,0,255)",
+			5: "rgb(255,255,0)",
+			6: "rgb(0,255,255)",
+			7: "rgb(255,0,255)",
+			8: "rgb(192,192,192)",
+			9: "rgb(128,128,128)",
+			10: "rgb(128,0,0)",
+			11: "rgb(128,128,0)",
+			12: "rgb(0,128,0)",
+			13: "rgb(128,0,128)",
+			14: "rgb(0,128,128)",
+			15: "rgb(0,0,128)",
 		};
 		this.pallette = `const colorMapping = ${JSON.stringify(this.colorMapping, null, 2)};`;
 		this.lineData = this.lineData || [];
@@ -792,7 +800,7 @@ function renderSprite(spriteNumber, x, y, bankImgIndex) {
 }
 
 function getColour(expression) {
-	return colorMapping[expression + 1];
+	return colorMapping[expression];
 }
 `;
 	}
@@ -976,7 +984,7 @@ readFromChannel(${channel}, (data) => {
 const amosScreen = document.getElementById('amos-screen');
 if (amosScreen) {
   amosScreen.innerHTML = '';
-  amosScreen.style.backgroundColor = colorMapping[Paper + 1] || "black";
+  amosScreen.style.backgroundColor = colorMapping[Paper];
 }
       `;
 		} else if (exprs.length === 1) {
@@ -986,7 +994,7 @@ if (amosScreen) {
 const amosScreen = document.getElementById('amos-screen');
 if (amosScreen) {
   amosScreen.innerHTML = '';
-  amosScreen.style.backgroundColor = colorMapping[${color} + 1] || "black";
+  amosScreen.style.backgroundColor = colorMapping[${color}];
 }
       `;
 		} else if (exprs.length >= 5) {
@@ -999,7 +1007,7 @@ if (amosScreen) {
 
 			this.output += `
 {
-  const clearColor = colorMapping[${color} + 1] || "black";
+  const clearColor = colorMapping[${color}];
   const clearX1 = ${x1};
   const clearY1 = ${y1};
   const clearX2 = ${x2};
@@ -1038,32 +1046,24 @@ document.getElementById('amos-screen').style.cursor = 'none';
 	}
 
 	enterPaper(ctx) {
-		const color = ctx.children[1]?.getText();
-		this.output += `
-Paper = ${color};
-    `;
+		const color = this.handleExpression(ctx.children[1]);
+		this.output += `Paper = ${color};`;
 	}
 
 	enterPen(ctx) {
 		const color = ctx.children[1]?.getText();
-		this.output += `
-Pen = ${color};
-    `;
+		this.output += `Pen = ${color};`;
 	}
 
 	enterCurs_on(ctx) {
-		this.output += `
-document.getElementById('amos-screen').style.cursor = 'auto';
-        `;
+		this.output += "document.getElementById('amos-screen').style.cursor = 'auto';";
 	}
 
 	enterPlay_sound(ctx) {
 		const soundIndex = ctx.children[1]?.getText();
 		const duration = ctx.children[3]?.getText();
 
-		this.output += `
-soundPlayer(${soundIndex}, ${duration}*1000);
-        `;
+		this.output += `soundPlayer(${soundIndex}, ${duration}*1000);`;
 	}
 
 	enterInk(ctx) {
@@ -1116,7 +1116,6 @@ soundPlayer(${soundIndex}, ${duration}*1000);
 			this.colorMapping[index + 1] = `rgb(${red}, ${green}, ${blue})`;
 		});
 		this.pallette = `const colorMapping = ${JSON.stringify(this.colorMapping, null, 2)};`;
-console.log(this.colorMapping);
 	}
 
 	enterTurbo_draw(ctx) {
@@ -1135,7 +1134,7 @@ console.log(this.colorMapping);
 		let y1 = ctx.expression1(1)?.getText();
 		let x2 = ctx.expression1(2)?.getText();
 		let y2 = ctx.expression1(3)?.getText();
-		let color = `colorMapping[(${ctx.expression1(4)?.getText()}) + 1]`;
+		let color = `colorMapping[(${ctx.expression1(4)?.getText()})]`;
 		let the_ID = generateRandomID();
 		let index = ctx.expression1(5)?.getText();
 
@@ -1445,8 +1444,8 @@ function ${name}(${props}) {
 			this.output += `
 const ${varName} = document.createElement('div');
 ${varName}.innerText = ${text};
-${varName}.id = 'textDiv' + '${x}' + '${y}';
-${varName}.style.position = 'fixed';
+${varName}.id = 'textDiv' + '${x}' + '${y}' + Math.random();
+${varName}.style.position = 'absolute';
 ${varName}.style.left = ${xValue};
 ${varName}.style.top = ${yValue};
 ${varName}.style.fontSize = '14px';
@@ -1460,13 +1459,12 @@ ${varName}.innerText = ${text}; // Function that returns updated value
 			this.output += `
 const ${varName} = document.createElement('div');
 ${varName}.innerText = '${text.replace(/"/g, "")}';
-${varName}.id = 'textDiv' + '${x}' + '${y}';
+${varName}.id = 'textDiv' + '${x}' + '${y}' + Math.random();
 ${varName}.style.position = 'absolute';
 ${varName}.style.left = ${xValue};
 ${varName}.style.top = ${yValue};
 ${varName}.style.fontSize = '14px';
 ${varName}.style.color = Ink;
-${varName}.style.position = "Relative";
 ${varName}.style.zIndex = 99;
 document.getElementById('amos-screen').appendChild(${varName});
         `;
@@ -1477,50 +1475,23 @@ document.getElementById('amos-screen').appendChild(${varName});
 		const waitTicks = ctx.NUMBER().getText();
 		const ms = parseInt(waitTicks) * 20; // AMOS = ~50fps
 
-		this.output += `
-allowLoop = false;
-setTimeout(() => {
-allowLoop = true;
-}, ${ms});\n`;
+		this.output += `await new Promise(r => setTimeout(r, ${ms}));`
 	}
 
 	enterDo_loop(ctx) {
-		this.output += `
-let allowLoop = true; // Controla o loop para Wait funcionar
-
-setInterval(() => {
-  if (!allowLoop) return;
-
-  currentTimer = Date.now();
-  Timer++;\n`;
+		this.output += 'while(true) {';
 	}
 
 	enterRepeat_key(ctx) {
-		this.output += `
-setInterval(() => {
-  currentTimer = Date.now();
-  Timer++;
-
-        `;
+		this.output += 'setInterval(() => { currentTimer = Date.now(); Timer++;';
 	}
 
 	exitRepeat_key(ctx) {
-		this.output += `
-    
-    
-    Timer = 9;
-  
-}, 16);`;
+		this.output += 'Timer = 9; }, 16);';
 	}
 
 	exitDo_loop(ctx) {
-		this.output += `
-    
-    
-    Timer = 9;
-  
-}, 16); \n
-`;
+		this.output += 'await new Promise(r => setTimeout(r, 16));}';
 	}
 
 	enterFor_loop(ctx) {
@@ -1850,6 +1821,7 @@ setInterval(() => {
 		);
 
 		result = result.replace(/Rnd\s*\(([^)]+)\)/gi, "randomInt($1)");
+console.log(result);
 		return result;
 	}
 }

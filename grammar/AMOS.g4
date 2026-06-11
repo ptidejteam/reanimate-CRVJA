@@ -363,7 +363,7 @@ cls:
     ;
 
 paper:
-    'Paper' NUMBER
+    'Paper' expression1
     ;
 
 degree:

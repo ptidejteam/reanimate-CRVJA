@@ -217,6 +217,37 @@ function App() {
                     </div>
                     <div style={{ display: 'flex', flexDirection: "column", gap: "10px" }} >
                       <button
+
+                        onClick={() => {
+                          const filename = "my_amos_code.asc"; // or generate dynamic name
+                          downloadASCFile(filename, AmosCode);
+                        }}
+
+                        style={styleButton}
+                        onMouseDown={(e) => {
+                          e.target.style.transform = "translate(4px, 4px)";
+                          e.target.style.boxShadow = "0 0 0 #004444";
+                        }}
+                        onMouseUp={(e) => {
+                          e.target.style.transform = "translate(0, 0)";
+                          e.target.style.boxShadow = "4px 4px 0 #004444";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.transform = "translate(0, 0)";
+                          e.target.style.boxShadow = "4px 4px 0 #004444";
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.transform = "translate(2px, 2px)";
+                          e.target.style.boxShadow = "2px 2px 0 #004444";
+                        }}
+                        onMouseOut={(e) => {
+                          e.target.style.transform = "translate(0, 0)";
+                          e.target.style.boxShadow = "4px 4px 0 #004444";
+                        }}
+                      >
+                        Save .ASC Code
+                      </button>
+                      <button
                         onClick={async () => {
                           try {
                             await forceParse(AmosCode); // updates jsCode
@@ -247,38 +278,7 @@ function App() {
                           e.target.style.boxShadow = "4px 4px 0 #004444";
                         }}
                       >
-                        Run code
-                      </button>
-                      <button
-
-                        onClick={() => {
-                          const filename = "my_amos_code.asc"; // or generate dynamic name
-                          downloadASCFile(filename, AmosCode);
-                        }}
-
-                        style={styleButton}
-                        onMouseDown={(e) => {
-                          e.target.style.transform = "translate(4px, 4px)";
-                          e.target.style.boxShadow = "0 0 0 #004444";
-                        }}
-                        onMouseUp={(e) => {
-                          e.target.style.transform = "translate(0, 0)";
-                          e.target.style.boxShadow = "4px 4px 0 #004444";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.target.style.transform = "translate(0, 0)";
-                          e.target.style.boxShadow = "4px 4px 0 #004444";
-                        }}
-                        onMouseEnter={(e) => {
-                          e.target.style.transform = "translate(2px, 2px)";
-                          e.target.style.boxShadow = "2px 2px 0 #004444";
-                        }}
-                        onMouseOut={(e) => {
-                          e.target.style.transform = "translate(0, 0)";
-                          e.target.style.boxShadow = "4px 4px 0 #004444";
-                        }}
-                      >
-                        Save .ASC Code
+                        Run Code
                       </button>
                     </div>
                   </div>
