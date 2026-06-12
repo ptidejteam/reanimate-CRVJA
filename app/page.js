@@ -182,7 +182,7 @@ function App() {
 		}
 		/> <
 		WorkbenchIcon id = "manual"
-		label = "AMOS Manual"
+		label = "Manual"
 		icon = "/icons/manual.png"
 		onOpen = {
 			() => window.open("https://amospromanual.dev/", "_blank")
