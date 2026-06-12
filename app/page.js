@@ -548,6 +548,7 @@ function App() {
 				</div>
 				</div>
 				</div>
+				&nbsp;
 				</WorkbenchWindow>
 			)
 		}

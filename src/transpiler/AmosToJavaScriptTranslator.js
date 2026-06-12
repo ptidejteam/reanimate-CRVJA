@@ -713,13 +713,11 @@ let tries = 0;
 
 function renderSprite(spriteNumber, x, y, bankImgIndex) {
 	if (tries > 40) {
-
 		console.error("Bank not found or could not be loaded");
 		location.reload();
 		return;
 	}
 	if (!bankData[1].sprites[bankImgIndex]) {
-
 		tries++;
 		setTimeout(() => {
 			renderSprite(spriteNumber, x, y, bankImgIndex);
@@ -1056,8 +1054,14 @@ if (amosScreen) {
 		this.output += `Ink = ${colorIndexExp};`;
 	}
 
+	enterPen(ctx) {
+		const colorIndexExp = this.handleExpression(ctx.children[1]);
+
+		this.output += `Ink = ${colorIndexExp};`;
+	}
+
 	enterPalette(ctx) {
-		// Array to collect complete hex color values from the Palette
+		// Array to collect complete hex colour values from the Palette
 		const hexColors = [];
 		let currentHex = '';
 
@@ -1269,6 +1273,7 @@ circleDiv.style.backgroundColor = getColour(Ink);`;
 			return parseInt(match.substring(1), 16);
 		});
 
+		// Cf. https://www.cknow.com/cms/articles/what-is-a-scan-code.html
 		this.output += `\nif (currentPressedKey === keyMapping[${leftExpression}]) {`;
 	}
 
@@ -1415,6 +1420,7 @@ function ${name}(${props}) {
 		const xValue = isNumeric(x) ? `'${x}px'` : `(${x}) + 'px'`;
 		const yValue = isNumeric(y) ? `'${y}px'` : `(${y}) + 'px'`;
 
+		// TODO: Find other elements below and, if covering them, delete them
 		this.output += `
 const ${varName} = document.createElement('div');
 ${varName}.innerText = ${text};
@@ -1510,18 +1516,21 @@ document.getElementById('amos-screen').appendChild(${varName});`;
 			const struct = ctx.array_structure(i);
 			const name = struct.IDENTIFIER(0)?.getText();
 
-			// This code is wrong, it should generate something like
-			// Array(5).fill(0).map(x => Array(10).fill(0))
 			// Cf. https://stackoverflow.com/questions/966225/how-can-i-create-a-two-dimensional-array-in-javascript
 
 			const numberOfDimensions = struct.expression1().length;
-			if (numberOfDimensions == 1) {
-				this.output += ` const ${name} = new Array(100);`;
-			} else if (numberOfDimensions == 2) {
-				this.output += ` const ${name} = Array(100).fill(0).map(x => Array(100).fill(0));`;
-			} else {
-				console.log("YYY, I don't know how to handle matrix with d > 2");
+			let dimension = struct.expression1()[0].getText();
+			this.output += `const ${name} = Array(${dimension}).fill(0)`;
+			
+			for(let i = 1; i < numberOfDimensions; i++) {
+				let dimension = struct.expression1()[i].getText();
+				this.output += `.map(x => Array(${dimension}).fill(0)`;
 			}
+			for(let i = 1; i < numberOfDimensions; i++) {
+				this.output += ')';
+			}
+
+			this.output += ';'
 		}
 	}
 

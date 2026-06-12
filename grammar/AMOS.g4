@@ -355,7 +355,7 @@ double_buffer:
     ;
 
 pen:
-    'Pen' NUMBER
+    'Pen' expression1
     ;
 
 cls:

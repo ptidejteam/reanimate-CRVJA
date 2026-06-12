@@ -1,22 +1,30 @@
-CRVJA
------
+TODO
+----
+
+Maximise/Minimise buttons for the code editor and the program screen
+
+Code formatter like in the real AMOS
+
+Error management!!!
 
 When the sprite bank is "wrong", the screen flickers without error message
-Cannot use variable in Screen Open, like "Screen Open 1, TILE_SIZE * 24..."
+
 Allow entering exact numbers in the sprite height and width boxes in the Pixel Editor
 When double clicking on a "pixel" the colour should revert to the previous colour
+
 When using "Sprite 4, 10, 10, 27" where 27 doesn't exist, the screen flickers
-Remove "Run Code" and have "Save .AMOS File" and rename "Save .ASC Code" into "Save .ASC File"
+
+Cannot use variable in Screen Open, like "Screen Open 1, TILE_SIZE * 24..."
 Screen Open should limit the number of colour of Palette
+
 If two procedures have the same name, there should be a clear error message
 
 array_create:
     'Dim' array_structure (COMMA? array_structure)*
 	Should probably remove the question mark
 
-
 Array should be checked before use
-Screen Open 1,700,700,8,Hires
+	Screen Open 1,700,700,8,Hires
 	Dim A(2)
 
 	A(1) = 1
@@ -31,13 +39,33 @@ Screen Open 1,700,700,8,Hires
 Wherever we do "const ${name} = "
 	We should prefix with, for example, "AMOS_"
 
-Right now, JavaScript arrays are always with "1" as value for their dimensions
-	See "const ${name} = new Array(1`;"
-
 Remove expression2 and keep only expression1 (rename into "expression")
 
 Why is there "NUMBER?" in
 	term ((ADD | SUBTRACT) term)* NUMBER? // Handle addition and subtraction
+
+Arithmetic computation should be Math.trunc when not using AMOS floats...
+
+"Global A(1)" shouldn't take a number but just be "Global A()"
+
+Multidimensional array: accessing the first index with a wrong number doesn't report an error in CRVJA
+Accessing the first index with a correct number but the second with a wrong one shows "undefined"
+	Screen Open 1,500,500,12,Hires
+	Paper 0
+	Cls
+
+	Dim A(1,1)
+	A(0,0) = 1
+	TEMP = A(0,1)
+	Ink 2
+	Text 10,10,"HELLO"
+	Text 10,50,TEMP
+
+
+
+DONE
+----
+Remove "Run Code" and have "Save .AMOS File" and rename "Save .ASC Code" into "Save .ASC File"
 
 Reading DATA doesn't work as expected at
 	"dataMatrix[${y}][${x}];\n"
@@ -60,9 +88,10 @@ Why is the first "raw" of a multidimensional array set to 1s?
 		Text 100,100,"Uh"
 	End If
 
-The creation of (multidimensional) arrays is hacked for 1 or 2 dimensions, and always with n=100
-
 Why do we deal with Rnd at three different places?
 	"randomInt"
 
-Arithmetic computation should be Math.trunc when not using AMOS floats...
+The creation of (multidimensional) arrays is hacked for 1 or 2 dimensions, and always with n=100
+
+Right now, JavaScript arrays are always with "1" as value for their dimensions
+	See "const ${name} = new Array(1`;"
