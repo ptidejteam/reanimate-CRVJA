@@ -87,6 +87,7 @@ export default function AmosRunner({ jsCode, runNonce, bankFiles }) {
       if (data.type === "amos-size") {
         iframe.style.width = `${Math.max(1, Math.round(data.width))}px`;
         iframe.style.height = `${Math.max(1, Math.round(data.height))}px`;
+        iframe.style.height = `${Math.max(1, Math.round(data.height))}px`;
       }
 
       if (data.type === "amos-ready") {

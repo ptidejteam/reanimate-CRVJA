@@ -9,6 +9,7 @@ export default function BankSlotManager({ numBanks, bankFiles, onFileChange }) {
         display: "flex",
         flexDirection: "row",
         border: "1px solid black",
+		padding: "10px"
       }}
     >
       <div
