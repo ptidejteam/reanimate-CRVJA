@@ -289,14 +289,14 @@ function App() {
                         [
 
                           {
-                            label: "Pacman",
+                            label: "Pac-Man",
                             onClick: async () => {
-                              const resBank1 = await fetch("/AmosFiles/AmosBank_pacman.abk");
+                              const resBank1 = await fetch("/AmosFiles/Example1_Pac-Man.abk");
                               const blob = await resBank1.blob();
-                              const file = new File([blob], "AmosBank_pacman.abk");
+                              const file = new File([blob], "Example1_Pac-Man.abk");
                               handleFileChange(0, file);
 
-                              const text = await (await fetch("/AmosFiles/Pacman.txt")).text();
+                              const text = await (await fetch("/AmosFiles/Example1_Pac-Man.asc")).text();
                               setAmosCode(text);
                               forceParse(text);
                             },
@@ -304,7 +304,7 @@ function App() {
                           {
                             label: "Piano",
                             onClick: async () => {
-                              const text = await (await fetch("/AmosFiles/Amos1_piano_improved.asc")).text();
+                              const text = await (await fetch("/AmosFiles/Example2_Piano.asc")).text();
                               setAmosCode(text);
                               forceParse(text);
                             },
@@ -315,7 +315,7 @@ function App() {
                           {
                             label: "Rotating Triangle",
                             onClick: async () => {
-                              const text = await (await fetch("/AmosFiles/Amos2_Rotating_Triangle.txt")).text();
+                              const text = await (await fetch("/AmosFiles/Example3_Rotating_Triangle.asc")).text();
                               setAmosCode(text);
                               forceParse(text);
                             },
