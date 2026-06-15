@@ -320,15 +320,6 @@ export default class AMOSListener extends antlr4.tree.ParseTreeListener {
 	}
 
 
-	// Enter a parse tree produced by AMOSParser#if_then.
-	enterIf_then(ctx) {
-	}
-
-	// Exit a parse tree produced by AMOSParser#if_then.
-	exitIf_then(ctx) {
-	}
-
-
 	// Enter a parse tree produced by AMOSParser#open_out_readfile.
 	enterOpen_out_readfile(ctx) {
 	}

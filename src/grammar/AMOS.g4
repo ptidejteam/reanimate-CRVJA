@@ -100,7 +100,6 @@ statement:
     | text
     | do_loop
     | for_loop
-    | if_then
     | if_statement_key_state
     | if_statement
     | bar
@@ -277,12 +276,12 @@ expressions_comparators:
     ;
 
 or_and:
-    'or' | 'and'
+    'Or' | 'And'
     ;
 
-if_then:
-    IF expression1 expressions_comparators? expression2 (or_and expression1 expressions_comparators expression2)? 'then' statement
-    ;
+//if_then:
+//    IF expression1 expressions_comparators? expression2 (or_and expression1 expressions_comparators expression2)? 'then' statement
+//    ;
 
 open_out_readfile:
     'Open' 'Out' NUMBER COMMA IDENTIFIER
@@ -470,7 +469,7 @@ for_loop:
     ;
 
 if_statement:
-    (IF expression1 | IF read_target) ('=' | '<>' | '>=' | '>' | '<=' | '<') expression2
+    (IF expression1 | IF read_target) ('=' | '<>' | '>=' | '>' | '<=' | '<') expression2 (or_and expression1 expressions_comparators expression2)?
     (statement)*
     (('End' 'if') | else_statement | ENDIF)
     ;

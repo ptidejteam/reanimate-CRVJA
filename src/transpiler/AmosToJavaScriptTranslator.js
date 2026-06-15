@@ -1484,6 +1484,7 @@ document.getElementById('amos-screen').appendChild(${varName});`;
 		let expressions2 = [];
 		let comparators = [];
 		let or_and = [];
+
 		for (let i = 0; i < ctx.expression1().length; i++) {
 			expressions1.push(ctx.expression1(i).getText());
 		}
@@ -1695,9 +1696,9 @@ document.getElementById('amos-screen').appendChild(${varName});`;
 		let leftExpression;
 		let comparator;
 		let rightExpression = '';
-
+		
 		// Get the left-hand side expression (e.g., PRESSEDKEYNUMBER)
-		leftExpression = this.handleExpression(ctx.expression1());
+		leftExpression = this.handleExpression(ctx.children[1]);
 
 		// Get the comparison operator (e.g., =, <>)
 		comparator = ctx.children[2]?.getText();
@@ -1713,7 +1714,7 @@ document.getElementById('amos-screen').appendChild(${varName});`;
 		}
 
 		// Get the right-hand side expression (e.g., 2 * I + 1)
-		rightExpression = this.handleExpression(ctx.expression2());
+		rightExpression = this.handleExpression(ctx.children[3]);
 
 		// Output the if statement
 		this.output += `if (${leftExpression} ${comparator} ${rightExpression}) {`;
