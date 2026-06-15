@@ -1,7 +1,7 @@
 import antlr4 from "antlr4";
 import AmosToJavaScriptTranslator from "@/src/transpiler/AmosToJavaScriptTranslator";
-import AMOSParser from "../grammar/generated/AMOSParser";
-import AMOSLexer from "../grammar/generated/AMOSLexer";
+import AMOSParser from "../src/grammar/generated/AMOSParser";
+import AMOSLexer from "../src/grammar/generated/AMOSLexer";
 import fs from "fs";
 
 test("compile pacman", () => {
@@ -16,6 +16,4 @@ test("compile pacman", () => {
   const translator = new AmosToJavaScriptTranslator();
   const walker = new antlr4.tree.ParseTreeWalker();
   walker.walk(translator, tree);
-  
-  fs.writeFileSync("pacman_output.js", translator.getJavaScript());
 });

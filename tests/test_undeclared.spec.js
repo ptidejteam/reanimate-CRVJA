@@ -1,7 +1,7 @@
 import antlr4 from "antlr4";
 import AmosToJavaScriptTranslator from "../src/transpiler/AmosToJavaScriptTranslator.js";
-import AMOSParser from "../grammar/generated/AMOSParser.js";
-import AMOSLexer from "../grammar/generated/AMOSLexer.js";
+import AMOSParser from "../src/grammar/generated/AMOSParser.js";
+import AMOSLexer from "../src/grammar/generated/AMOSLexer.js";
 
 test("undeclared var", () => {
   const code = `

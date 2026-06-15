@@ -427,12 +427,12 @@ function App() {
 							{
 								label: "Pac-Man",
 								onClick: async () => {
-									const resBank1 = await fetch("/AmosFiles/Example1_Pac-Man.abk");
+									const resBank1 = await fetch("/Examples/Example1_Pac-Man/Example1_Pac-Man.abk");
 									const blob = await resBank1.blob();
 									const file = new File([blob], "Example1_Pac-Man.abk");
 									handleFileChange(0, file);
 
-									const text = await (await fetch("/AmosFiles/Example1_Pac-Man.asc")).text();
+									const text = await (await fetch("/Examples/Example1_Pac-Man/Example1_Pac-Man.asc")).text();
 									setAmosCode(text);
 									forceParse(text);
 								},
@@ -440,7 +440,7 @@ function App() {
 							{
 								label: "Piano",
 								onClick: async () => {
-									const text = await (await fetch("/AmosFiles/Example2_Piano.asc")).text();
+									const text = await (await fetch("/Examples/Example2_Piano/Example2_Piano.asc")).text();
 									setAmosCode(text);
 									forceParse(text);
 								},
@@ -450,7 +450,7 @@ function App() {
 						[{
 								label: "Rotating Triangle",
 								onClick: async () => {
-									const text = await (await fetch("/AmosFiles/Example3_Rotating_Triangle.asc")).text();
+									const text = await (await fetch("/Examples/Example3_Rotating_Triangle/Example3_Rotating_Triangle.asc")).text();
 									setAmosCode(text);
 									forceParse(text);
 								},

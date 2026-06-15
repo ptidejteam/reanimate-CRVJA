@@ -1,7 +1,7 @@
 import antlr4 from "antlr4";
 import AmosToJavaScriptTranslator from "@/src/transpiler/AmosToJavaScriptTranslator";
-import AMOSParser from "../grammar/generated/AMOSParser";
-import AMOSLexer from "../grammar/generated/AMOSLexer";
+import AMOSParser from "../src/grammar/generated/AMOSParser";
+import AMOSLexer from "../src/grammar/generated/AMOSLexer";
 
 test("string assignments and procedure arguments", () => {
   const amosBasicCode = `

@@ -1,4 +1,4 @@
-import AMOSListener from "@/grammar/generated/AMOSListener";
+import AMOSListener from "@/src/grammar/generated/AMOSListener";
 
 class AmosToJavaScriptTranslator extends AMOSListener {
 	constructor() {
@@ -1599,7 +1599,7 @@ document.getElementById('amos-screen').appendChild(${varName});`;
 
 		const expression1 = ctx.expression1();
 		const arrayValue = expression1.getText();
-		this.output += `= ${arrayValue};`;
+		this.output += ` = ${arrayValue};`;
 	}
 
 	/*
@@ -1791,6 +1791,7 @@ document.getElementById('amos-screen').appendChild(${varName});`;
 
 		// TODO: Functions, like Rnd(), should be treated properly in the corresponding semantic actions
 		result = result.replace(/Rnd\s*\(([^)]+)\)/gi, 'randomInt($1)');
+console.log(result);
 		return result;
 	}
 }
