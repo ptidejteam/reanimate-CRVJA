@@ -289,8 +289,8 @@ const serializedATN = [4,1,121,962,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,
 855,1,0,0,0,858,859,5,91,0,0,859,862,5,103,0,0,860,862,5,91,0,0,861,858,
 1,0,0,0,861,860,1,0,0,0,862,157,1,0,0,0,863,864,5,92,0,0,864,868,3,2,1,0,
 865,866,5,92,0,0,866,868,3,34,17,0,867,863,1,0,0,0,867,865,1,0,0,0,868,869,
-1,0,0,0,869,870,7,3,0,0,870,876,3,0,0,0,871,872,3,68,34,0,872,873,3,2,1,
-0,873,874,3,66,33,0,874,875,3,0,0,0,875,877,1,0,0,0,876,871,1,0,0,0,876,
+1,0,0,0,869,870,3,66,33,0,870,876,3,0,0,0,871,872,3,68,34,0,872,873,3,2,
+1,0,873,874,3,66,33,0,874,875,3,0,0,0,875,877,1,0,0,0,876,871,1,0,0,0,876,
 877,1,0,0,0,877,881,1,0,0,0,878,880,3,10,5,0,879,878,1,0,0,0,880,883,1,0,
 0,0,881,879,1,0,0,0,881,882,1,0,0,0,882,888,1,0,0,0,883,881,1,0,0,0,884,
 885,5,1,0,0,885,889,5,71,0,0,886,889,3,160,80,0,887,889,5,94,0,0,888,884,
@@ -335,7 +335,7 @@ export default class AMOSParser extends antlr4.Parser {
                             "'Set'", "'Rainbow'", "'Speed'", "'SAM'", "'LOOP'", 
                             "'OFF'", "'BANK'", "'LED'", "'Load'", "'Sprite'", 
                             "'='", "'<>'", "'>='", "'>'", "'<='", "'<'", 
-                            "'Or'", "'And'", "'Open'", "'Out'", "'In'", 
+                            "'or'", "'and'", "'Open'", "'Out'", "'In'", 
                             "'Close'", "'Input'", "'Btst'", "'Repeat'", 
                             "'Until'", "'Mouse'", "'Buffer'", "'Global'", 
                             "'Turbo'", "'Draw'", "'Locate'", "'Add'", "'Blitter'", 
@@ -3990,14 +3990,7 @@ export default class AMOSParser extends antlr4.Parser {
 
 	        }
 	        this.state = 869;
-	        _la = this._input.LA(1);
-	        if(!(((((_la - 30)) & ~0x1f) === 0 && ((1 << (_la - 30)) & 63) !== 0))) {
-	        this._errHandler.recoverInline(this);
-	        }
-	        else {
-	        	this._errHandler.reportMatch(this);
-	            this.consume();
-	        }
+	        this.expressions_comparators();
 	        this.state = 870;
 	        this.expression2();
 	        this.state = 876;
@@ -8678,6 +8671,17 @@ class If_statementContext extends antlr4.ParserRuleContext {
         this.ruleIndex = AMOSParser.RULE_if_statement;
     }
 
+	expressions_comparators = function(i) {
+	    if(i===undefined) {
+	        i = null;
+	    }
+	    if(i===null) {
+	        return this.getTypedRuleContexts(Expressions_comparatorsContext);
+	    } else {
+	        return this.getTypedRuleContext(Expressions_comparatorsContext,i);
+	    }
+	};
+
 	expression2 = function(i) {
 	    if(i===undefined) {
 	        i = null;
@@ -8718,10 +8722,6 @@ class If_statementContext extends antlr4.ParserRuleContext {
 
 	or_and() {
 	    return this.getTypedRuleContext(Or_andContext,0);
-	};
-
-	expressions_comparators() {
-	    return this.getTypedRuleContext(Expressions_comparatorsContext,0);
 	};
 
 	statement = function(i) {

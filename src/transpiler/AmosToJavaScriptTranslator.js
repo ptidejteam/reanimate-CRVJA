@@ -1693,31 +1693,43 @@ document.getElementById('amos-screen').appendChild(${varName});`;
 	}
 
 	enterIf_statement(ctx) {
-		let leftExpression;
-		let comparator;
-		let rightExpression = '';
-		
-		// Get the left-hand side expression (e.g., PRESSEDKEYNUMBER)
-		leftExpression = this.handleExpression(ctx.children[1]);
+		let statement = "";
+		let logicalOperator = "";
+		let comparator = "";
 
-		// Get the comparison operator (e.g., =, <>)
-		comparator = ctx.children[2]?.getText();
-		// Special cases for = and <>
-		if (comparator === '=') {
-			comparator = '==';
-		}
-		else if (comparator === '<>') {
-			comparator = '!=';
-		}
-		else {
-			// Nothing to do here
-		}
+		for (let i = 0; i < ctx.children.length; i++) {
+			if (ctx.children[i].constructor.name == "Expression1Context") {
+				statement += this.handleExpression(ctx.children[i]);
+			} else if (ctx.children[i].constructor.name == "Or_andContext") {
+				logicalOperator = ctx.children[i].getText();
+				if (logicalOperator == "and") {
+					statement += " && ";
+				}
+				else if (logicalOperator == "or") {
+					statement += " || ";
+				}
+				else {
+					console.log("Unrecognized logicalOperator in IF Statement");
+				}
+			} else if (ctx.children[i].constructor.name == "Expression2Context") {
+				statement += this.handleExpression(ctx.children[i]);
+			} else if (ctx.children[i].constructor.name == "Expressions_comparatorsContext") {
+				comparator = ctx.children[i].getText();
+				// Special cases for = and <>
+				if (comparator === '=') {
+					comparator = '==';
+				}
+				else if (comparator === '<>') {
+					comparator = '!=';
+				}
+				else {
+					// Nothing to do here
+				}
+				statement += ` ${comparator} `
+			}
 
-		// Get the right-hand side expression (e.g., 2 * I + 1)
-		rightExpression = this.handleExpression(ctx.children[3]);
-
-		// Output the if statement
-		this.output += `if (${leftExpression} ${comparator} ${rightExpression}) {`;
+		}
+		this.output += `if (${statement}) {`
 	}
 
 	exitIf_statement(ctx) {

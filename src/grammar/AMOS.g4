@@ -276,7 +276,7 @@ expressions_comparators:
     ;
 
 or_and:
-    'Or' | 'And'
+    'or' | 'and'
     ;
 
 //if_then:
@@ -469,7 +469,7 @@ for_loop:
     ;
 
 if_statement:
-    (IF expression1 | IF read_target) ('=' | '<>' | '>=' | '>' | '<=' | '<') expression2 (or_and expression1 expressions_comparators expression2)?
+    (IF expression1 | IF read_target) expressions_comparators expression2 (or_and expression1 expressions_comparators expression2)?
     (statement)*
     (('End' 'if') | else_statement | ENDIF)
     ;
