@@ -3,7 +3,7 @@
 ## 1. Main Idea
 The core concept of Reanimate-CRVJA is to bring retro Amiga AMOS BASIC games and applications to the modern web. It achieves this by functioning as a parser and transpiler that converts AMOS BASIC code into executable JavaScript code that relies on the DOM and HTML5 APIs. The project also provides an Amiga Workbench-styled web interface where users can load AMOS code, parse it, and execute it within a sandboxed environment. Additionally, it offers tools to load, extract, and visually edit AMOS sprite banks (`.abk` files).
 
-- For a beginner-friendly introduction to using CRVJA, please refer to the [CRVJA Tutorial](tutorial.md).
+- For a beginner-friendly introduction to using CRVJA, please refer to the [CRVJA Tutorial](./docs/tutorial.md).
 
 ## 2. How the Project Works (Technical Aspect)
 The system is built as a Next.js web application and relies heavily on **ANTLR4** (ANother Tool for Language Recognition) for the language processing phase.
@@ -101,5 +101,10 @@ For a comprehensive breakdown of the core components of the transpiler system, p
 * **Translation Mechanics**: For information on listener pattern traversal, code formatting indents, and async loop strategies, read [amos_to_js.md](docs/amos_to_js.md).
 * **Test Architecture & Regression Checks**: For understanding testing workflows, test templates, space normalization, and debugging walkers, read [tests.md](docs/tests.md). PS: tests are not up to date with the latest CRVJA, so many of the tests are currently failing. They will be updated in the future to reflect the latest changes in the grammar and translator.
 
-##
+## Summary
 
+The important commands are:
+- `npm run compile-grammar`
+- `npm run dev`
+- `npm run build
+- `npm run start`

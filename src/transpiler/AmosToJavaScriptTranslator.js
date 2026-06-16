@@ -1,22 +1,30 @@
-import AMOSListener from "@/grammar/generated/AMOSListener";
+import AMOSListener from "@/src/grammar/generated/AMOSListener";
 
 class AmosToJavaScriptTranslator extends AMOSListener {
 	constructor() {
 		super();
 
-		this.imports = "";
-		this.output = "";
+		this.imports = '';
+		this.output = '';
 		this.id = 0;
+		// https://www.rapidtables.com/web/color/RGB_Color.html
 		this.colorMapping = {
-			1: "black",
-			2: "white",
-			3: "white",
-			4: "red",
-			5: "green",
-			6: "green",
-			7: "rgb(160, 64, 0)",
-			8: "rgb(160, 64, 0)",
-			9: "rgb(160, 64, 0)",
+			 0: 'rgb(0,0,0)',
+			 1: 'rgb(255,255,255)',
+			 2: 'rgb(255,0,0)',
+			 3: 'rgb(0,255,0)',
+			 4: 'rgb(0,0,255)',
+			 5: 'rgb(255,255,0)',
+			 6: 'rgb(0,255,255)',
+			 7: 'rgb(255,0,255)',
+			 8: 'rgb(192,192,192)',
+			 9: 'rgb(128,128,128)',
+			10: 'rgb(128,0,0)',
+			11: 'rgb(128,128,0)',
+			12: 'rgb(0,128,0)',
+			13: 'rgb(128,0,128)',
+			14: 'rgb(0,128,128)',
+			15: 'rgb(0,0,128)',
 		};
 		this.pallette = `const colorMapping = ${JSON.stringify(this.colorMapping, null, 2)};`;
 		this.lineData = this.lineData || [];
@@ -270,10 +278,10 @@ const keyMapping = {
 }`;
 
 		this.output += `
+let dataMatrixPointer = 0;
 let currentTimer = Date.now();
-let Ink = "black";
-let Paper = 1;
-let Pen = 2;
+let Ink = 1;
+let Paper = 0;
 let Timer = 0;
 let currentPressedKey = null;
 let isPressed = false;
@@ -705,13 +713,11 @@ let tries = 0;
 
 function renderSprite(spriteNumber, x, y, bankImgIndex) {
 	if (tries > 40) {
-
 		console.error("Bank not found or could not be loaded");
 		location.reload();
 		return;
 	}
 	if (!bankData[1].sprites[bankImgIndex]) {
-
 		tries++;
 		setTimeout(() => {
 			renderSprite(spriteNumber, x, y, bankImgIndex);
@@ -792,9 +798,8 @@ function renderSprite(spriteNumber, x, y, bankImgIndex) {
 }
 
 function getColour(expression) {
-	return colorMapping[expression + 1];
-}
-`;
+	return colorMapping[expression];
+}`;
 	}
 
 	enterScreen_open(ctx) {
@@ -806,15 +811,14 @@ function getColour(expression) {
 const screenDiv = document.createElement('div');
 screenDiv.style.width = '${width}px';
 screenDiv.style.height = '${height}px';
-screenDiv.style.border = '1px solid red';
+screenDiv.style.border = '1px solid black';
 screenDiv.style.overflow = 'hidden'; 
 screenDiv.style.padding = '0'; 
 screenDiv.style.position = 'relative'; 
 screenDiv.id = 'amos-screen'; 
 screenDiv.style.zIndex = 1;
 document.getElementById('game-container').appendChild(screenDiv);
-document.getElementById('amos-screen').style.backgroundColor = colorMapping[${color}];
-        `;
+document.getElementById('amos-screen').style.backgroundColor = 'black';`;
 	}
 
 	enterBlitter_fill(ctx) {
@@ -918,7 +922,7 @@ readFromChannel(${channel}, (data) => {
 
 	enterPrint_something(ctx) {
 		const printConfig = ctx.print_options(0)?.getText();
-		if (printConfig.includes("#")) {
+		if (printConfig.includes('#')) {
 			/* WRITE TO FILE */
 			let channel = ctx.print_options(0)?.getText();
 			let content = ctx.print_options(1)?.getText();
@@ -933,36 +937,34 @@ readFromChannel(${channel}, (data) => {
 					.print_options(i)
 					?.expression1(0)
 					?.getText()
-					.replace(/["']/g, "");
+					.replace(/["']/g, '');
 				this.output += `
-        const finder_printDiv${i} = document.getElementById('printDiv${i}' + '${text}');
-        if(finder_printDiv${i}){finder_printDiv${i}.remove();}
-  const printDiv${i} = document.createElement('div');
-  printDiv${i}.innerText = ${text};
-  printDiv${i}.style.position = 'relative';
-  printDiv${i}.style.left = '50%';
-  printDiv${i}.style.top = '50%';
-  printDiv${i}.style.fontSize = '14px';
-  printDiv${i}.style.color = Ink;
-    printDiv${i}.style.zIndex = "999";
-  printDiv${i}.id = 'printDiv${i}' + '${text}';
-  document.getElementById('amos-screen').appendChild(printDiv${i});
-  `;
+const finder_printDiv${i} = document.getElementById('printDiv${i}' + '${text}');
+if (finder_printDiv${i}) { finder_printDiv${i}.remove(); }
+const printDiv${i} = document.createElement('div');
+printDiv${i}.innerText = ${text};
+printDiv${i}.style.position = 'relative';
+printDiv${i}.style.left = '50%';
+printDiv${i}.style.top = '50%';
+printDiv${i}.style.fontSize = '14px';
+printDiv${i}.style.color = getColour(Ink);
+printDiv${i}.style.zIndex = '999';
+printDiv${i}.id = 'printDiv${i}' + '${text}';
+document.getElementById('amos-screen').appendChild(printDiv${i});`;
 			} else {
 				this.output += `
-           const finder_printDiv${i} = document.getElementById('printDiv${i}' + '${text}');
-        if(finder_printDiv${i}){finder_printDiv${i}.remove();}
-        const printDiv${i} = document.createElement('div');
-        printDiv${i}.innerText = ${text};
-        printDiv${i}.style.position = 'relative';
-        printDiv${i}.style.left = '50%';
-        printDiv${i}.style.top = '50%';
-        printDiv${i}.style.fontSize = '14px';
-        printDiv${i}.style.color = Ink;
-            printDiv${i}.style.zIndex = "999";
-          printDiv${i}.id = 'printDiv${i}' + '${text}';
-        document.getElementById('amos-screen').appendChild(printDiv${i});
-        `;
+const finder_printDiv${i} = document.getElementById('printDiv${i}' + '${text}');
+if (finder_printDiv${i}) { finder_printDiv${i}.remove(); }
+const printDiv${i} = document.createElement('div');
+printDiv${i}.innerText = ${text};
+printDiv${i}.style.position = 'relative';
+printDiv${i}.style.left = '50%';
+printDiv${i}.style.top = '50%';
+printDiv${i}.style.fontSize = '14px';
+printDiv${i}.style.color = getColour(Ink);
+printDiv${i}.style.zIndex = '999';
+printDiv${i}.id = 'printDiv${i}' + '${text}';
+document.getElementById('amos-screen').appendChild(printDiv${i});`;
 			}
 		}
 	}
@@ -975,20 +977,18 @@ readFromChannel(${channel}, (data) => {
 			this.output += `
 const amosScreen = document.getElementById('amos-screen');
 if (amosScreen) {
-  amosScreen.innerHTML = '';
-  amosScreen.style.backgroundColor = colorMapping[Paper + 1] || "black";
-}
-      `;
+	amosScreen.innerHTML = '';
+	amosScreen.style.backgroundColor = colorMapping[Paper];
+}`;
 		} else if (exprs.length === 1) {
 			// Case 2: Cls colour (clear entire screen + set background color to specified color index)
 			const color = exprs[0].getText();
 			this.output += `
 const amosScreen = document.getElementById('amos-screen');
 if (amosScreen) {
-  amosScreen.innerHTML = '';
-  amosScreen.style.backgroundColor = colorMapping[${color} + 1] || "black";
-}
-      `;
+	amosScreen.innerHTML = '';
+	amosScreen.style.backgroundColor = colorMapping[${color}];
+}`;
 		} else if (exprs.length >= 5) {
 			// Case 3: Cls colour, x1, y1 To x2, y2 (clear rectangular block + fill with color)
 			const color = exprs[0].getText();
@@ -999,97 +999,85 @@ if (amosScreen) {
 
 			this.output += `
 {
-  const clearColor = colorMapping[${color} + 1] || "black";
-  const clearX1 = ${x1};
-  const clearY1 = ${y1};
-  const clearX2 = ${x2};
-  const clearY2 = ${y2};
-  const screen = document.getElementById('amos-screen');
-  if (screen) {
-    // 1. Remove child elements that fall inside the bounding box coordinates
-    const children = Array.from(screen.children);
-    children.forEach(child => {
-      const left = parseInt(child.style.left) || 0;
-      const top = parseInt(child.style.top) || 0;
-      if (left >= clearX1 && left <= clearX2 && top >= clearY1 && top <= clearY2) {
-        child.remove();
-      }
-    });
-    // 2. Add a filled background div to cover the cleared area
-    const fillDiv = document.createElement('div');
-    fillDiv.style.position = 'absolute';
-    fillDiv.style.left = clearX1 + 'px';
-    fillDiv.style.top = clearY1 + 'px';
-    fillDiv.style.width = (clearX2 - clearX1) + 'px';
-    fillDiv.style.height = (clearY2 - clearY1) + 'px';
-    fillDiv.style.backgroundColor = clearColor;
-    fillDiv.style.zIndex = 1;
-    screen.appendChild(fillDiv);
-  }
-}
-      `;
+	const clearColor = colorMapping[${color}];
+	const clearX1 = ${x1};
+	const clearY1 = ${y1};
+	const clearX2 = ${x2};
+	const clearY2 = ${y2};
+	const screen = document.getElementById('amos-screen');
+	if (screen) {
+		// 1. Remove child elements that fall inside the bounding box coordinates
+		const children = Array.from(screen.children);
+		children.forEach(child => {
+			const left = parseInt(child.style.left) || 0;
+			const top = parseInt(child.style.top) || 0;
+			if (left >= clearX1 && left <= clearX2 && top >= clearY1 && top <= clearY2) { child.remove(); }
+		});
+		// 2. Add a filled background div to cover the cleared area
+		const fillDiv = document.createElement('div');
+		fillDiv.style.position = 'absolute';
+		fillDiv.style.left = clearX1 + 'px';
+		fillDiv.style.top = clearY1 + 'px';
+		fillDiv.style.width = (clearX2 - clearX1) + 'px';
+		fillDiv.style.height = (clearY2 - clearY1) + 'px';
+		fillDiv.style.backgroundColor = clearColor;
+		fillDiv.style.zIndex = 1;
+		screen.appendChild(fillDiv);
+	}
+}`;
 		}
 	}
 
 	enterCurs_off(ctx) {
-		this.output += `
-document.getElementById('amos-screen').style.cursor = 'none';   
-        `;
+		this.output += "document.getElementById('amos-screen').style.cursor = 'none';";
 	}
 
 	enterPaper(ctx) {
-		const color = ctx.children[1]?.getText();
-		this.output += `
-Paper = ${color};
-    `;
-	}
-
-	enterPen(ctx) {
-		const color = ctx.children[1]?.getText();
-		this.output += `
-Pen = ${color};
-    `;
+		const color = this.handleExpression(ctx.children[1]);
+		this.output += `Paper = ${color};`;
 	}
 
 	enterCurs_on(ctx) {
-		this.output += `
-document.getElementById('amos-screen').style.cursor = 'auto';
-        `;
+		this.output += "document.getElementById('amos-screen').style.cursor = 'auto';";
 	}
 
 	enterPlay_sound(ctx) {
 		const soundIndex = ctx.children[1]?.getText();
 		const duration = ctx.children[3]?.getText();
 
-		this.output += `
-soundPlayer(${soundIndex}, ${duration}*1000);
-        `;
+		this.output += `soundPlayer(${soundIndex}, ${duration} * 1000);`;
 	}
 
 	enterInk(ctx) {
 		const colorIndexExp = this.handleExpression(ctx.children[1]);
 
-		this.output += `Ink = getColour(${colorIndexExp});`;
+		this.output += `Ink = ${colorIndexExp};`;
+	}
+
+	enterPen(ctx) {
+		const colorIndexExp = this.handleExpression(ctx.children[1]);
+
+		this.output += `Ink = ${colorIndexExp};`;
 	}
 
 	enterPalette(ctx) {
-		// Array to collect complete hex color values from the Palette
+		// Array to collect complete hex colour values from the Palette
 		const hexColors = [];
-		let currentHex = "";
+		let currentHex = '';
 
 		// Loop through each child in `ctx` to gather colors
 		for (const child of ctx.children) {
 			const text = child.getText().trim();
 
-			if (text.toLowerCase() === "palette") continue;
-			if (text === "$") {
+			if (text.toLowerCase() === 'palette') continue;
+			if (text === '$') {
 				// Start of a new hex color, initialize currentHex
-				currentHex = "$";
-			} else if (text === ",") {
+				currentHex = '$';
+			} else if (text === ',') {
 				// End of a hex color, parse it if currentHex has a complete hex value
 				if (currentHex.length > 1) {
 					hexColors.push(currentHex);
-					currentHex = ""; // Reset for the next hex color
+					currentHex = ''; // Reset for the next hex color
 				}
 			} else {
 				// Append hex digits to currentHex
@@ -1113,17 +1101,16 @@ soundPlayer(${soundIndex}, ${duration}*1000);
 			const blue = (hexValue & 0xf) * 17;
 
 			// Map color in `rgb` format
-			this.colorMapping[index + 1] = `rgb(${red}, ${green}, ${blue})`;
+			this.colorMapping[index] = `rgb(${red}, ${green}, ${blue})`;
 		});
 		this.pallette = `const colorMapping = ${JSON.stringify(this.colorMapping, null, 2)};`;
-console.log(this.colorMapping);
 	}
 
 	enterTurbo_draw(ctx) {
 		function generateRandomID() {
 			let characters =
-				"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-			let id = "";
+				'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+			let id = '';
 			for (let i = 0; i < 9; i++) {
 				let randomIndex = Math.floor(Math.random() * characters.length);
 				id += characters[randomIndex];
@@ -1135,62 +1122,59 @@ console.log(this.colorMapping);
 		let y1 = ctx.expression1(1)?.getText();
 		let x2 = ctx.expression1(2)?.getText();
 		let y2 = ctx.expression1(3)?.getText();
-		let color = `colorMapping[(${ctx.expression1(4)?.getText()}) + 1]`;
+		let color = `colorMapping[(${ctx.expression1(4)?.getText()})]`;
 		let the_ID = generateRandomID();
 		let index = ctx.expression1(5)?.getText();
 
 		// Calculate the length and angle of the line
 
 		this.output += `
-    // Calculate the length and angle of the line
-    
-    const TurboDrawX1${the_ID} = ${x1};
-    const TurboDrawX2${the_ID} = ${x2};
-    const TurboDrawY1${the_ID} = ${y1};
-    const TurboDrawY2${the_ID} = ${y2};
-    const idBar${the_ID} = "TurboDraw" + "${the_ID}";
-    
-    let lineDiv${the_ID} = document.getElementById(idBar${the_ID});
+// Calculate the length and angle of the line
+const TurboDrawX1${the_ID} = ${x1};
+const TurboDrawX2${the_ID} = ${x2};
+const TurboDrawY1${the_ID} = ${y1};
+const TurboDrawY2${the_ID} = ${y2};
+const idBar${the_ID} = 'TurboDraw${the_ID}';
 
-    const deltaX${the_ID} = TurboDrawX2${the_ID} - TurboDrawX1${the_ID};
-    const deltaY${the_ID} = TurboDrawY2${the_ID} - TurboDrawY1${the_ID};
-    const length${the_ID} = Math.sqrt(deltaX${the_ID} * deltaX${the_ID} + deltaY${the_ID} * deltaY${the_ID}); // Pythagorean theorem
-    const angle${the_ID} = Math.atan2(deltaY${the_ID}, deltaX${the_ID}) * (180 / Math.PI); // Convert angle to degrees
+let lineDiv${the_ID} = document.getElementById(idBar${the_ID});
 
-    if (lineDiv${the_ID}) {
-        // If the div exists, update its properties
-        lineDiv${the_ID}.style.backgroundColor = ${color};
-        lineDiv${the_ID}.style.left = TurboDrawX1${the_ID} + 'px';
-        lineDiv${the_ID}.style.top = TurboDrawY1${the_ID} + 'px';
-        lineDiv${the_ID}.style.width = length${the_ID} + 'px';
-        lineDiv${the_ID}.style.height = '2px'; // Line height
-        lineDiv${the_ID}.style.transform = 'rotate(' + angle${the_ID} + 'deg)';
-        lineDiv${the_ID}.style.transformOrigin = '0 0'; // Rotate from the starting point
-        lineDiv${the_ID}.style.position = 'absolute';
-        lineDiv${the_ID}.style.borderRadius = '1px';
-        lineDiv${the_ID}.style.borderColor = ${color};
-        lineDiv${the_ID}.style.zIndex = 1000${index};
-         lineDiv${the_ID}.indexPlacer = 1000${index};
-    } else {
-        // If the div doesn't exist, create it
-        lineDiv${the_ID} = document.createElement('div');
-        lineDiv${the_ID}.style.position = 'absolute';
-        lineDiv${the_ID}.id = idBar${the_ID};
-        lineDiv${the_ID}.style.backgroundColor = ${color};
-        lineDiv${the_ID}.style.left = TurboDrawX1${the_ID} + 'px';
-        lineDiv${the_ID}.style.top = TurboDrawY1${the_ID} + 'px';
-        lineDiv${the_ID}.style.width = length${the_ID} + 'px';
-        lineDiv${the_ID}.style.height = '2px'; // Line height
-        lineDiv${the_ID}.style.transform = 'rotate(' + angle${the_ID} + 'deg)';
-        lineDiv${the_ID}.style.transformOrigin = '0 0'; // Rotate from the starting point
-        lineDiv${the_ID}.style.borderRadius = '1px';
-        lineDiv${the_ID}.style.borderColor = ${color};
-        lineDiv${the_ID}.style.zIndex = 1000${index};
-    lineDiv${the_ID}.indexPlacer = 1000${index};
-        document.getElementById('amos-screen').appendChild(lineDiv${the_ID});
-    }
+const deltaX${the_ID} = TurboDrawX2${the_ID} - TurboDrawX1${the_ID};
+const deltaY${the_ID} = TurboDrawY2${the_ID} - TurboDrawY1${the_ID};
+const length${the_ID} = Math.sqrt(deltaX${the_ID} * deltaX${the_ID} + deltaY${the_ID} * deltaY${the_ID}); // Pythagorean theorem
+const angle${the_ID}  = Math.atan2(deltaY${the_ID}, deltaX${the_ID}) * (180 / Math.PI); // Convert angle to degrees
 
-    `;
+if (lineDiv${the_ID}) {
+	// If the div exists, update its properties
+	lineDiv${the_ID}.style.backgroundColor = ${color};
+	lineDiv${the_ID}.style.left = TurboDrawX1${the_ID} + 'px';
+	lineDiv${the_ID}.style.top = TurboDrawY1${the_ID} + 'px';
+	lineDiv${the_ID}.style.width = length${the_ID} + 'px';
+	lineDiv${the_ID}.style.height = '2px'; // Line height
+	lineDiv${the_ID}.style.transform = 'rotate(' + angle${the_ID} + 'deg)';
+	lineDiv${the_ID}.style.transformOrigin = '0 0'; // Rotate from the starting point
+	lineDiv${the_ID}.style.position = 'absolute';
+	lineDiv${the_ID}.style.borderRadius = '1px';
+	lineDiv${the_ID}.style.borderColor = ${color};
+	lineDiv${the_ID}.style.zIndex = 1000${index};
+	lineDiv${the_ID}.indexPlacer = 1000${index};
+} else {
+	// If the div doesn't exist, create it
+	lineDiv${the_ID} = document.createElement('div');
+	lineDiv${the_ID}.style.position = 'absolute';
+	lineDiv${the_ID}.id = idBar${the_ID};
+	lineDiv${the_ID}.style.backgroundColor = ${color};
+	lineDiv${the_ID}.style.left = TurboDrawX1${the_ID} + 'px';
+	lineDiv${the_ID}.style.top = TurboDrawY1${the_ID} + 'px';
+	lineDiv${the_ID}.style.width = length${the_ID} + 'px';
+	lineDiv${the_ID}.style.height = '2px'; // Line height
+	lineDiv${the_ID}.style.transform = 'rotate(' + angle${the_ID} + 'deg)';
+	lineDiv${the_ID}.style.transformOrigin = '0 0'; // Rotate from the starting point
+	lineDiv${the_ID}.style.borderRadius = '1px';
+	lineDiv${the_ID}.style.borderColor = ${color};
+	lineDiv${the_ID}.style.zIndex = 1000${index};
+	lineDiv${the_ID}.indexPlacer = 1000${index};
+	document.getElementById('amos-screen').appendChild(lineDiv${the_ID});
+}`;
 	}
 
 	enterBar(ctx) {
@@ -1203,31 +1187,29 @@ console.log(this.colorMapping);
 		const idBar = `"Bar_" + (${x1}) + "_" + (${y1})`;
 
 		this.output += `
-    const idBar = ${idBar};
-    const x1 = ${x1};
-    const y1 = ${y1};
-    const x2 = ${x2};
-    const y2 = ${y2};
-    const width = x2 - x1;
-    const height = y2 - y1;
+const idBar = ${idBar};
+const x1 = ${x1};
+const y1 = ${y1};
+const x2 = ${x2};
+const y2 = ${y2};
+const width = x2 - x1;
+const height = y2 - y1;
 
-    let screenBarDiv = document.getElementById(idBar);
+let screenBarDiv = document.getElementById(idBar);
+if (!screenBarDiv) {
+	screenBarDiv = document.createElement('div');
+	screenBarDiv.id = idBar;
+	screenBarDiv.style.position = 'absolute';
+	screenBarDiv.style.boxSizing = 'border-box';
+	document.getElementById('amos-screen').appendChild(screenBarDiv);
+}
 
-    if (!screenBarDiv) {
-        screenBarDiv = document.createElement('div');
-        screenBarDiv.id = idBar;
-        screenBarDiv.style.position = 'absolute';
-        screenBarDiv.style.boxSizing = 'border-box';
-        document.getElementById('amos-screen').appendChild(screenBarDiv);
-    }
-
-    screenBarDiv.style.backgroundColor = Ink;
-    screenBarDiv.style.left = x1 + 'px';
-    screenBarDiv.style.top = y1 + 'px';
-    screenBarDiv.style.width = width + 'px';
-    screenBarDiv.style.height = height + 'px';
-    screenBarDiv.style.zIndex = 10;
-  `;
+screenBarDiv.style.backgroundColor = getColour(Ink);
+screenBarDiv.style.left = x1 + 'px';
+screenBarDiv.style.top = y1 + 'px';
+screenBarDiv.style.width = width + 'px';
+screenBarDiv.style.height = height + 'px';
+screenBarDiv.style.zIndex = 10;`;
 	}
 
 	enterBox(ctx) {
@@ -1239,22 +1221,21 @@ console.log(this.colorMapping);
 		const boxID = `"Box_" + ${x1} + "_" + ${y1} + "_" + ${x2} + "_" + ${y2}`;
 
 		this.output += `
-    const idBox = ${boxID};
-    let boxDiv = document.getElementById(idBox);
-    if (!boxDiv) {
-      boxDiv = document.createElement('div');
-      boxDiv.id = idBox;
-      boxDiv.style.position = 'absolute';
-      boxDiv.style.boxSizing = 'border-box';
-      document.getElementById('amos-screen').appendChild(boxDiv);
-      }
-    boxDiv.style.border = '2px solid ' + Ink;
-    boxDiv.style.left = (${x1}) + "px";
-    boxDiv.style.top = (${y1}) + "px";
-    boxDiv.style.width = (${x2} - ${x1}) + "px";
-    boxDiv.style.height = (${y2} - ${y1}) + "px";
-    boxDiv.style.zIndex = 10;
-  `;
+const idBox = ${boxID};
+let boxDiv = document.getElementById(idBox);
+if (!boxDiv) {
+	boxDiv = document.createElement('div');
+	boxDiv.id = idBox;
+	boxDiv.style.position = 'absolute';
+	boxDiv.style.boxSizing = 'border-box';
+	document.getElementById('amos-screen').appendChild(boxDiv);
+}
+boxDiv.style.border = '2px solid ' + getColour(Ink);
+boxDiv.style.left = (${x1}) + 'px';
+boxDiv.style.top = (${y1}) + 'px';
+boxDiv.style.width = (${x2} - ${x1}) + 'px';
+boxDiv.style.height = (${y2} - ${y1}) + 'px';
+boxDiv.style.zIndex = 10;`;
 	}
 
 	enterCircle(ctx) {
@@ -1264,24 +1245,23 @@ console.log(this.colorMapping);
 		const circleID = `"Circle_" + (${x}) + "_" + (${y}) + "_" + (${r})`;
 
 		this.output += `
-    const circleId = ${circleID};
-    let circleDiv = document.getElementById(circleId);
-    if (!circleDiv) {
-      circleDiv = document.createElement('div');
-      circleDiv.id = circleId;
-      circleDiv.style.position = 'absolute';
-      circleDiv.style.boxSizing = 'border-box';
-      document.getElementById('amos-screen').appendChild(circleDiv);
-      }
-    circleDiv.style.borderRadius = '50%';
-    circleDiv.style.border = '2px solid ' + Ink;
-    circleDiv.style.left = (${x} - ${r}) + 'px';
-    circleDiv.style.top = (${y} - ${r}) + 'px';
-    circleDiv.style.width = (${r} * 2) + 'px';
-    circleDiv.style.height = (${r} * 2) + 'px';
-    circleDiv.style.zIndex = 10;
-    circleDiv.style.backgroundColor = Ink; 
-  `;
+const circleId = ${circleID};
+let circleDiv = document.getElementById(circleId);
+if (!circleDiv) {
+	circleDiv = document.createElement('div');
+	circleDiv.id = circleId;
+	circleDiv.style.position = 'absolute';
+	circleDiv.style.boxSizing = 'border-box';
+	document.getElementById('amos-screen').appendChild(circleDiv);
+}
+circleDiv.style.borderRadius = '50%';
+circleDiv.style.border = '2px solid ' + getColour(Ink);
+circleDiv.style.left = (${x} - ${r}) + 'px';
+circleDiv.style.top = (${y} - ${r}) + 'px';
+circleDiv.style.width = (${r} * 2) + 'px';
+circleDiv.style.height = (${r} * 2) + 'px';
+circleDiv.style.zIndex = 10;
+circleDiv.style.backgroundColor = getColour(Ink);`;
 	}
 
 	enterWhile_wend(ctx) {
@@ -1293,7 +1273,8 @@ console.log(this.colorMapping);
 			return parseInt(match.substring(1), 16);
 		});
 
-		this.output += `\nif (currentPressedKey === keyMapping[${leftExpression}]) {\n`;
+		// Cf. https://www.cknow.com/cms/articles/what-is-a-scan-code.html
+		this.output += `\nif (currentPressedKey === keyMapping[${leftExpression}]) {`;
 	}
 
 	enterWait_key(ctx) {
@@ -1303,7 +1284,7 @@ console.log(this.colorMapping);
 	}
 
 	exitWhile_wend(ctx) {
-		this.output += `}`;
+		this.output += '}';
 	}
 
 	enterGlobal(ctx) {
@@ -1316,11 +1297,11 @@ console.log(this.colorMapping);
 	}
 
 	enterVariable_starter(ctx) {
-		let name = ctx.children[0]?.getText() || "";
+		let name = ctx.children[0].getText();
 		let value = this.handleExpression(ctx.children[2]);
 
 		let lineNumber = ctx.start.line;
-		if (name !== "Timer") {
+		if (name !== 'Timer') {
 			if (value > 2147483647) {
 				throw new Error(
 					`ERROR: Amos code line ${lineNumber}: Value for variable "${name}" exceeds the allowed limit of 2,147,483,647.`
@@ -1359,9 +1340,9 @@ console.log(this.colorMapping);
 		if (!isDeclared) {
 			let defaultValue = variable.endsWith('$') ? '""' : 0;
 			if (this.scopes.length === 1) {
-				this.globalVariables += `let ${variable} = ${defaultValue};\n`;
+				this.globalVariables += `let ${variable} = ${defaultValue};`;
 			} else {
-				this.output += `let ${variable} = ${defaultValue};\n`;
+				this.output += `let ${variable} = ${defaultValue};`;
 			}
 			currentScope[variable] = defaultValue;
 		}
@@ -1374,15 +1355,12 @@ console.log(this.colorMapping);
 			valueEndIteration = ctx.expression1(2)?.getText();
 
 			this.output += `
-    ${variable} = (${variable} + ${valueExpression}) % ${valueEndIteration};
-    if (${variable} < ${valueStarter}) {
-      ${variable} += ${valueEndIteration};
-    }
-    `;
+${variable} = (${variable} + ${valueExpression}) % ${valueEndIteration};
+if (${variable} < ${valueStarter}) {
+	${variable} += ${valueEndIteration};
+}`;
 		} else {
-			this.output += `
-    ${variable} = ${variable} + ${valueExpression};
-    `;
+			this.output += `${variable} = ${variable} + ${valueExpression};`;
 		}
 	}
 
@@ -1395,10 +1373,10 @@ console.log(this.colorMapping);
 		for (let i = 1; i < ctx.IDENTIFIER().length; i++) {
 			params.push(ctx.IDENTIFIER(i).getText());
 		}
-		let props = params.join(", ");
+		let props = params.join(', ');
 
 		this.scopes.push({});
-		let localDeclarations = "";
+		let localDeclarations = '';
 		for (let varName of Object.keys(this.scopes[0])) {
 			if (!this.globalVariablesSet.has(varName) && !params.includes(varName)) {
 				let defaultValue = varName.endsWith('$') ? '""' : 0;
@@ -1414,8 +1392,9 @@ function ${name}(${props}) {
 	const currentTime = Date.now();
 	const timeSinceLastCall = currentTime - lastTime${name};
 	if (timeSinceLastCall < 16) {
-		if (timeoutId${name})
+		if (timeoutId${name}) {
 			clearTimeout(timeoutId${name});
+		}
 		timeoutId${name} = setTimeout(() => { ${name}(${props}); }, 100 - timeSinceLastCall);
 		return;
 	}
@@ -1425,7 +1404,7 @@ function ${name}(${props}) {
 
 	exitProcedure(ctx) {
 		this.scopes.pop();
-		this.output += `}\n`;
+		this.output += '}';
 	}
 
 	enterText(ctx) {
@@ -1433,94 +1412,50 @@ function ${name}(${props}) {
 		const y = ctx.expression1(1)?.getText();
 		const text = (ctx.STRING() || ctx.IDENTIFIER())?.getText();
 
-		const cleanX = x.replace(/[^a-zA-Z0-9]/g, "");
-		const cleanY = y.replace(/[^a-zA-Z0-9]/g, "");
+		const cleanX = x.replace(/[^a-zA-Z0-9]/g, '');
+		const cleanY = y.replace(/[^a-zA-Z0-9]/g, '');
 		const varName = `textDiv${cleanX}${cleanY}`;
 
 		const isNumeric = (str) => /^\d+$/.test(str);
 		const xValue = isNumeric(x) ? `'${x}px'` : `(${x}) + 'px'`;
 		const yValue = isNumeric(y) ? `'${y}px'` : `(${y}) + 'px'`;
 
-		if (!text || !text.includes('"')) {
-			this.output += `
+		// TODO: Find other elements below and, if covering them, delete them
+		this.output += `
 const ${varName} = document.createElement('div');
 ${varName}.innerText = ${text};
-${varName}.id = 'textDiv' + '${x}' + '${y}';
-${varName}.style.position = 'fixed';
-${varName}.style.left = ${xValue};
-${varName}.style.top = ${yValue};
-${varName}.style.fontSize = '14px';
-${varName}.style.color = Ink;
-${varName}.style.zIndex = 99;
-document.getElementById('amos-screen').appendChild(${varName});
-setInterval(() => {
-${varName}.innerText = ${text}; // Function that returns updated value
-}, 100);`;
-		} else {
-			this.output += `
-const ${varName} = document.createElement('div');
-${varName}.innerText = '${text.replace(/"/g, "")}';
-${varName}.id = 'textDiv' + '${x}' + '${y}';
+${varName}.id = 'textDiv${x}${y}' + Math.random();
 ${varName}.style.position = 'absolute';
 ${varName}.style.left = ${xValue};
 ${varName}.style.top = ${yValue};
 ${varName}.style.fontSize = '14px';
-${varName}.style.color = Ink;
-${varName}.style.position = "Relative";
+${varName}.style.color = getColour(Ink);
+${varName}.style.backgroundColor = getColour(Paper);
 ${varName}.style.zIndex = 99;
-document.getElementById('amos-screen').appendChild(${varName});
-        `;
-		}
+document.getElementById('amos-screen').appendChild(${varName});`;
 	}
 
 	enterWait_key(ctx) {
 		const waitTicks = ctx.NUMBER().getText();
 		const ms = parseInt(waitTicks) * 20; // AMOS = ~50fps
 
-		this.output += `
-allowLoop = false;
-setTimeout(() => {
-allowLoop = true;
-}, ${ms});\n`;
+		this.output += `await new Promise(r => setTimeout(r, ${ms}));`
 	}
 
 	enterDo_loop(ctx) {
-		this.output += `
-let allowLoop = true; // Controla o loop para Wait funcionar
-
-setInterval(() => {
-  if (!allowLoop) return;
-
-  currentTimer = Date.now();
-  Timer++;\n`;
+		this.output += 'while(true) {';
 	}
 
 	enterRepeat_key(ctx) {
-		this.output += `
-setInterval(() => {
-  currentTimer = Date.now();
-  Timer++;
-
-        `;
+		this.output += 'setInterval(() => { currentTimer = Date.now(); Timer++;';
 	}
 
 	exitRepeat_key(ctx) {
-		this.output += `
-    
-    
-    Timer = 9;
-  
-}, 16);`;
+		this.output += 'Timer = 9; }, 16);';
 	}
 
 	exitDo_loop(ctx) {
-		this.output += `
-    
-    
-    Timer = 9;
-  
-}, 16); \n
-`;
+		this.output += 'await new Promise(r => setTimeout(r, 16));}';
 	}
 
 	enterFor_loop(ctx) {
@@ -1549,6 +1484,7 @@ setInterval(() => {
 		let expressions2 = [];
 		let comparators = [];
 		let or_and = [];
+
 		for (let i = 0; i < ctx.expression1().length; i++) {
 			expressions1.push(ctx.expression1(i).getText());
 		}
@@ -1562,16 +1498,16 @@ setInterval(() => {
 			or_and.push(ctx.or_and(i).getText());
 		}
 
-		let finalIfStatement = "";
+		let finalIfStatement = '';
 
 		for (let i = 0; i < expressions1.length; i++) {
 			finalIfStatement +=
-				expressions1[i] + " " + comparators[i] + " " + expressions2[i];
-			if (or_and[i] && or_and[i] === "AND") {
-				finalIfStatement += " && ";
+				expressions1[i] + ' ' + comparators[i] + ' ' + expressions2[i];
+			if (or_and[i] && or_and[i] === 'AND') {
+				finalIfStatement += ' && ';
 			}
-			if (or_and[i] && or_and[i] === "OR") {
-				finalIfStatement += " || ";
+			if (or_and[i] && or_and[i] === 'OR') {
+				finalIfStatement += ' || ';
 			}
 		}
 	}
@@ -1581,63 +1517,71 @@ setInterval(() => {
 			const struct = ctx.array_structure(i);
 			const name = struct.IDENTIFIER(0)?.getText();
 
-			// This code is wrong, it should generate something like
-			// Array(5).fill(0).map(x => Array(10).fill(0))
 			// Cf. https://stackoverflow.com/questions/966225/how-can-i-create-a-two-dimensional-array-in-javascript
 
 			const numberOfDimensions = struct.expression1().length;
-			if (numberOfDimensions == 1) {
-				this.output += ` const ${name} = new Array(100);`;
-			} else if (numberOfDimensions == 2) {
-				this.output += ` const ${name} = Array(100).fill(0).map(x => Array(100).fill(0));`;
-			} else {
-				console.log("YYY, I don't know how to handle matrix with d > 2");
+			let dimension = struct.expression1()[0].getText();
+			this.output += `const ${name} = Array(${dimension}).fill(0)`;
+			
+			for(let i = 1; i < numberOfDimensions; i++) {
+				let dimension = struct.expression1()[i].getText();
+				this.output += `.map(x => Array(${dimension}).fill(0)`;
 			}
+			for(let i = 1; i < numberOfDimensions; i++) {
+				this.output += ')';
+			}
+
+			this.output += ';'
 		}
 	}
 
 	exitFor_loop(ctx) {
-		this.output += `}`;
+		this.output += '}';
 	}
 
 	enterData_statement(ctx) {
-		if (!this.dataMatrix) {
-			this.dataMatrix = [];
-			this.output += `const dataMatrix = [];\n`;
+		if (!this.hasDataMatrix) {
+			this.hasDataMatrix = true;
+			this.output += 'const dataMatrix = [];';
 		}
 
+		// Data values are "contiguous" and should be read one after the other until no more
 		const values = ctx.expression1().map((e) => e.getText());
-		const row = `[${values.join(", ")}]`;
-		this.dataMatrix.push(row);
-		this.output += `dataMatrix.push(${row});\n`;
+		const row = `${values.join(', ')}`;
+		this.output += `dataMatrix.push(${row});`;
 	}
 
 	enterRead_statement(ctx) {
-		const targets = ctx.children.filter((child) => child.getText() !== "Read" && child.getText() !== ",");
+		const targets = ctx.children.filter((child) => child.getText() !== 'Read' && child.getText() !== ',');
 
 		for (let i = 0; i < targets.length; i++) {
-			const rawText = targets[i].getText();
+			const children = targets[i].children;
 
-			const struct = targets[i].array_structure();
-			const name = struct.IDENTIFIER(0)?.getText();
-			this.output += ` ${name}`;
+			for (let j = 0; j < children.length; j++) {
+				const child = children[j];
+				const childName = child.constructor.name;
 
-			const numberOfDimensions = struct.expression1().length;
+				// TODO: AMOS should report an error if dataMatrixPointer > dataMatrix.length
+				if (childName === 'Me') {
+					this.output += child.getText();
+					this.output += ` = dataMatrix[dataMatrixPointer++];`;
+				} else if (childName === 'Array_structureContext') {
+					const name = child.IDENTIFIER(0).getText();
+					this.output += `${name}`;
 
-			let indicesLeftToRight = "";
-			for (let j = 0; j < numberOfDimensions; j++) {
-				const indexValue = struct.expression1(j).getText();
-				indicesLeftToRight += `[${indexValue}]`;
+					const numberOfDimensions = child.expression1().length;
+					for (let j = 0; j < numberOfDimensions; j++) {
+						const indexValue = child.expression1(j).getText();
+						this.output += `[${indexValue}]`;
+					}
+
+					// Reading dataMatrix should be independent of x and y
+					this.output += ' = dataMatrix[dataMatrixPointer++];';
+				} else {
+					console.log("WWW, I don't know what to do with " + childName);
+					accumulator.push(child.getText());
+				}
 			}
-
-			let indicesRightToLeft = "";
-			for (let j = numberOfDimensions - 1; j >= 0; j--) {
-				const indexValue = struct.expression1(j).getText();
-				indicesRightToLeft += `[${indexValue}]`;
-			}
-
-			// Reading dataMatrix should be independent of x and y
-			this.output += `${indicesLeftToRight} = dataMatrix${indicesRightToLeft};\n`;
 		}
 	}
 
@@ -1656,7 +1600,7 @@ setInterval(() => {
 
 		const expression1 = ctx.expression1();
 		const arrayValue = expression1.getText();
-		this.output += `= ${arrayValue};\n`;
+		this.output += ` = ${arrayValue};`;
 	}
 
 	/*
@@ -1714,16 +1658,18 @@ setInterval(() => {
 
 	handleTerm(accumulator, termContext) {
 		const children = termContext.children;
-		for (let i = 0; i < children.length; i++) {
-			const child = children[i];
-			const childName = child.constructor.name;
-			if (childName === 'Me') {
-				this.handleSymbol(accumulator, child);
-			} else if (childName === 'FactorContext') {
-				this.handleFactor(accumulator, child);
-			} else {
-				console.log("ZZZ, I don't know what to do with " + childName);
-				accumulator.push('ZZZ');
+		if(termContext.children != null) {
+			for (let i = 0; i < children.length; i++) {
+				const child = children[i];
+				const childName = child.constructor.name;
+				if (childName === 'Me') {
+					this.handleSymbol(accumulator, child);
+				} else if (childName === 'FactorContext') {
+					this.handleFactor(accumulator, child);
+				} else {
+					console.log("ZZZ, I don't know what to do with " + childName);
+					accumulator.push('ZZZ');
+				}
 			}
 		}
 	}
@@ -1743,78 +1689,85 @@ setInterval(() => {
 			this.handleSymbol(accumulator, expressionContext.children[1]);
 			this.handleTerm(accumulator, expressionContext.term(1));
 		}
-		return accumulator.join("");
+		return accumulator.join('');
 	}
 
 	enterIf_statement(ctx) {
-		let leftExpression;
-		let comparator;
-		let rightExpression = "";
+		let statement = "";
+		let logicalOperator = "";
+		let comparator = "";
 
-		// Get the left-hand side expression (e.g., PRESSEDKEYNUMBER)
-		leftExpression = this.handleExpression(ctx.expression1());
+		for (let i = 0; i < ctx.children.length; i++) {
+			if (ctx.children[i].constructor.name == "Expression1Context") {
+				statement += this.handleExpression(ctx.children[i]);
+			} else if (ctx.children[i].constructor.name == "Or_andContext") {
+				logicalOperator = ctx.children[i].getText();
+				if (logicalOperator == "and") {
+					statement += " && ";
+				}
+				else if (logicalOperator == "or") {
+					statement += " || ";
+				}
+				else {
+					console.log("Unrecognized logicalOperator in IF Statement");
+				}
+			} else if (ctx.children[i].constructor.name == "Expression2Context") {
+				statement += this.handleExpression(ctx.children[i]);
+			} else if (ctx.children[i].constructor.name == "Expressions_comparatorsContext") {
+				comparator = ctx.children[i].getText();
+				// Special cases for = and <>
+				if (comparator === '=') {
+					comparator = '==';
+				}
+				else if (comparator === '<>') {
+					comparator = '!=';
+				}
+				else {
+					// Nothing to do here
+				}
+				statement += ` ${comparator} `
+			}
 
-		// Get the comparison operator (e.g., =, <>)
-		comparator = ctx.children[2]?.getText();
-		if (comparator === "=") {
-			comparator = "==";
 		}
-		if (comparator === "<>") {
-			comparator = "!=";
-		}
-
-		// Get the right-hand side expression (e.g., 2 * I + 1)
-		rightExpression = this.handleExpression(ctx.expression2());
-
-		// Output the if statement
-		this.output += `if (${leftExpression} ${comparator} ${rightExpression}) {`;
+		this.output += `if (${statement}) {`
 	}
 
 	exitIf_statement(ctx) {
-		this.output += `}`;
+		this.output += '}';
 	}
 
 	enterProcedure_call(ctx) {
 		const name = ctx.IDENTIFIER().getText();
-		let callCode = "";
+		let callCode = '';
 
 		if (!ctx.SQUARE_BRACKET_OPEN()) {
 			// Case 1: Calling a procedure with just its name 
-			callCode = `${name}();\n`;
+			callCode = `${name}();`;
 		} else {
 			// Case 2: Calling a procedure with some parameters
-			const args = ctx.expression1().map(expr => expr.getText()).join(", ");
-			callCode = `${name}(${args});\n`;
+			const args = ctx.expression1().map(expr => expr.getText()).join(', ');
+			callCode = `${name}(${args});`;
 		}
 
-		// Direct the generated code to the correct buffer to avoid hoisting errors
-		/*
-		if (this.indentLevel === 0) {
-			this.functionStarters += `\n${callCode}`;
-		} else {
-			this.output += `\n${callCode}`;
-		}
-		*/
-		// this.functionStarters += `\n${callCode}`;
-		this.output += `\n${callCode}`;
+		this.output += `${callCode}`;
 	}
 
 	enterIf_statement_key_state(ctx) {
 		let leftExpression = ctx.current_Key_State(0)?.expression1(0)?.getText();
 
-		if (leftExpression.includes("$")) {
+		if (leftExpression.includes('$')) {
 			// Extract the hexadecimal value from the expression
 			let hexValueMatch = leftExpression.match(/\$[0-9A-Fa-f]+/);
 
 			if (hexValueMatch) {
-				let hexValue = parseInt(hexValueMatch[0].replace("$", ""), 16);
+				let hexValue = parseInt(hexValueMatch[0].replace('$', ''), 16);
 
 				// Check if the leftExpression is just a hexadecimal value
 				if (hexValueMatch[0] === leftExpression) {
 					// If it's only a hex value, convert it to a key mapping lookup
 					leftExpression = `keyMapping[${hexValue}`;
 				} else {
-					let variable = leftExpression.split("$")[0];
+					let variable = leftExpression.split('$')[0];
 
 					// If it's a variable or expression with a hex part, construct it accordingly
 					leftExpression = leftExpression.replace(
@@ -1849,7 +1802,9 @@ setInterval(() => {
 			this.output
 		);
 
-		result = result.replace(/Rnd\s*\(([^)]+)\)/gi, "randomInt($1)");
+		// TODO: Functions, like Rnd(), should be treated properly in the corresponding semantic actions
+		result = result.replace(/Rnd\s*\(([^)]+)\)/gi, 'randomInt($1)');
+console.log(result);
 		return result;
 	}
 }

@@ -628,7 +628,7 @@ export function WorkbenchShell({ children }) {
                     fontWeight: "bold",
                 }}
             >
-                CRVJA Tool Suite v1.1
+                CRVJA Tool Suite v1.2
             </div>
 
            {React.Children.map(children, child => {
