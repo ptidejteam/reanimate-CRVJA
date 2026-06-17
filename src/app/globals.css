@@ -1,0 +1,20 @@
+@font-face {
+    font-family: 'Amiga4Ever';
+    src: url('/fonts/amiga4ever.ttf') format('truetype');
+
+}
+
+@font-face {
+    font-family: 'Amiga4EverPro';
+    src: url('/fonts/amiga4ever pro.ttf') format('truetype');
+}
+* {
+    font-family: 'Amiga4Ever', sans-serif;
+}
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #9B87FF !important;
+  height: 100%;
+
+}

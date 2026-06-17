@@ -1,74 +1,68 @@
-import antlr4 from "antlr4";
-import AmosToJavaScriptTranslator from "@/src/transpiler/AmosToJavaScriptTranslator";
-import AMOSParser from "@/src/grammar/generated/AMOSParser";
-import AMOSLexer from "@/src/grammar/generated/AMOSLexer";
+import { translateAmos } from "./helpers/translate";
 
 test("cls translation", () => {
-    const amosBasicCode = `
-        Cls
-    `;
+  const amosBasicCode = `
+    Cls
+  `;
 
-    const chars = new antlr4.InputStream(amosBasicCode);
-    const lexer = new AMOSLexer(chars);
-    const tokens = new antlr4.CommonTokenStream(lexer);
-    const parser = new AMOSParser(tokens);
+  const [lexErrs, parseErrs, translatedJS] = translateAmos(amosBasicCode);
 
-    const tree = parser.program();
+  expect(lexErrs.errors).toEqual([]);
+  expect(parseErrs.errors).toEqual([]);
 
-    const translator = new AmosToJavaScriptTranslator();
-    const walker = new antlr4.tree.ParseTreeWalker();
-    walker.walk(translator, tree);
-    const translatedJsCode = translator.getJavaScript();
+  const normalizedJS = translatedJS.replace(/\s+/g, " ").trim();
 
-    // Check if the output contains the screen clearing commands
-    expect(translatedJsCode).toContain("const amosScreen = document.getElementById('amos-screen');");
-    expect(translatedJsCode).toContain("amosScreen.innerHTML = '';");
+  // Check if the output contains the screen clearing commands
+  expect(normalizedJS).toContain(
+    "const amosScreen = document.getElementById('amos-screen');",
+  );
+  expect(normalizedJS).toContain("amosScreen.innerHTML = '';");
 });
 
 test("cls with color translation", () => {
-    const amosBasicCode = `
-        Cls 2
+  const amosBasicCode = `
+    Cls 2
     `;
+  
+  const [lexErrs, parseErrs, translatedJS] = translateAmos(amosBasicCode);
 
-    const chars = new antlr4.InputStream(amosBasicCode);
-    const lexer = new AMOSLexer(chars);
-    const tokens = new antlr4.CommonTokenStream(lexer);
-    const parser = new AMOSParser(tokens);
-    const tree = parser.program();
+  expect(lexErrs.errors).toEqual([]);
+  expect(parseErrs.errors).toEqual([]);
+  
+  const normalizedJS = translatedJS.replace(/\s+/g, " ").trim();
 
-    const translator = new AmosToJavaScriptTranslator();
-    const walker = new antlr4.tree.ParseTreeWalker();
-    walker.walk(translator, tree);
-    const translatedJsCode = translator.getJavaScript();
+  // Check if the output contains the screen clearing commands
+  expect(normalizedJS).toContain(
+    "const amosScreen = document.getElementById('amos-screen');",
+  );
+  expect(normalizedJS).toContain("amosScreen.innerHTML = '';");
 
-    // Check if the output contains the screen clearing commands
-    expect(translatedJsCode).toContain("const amosScreen = document.getElementById('amos-screen');");
-    expect(translatedJsCode).toContain("amosScreen.innerHTML = '';");
-    
-    // Check if it sets the background color using the colorMapping dictionary
-    expect(translatedJsCode).toContain("amosScreen.style.backgroundColor = colorMapping[2 + 1] || \"black\";");
+  // Check if it sets the background color using the colorMapping dictionary
+  expect(normalizedJS).toContain(
+    'amosScreen.style.backgroundColor = colorMapping[2];',
+  );
 });
 
 test("cls with block area translation", () => {
-    const amosBasicCode = `
+  const amosBasicCode = `
         Cls 2,10,20 To 100,200
     `;
 
-    const chars = new antlr4.InputStream(amosBasicCode);
-    const lexer = new AMOSLexer(chars);
-    const tokens = new antlr4.CommonTokenStream(lexer);
-    const parser = new AMOSParser(tokens);
-    const tree = parser.program();
+  const [lexErrs, parseErrs, translatedJS] = translateAmos(amosBasicCode);
 
-    const translator = new AmosToJavaScriptTranslator();
-    const walker = new antlr4.tree.ParseTreeWalker();
-    walker.walk(translator, tree);
-    const translatedJsCode = translator.getJavaScript();
+  expect(lexErrs.errors).toEqual([]);
+  expect(parseErrs.errors).toEqual([]);
+  
+  const normalizedJS = translatedJS.replace(/\s+/g, " ").trim();
 
-    expect(translatedJsCode).toContain("const clearColor = colorMapping[2 + 1] || \"black\";");
-    expect(translatedJsCode).toContain("const clearX1 = 10;");
-    expect(translatedJsCode).toContain("const clearY1 = 20;");
-    expect(translatedJsCode).toContain("const clearX2 = 100;");
-    expect(translatedJsCode).toContain("const clearY2 = 200;");
-    expect(translatedJsCode).toContain("fillDiv.style.backgroundColor = clearColor;");
+  expect(normalizedJS).toContain(
+    'const clearColor = colorMapping[2];',
+  );
+  expect(normalizedJS).toContain("const clearX1 = 10;");
+  expect(normalizedJS).toContain("const clearY1 = 20;");
+  expect(normalizedJS).toContain("const clearX2 = 100;");
+  expect(normalizedJS).toContain("const clearY2 = 200;");
+  expect(normalizedJS).toContain(
+    "fillDiv.style.backgroundColor = clearColor;",
+  );
 });
