@@ -1812,7 +1812,7 @@ document.getElementById('amos-screen').appendChild(${varName});`;
 
     // TODO: Functions, like Rnd(), should be treated properly in the corresponding semantic actions
     result = result.replace(/Rnd\s*\(([^)]+)\)/gi, "randomInt($1)");
-console.log(result);
+// console.log(result);
     return result;
   }
 }

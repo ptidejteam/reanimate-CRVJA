@@ -7,21 +7,25 @@ function translate(code) {
   return normalizedJS.replace(/\s+/g, " ").trim();
 }
 
-test("load_banks without bank id", () => {
+test("string assignments", () => {
   const amosBasicCode = `
-    Load "assets/icons.abk"
+A$ = "Hello, World!"
   `;
 
   const normalizedJS = translate(amosBasicCode);
 
-  expect(normalizedJS).toContain("loadBank('\"assets/icons.abk\"', 1);");
+  expect(normalizedJS).toContain('A$ = "Hello, World!";');
+
 });
 
-test("load_banks with bank id", () => {
-  const amosBasicCode = `Load "assets/icons.abk", 2`;
+test("string assignments and text", () => {
+  const amosBasicCode = `
+A$ = "Hello, World!"
+Text 10,10,A$
+  `;
 
   const normalizedJS = translate(amosBasicCode);
 
-  expect(normalizedJS).toContain("loadBank('\"assets/icons.abk\"', 2);");
+  expect(normalizedJS).toContain('A$ = "Hello, World!";');
+  expect(normalizedJS).toContain('textDiv1010.innerText = A$;');
 });
-

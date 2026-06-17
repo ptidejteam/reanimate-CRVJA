@@ -1,15 +1,18 @@
 import { translateAmos } from "../helpers/translate";
 
+function translate(code) {
+  const [lexErrs, parseErrs, normalizedJS] = translateAmos(code);
+  expect(lexErrs.errors).toEqual([]);
+  expect(parseErrs.errors).toEqual([]);
+  return normalizedJS.replace(/\s+/g, " ").trim();
+}
+
 test("statement_separator", () => {
   const amosBasicCode = `
        Screen Open 1,600,400,8,Hires : Curs Off : Text 10,10,"ReAnimate(d) Piano"
     `;
 
-  const [lexErrs, parseErrs, normalizedJS] = translateAmos(amosBasicCode);
-  expect(lexErrs.errors).toEqual([]);
-  expect(parseErrs.errors).toEqual([]);
-  
-  
+  const normalizedJS = translate(amosBasicCode);
 
   // Screen Open assertions
   expect(normalizedJS).toContain("const screenDiv = document.createElement('div');");
@@ -32,4 +35,5 @@ test("statement_separator", () => {
   expect(normalizedJS).toContain("textDiv1010.style.zIndex = 99;");
   expect(normalizedJS).toContain("document.getElementById('amos-screen').appendChild(textDiv1010);");
 });
+
 

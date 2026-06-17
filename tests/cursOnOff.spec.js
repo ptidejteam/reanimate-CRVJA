@@ -1,16 +1,18 @@
 import { translateAmos } from "./helpers/translate";
 
+function translate(code) {
+  const [lexErrs, parseErrs, normalizedJS] = translateAmos(code);
+  expect(lexErrs.errors).toEqual([]);
+  expect(parseErrs.errors).toEqual([]);
+  return normalizedJS.replace(/\s+/g, " ").trim();
+}
+
 test("curs_on", () => {
   const amosBasicCode = `
     Curs On
   `;
 
-  const [lexErrs, parseErrs, translatedJS] = translateAmos(amosBasicCode);
-
-  expect(lexErrs.errors).toEqual([]);
-  expect(parseErrs.errors).toEqual([]);
-
-  const normalizedJS = translatedJS.replace(/\s+/g, " ").trim();
+  const normalizedJS = translate(amosBasicCode);
 
   expect(normalizedJS).toContain(
     `document.getElementById('amos-screen').style.cursor = 'auto';`,
@@ -22,14 +24,10 @@ test("curs_off", () => {
     Curs Off
     `;
 
-  const [lexErrs, parseErrs, translatedJS] = translateAmos(amosBasicCode);
-
-  expect(lexErrs.errors).toEqual([]);
-  expect(parseErrs.errors).toEqual([]);
-
-  const normalizedJS = translatedJS.replace(/\s+/g, " ").trim();
+  const normalizedJS = translate(amosBasicCode);
 
   expect(normalizedJS).toContain(
     `document.getElementById('amos-screen').style.cursor = 'none';`,
   );
 });
+

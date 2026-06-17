@@ -1,16 +1,18 @@
 import { translateAmos } from "./helpers/translate";
 
+function translate(code) {
+  const [lexErrs, parseErrs, normalizedJS] = translateAmos(code);
+  expect(lexErrs.errors).toEqual([]);
+  expect(parseErrs.errors).toEqual([]);
+  return normalizedJS.replace(/\s+/g, " ").trim();
+}
+
 test("cls translation", () => {
   const amosBasicCode = `
     Cls
   `;
 
-  const [lexErrs, parseErrs, translatedJS] = translateAmos(amosBasicCode);
-
-  expect(lexErrs.errors).toEqual([]);
-  expect(parseErrs.errors).toEqual([]);
-
-  const normalizedJS = translatedJS.replace(/\s+/g, " ").trim();
+  const normalizedJS = translate(amosBasicCode);
 
   // Check if the output contains the screen clearing commands
   expect(normalizedJS).toContain(
@@ -24,12 +26,7 @@ test("cls with color translation", () => {
     Cls 2
     `;
   
-  const [lexErrs, parseErrs, translatedJS] = translateAmos(amosBasicCode);
-
-  expect(lexErrs.errors).toEqual([]);
-  expect(parseErrs.errors).toEqual([]);
-  
-  const normalizedJS = translatedJS.replace(/\s+/g, " ").trim();
+  const normalizedJS = translate(amosBasicCode);
 
   // Check if the output contains the screen clearing commands
   expect(normalizedJS).toContain(
@@ -48,12 +45,7 @@ test("cls with block area translation", () => {
         Cls 2,10,20 To 100,200
     `;
 
-  const [lexErrs, parseErrs, translatedJS] = translateAmos(amosBasicCode);
-
-  expect(lexErrs.errors).toEqual([]);
-  expect(parseErrs.errors).toEqual([]);
-  
-  const normalizedJS = translatedJS.replace(/\s+/g, " ").trim();
+  const normalizedJS = translate(amosBasicCode);
 
   expect(normalizedJS).toContain(
     'const clearColor = colorMapping[2];',
@@ -66,3 +58,4 @@ test("cls with block area translation", () => {
     "fillDiv.style.backgroundColor = clearColor;",
   );
 });
+
