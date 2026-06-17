@@ -107,9 +107,9 @@ export default function AmosRunner({ jsCode, runNonce, bankFiles }) {
 
     const FONT_CSS = `
 @font-face { font-family: 'Amiga4Ever';
-  src: url('/fonts/amiga/amiga4ever.ttf') format('truetype'); font-display: swap; }
+  src: url('/fonts/amiga4ever.ttf') format('truetype'); font-display: swap; }
 @font-face { font-family: 'Amiga4EverPro';
-  src: url('/fonts/amiga/amiga4ever-pro.ttf') format('truetype'); font-display: swap; }
+  src: url('/fonts/amiga4ever-pro.ttf') format('truetype'); font-display: swap; }
 html, body, #game-container, #amos-screen, * { font-family: 'Amiga4Ever', sans-serif; }
 `;
 

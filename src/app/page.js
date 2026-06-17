@@ -17,12 +17,12 @@ import {
 import ReactMarkdown from 'react-markdown';
 import {
 	styleButton
-} from "@/app/constants/styles";
+} from "@/src/app/constants/styles";
 import {
 	useAMOSParser
-} from "@/app/hooks/useAMOSParser";
-import CodeEditorWithErrors from "@/app/components/Editor/CodeEditorWithErrors";
-import ExampleTabs from "@/app/components/Editor/ExampleTabs";
+} from "@/src/app/hooks/useAMOSParser";
+import CodeEditorWithErrors from "@/src/app/components/Editor/CodeEditorWithErrors";
+import ExampleTabs from "@/src/app/components/Editor/ExampleTabs";
 import {
 	downloadASCFile
 } from "@/src/tools/fileUtils";
@@ -37,10 +37,10 @@ import {
 } from "@/src/tools/spriteRenderer";
 import {
 	useBankCreator
-} from "@/app/hooks/useBankCreator";
-import BankEditor from "@/app/components/BankEditor/BankEditor";
-import AmosRunner from "@/app/components/Runner/AmosRunner";
-import BankSlotManager from "@/app/components/BankManager/BankSlotManager";
+} from "@/src/app/hooks/useBankCreator";
+import BankEditor from "@/src/app/components/BankEditor/BankEditor";
+import AmosRunner from "@/src/app/components/Runner/AmosRunner";
+import BankSlotManager from "@/src/app/components/BankManager/BankSlotManager";
 
 function App() {
 	const [showCode, setShowCode] = useState(false);

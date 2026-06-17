@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from 'react';
-import { styleButton } from "@/app/constants/styles";
+import { styleButton } from "@/src/app/constants/styles";
 
 export default function ExampleTabs({ tabs, onSelect }) {
   const [active, setActive] = useState(0);
