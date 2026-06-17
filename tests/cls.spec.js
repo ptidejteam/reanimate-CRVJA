@@ -3,7 +3,7 @@ import { translateAmos } from "./helpers/translate";
 test("cls translation", () => {
   const amosBasicCode = `
     Cls
-    `;
+  `;
 
   const [lexErrs, parseErrs, translatedJS] = translateAmos(amosBasicCode);
 

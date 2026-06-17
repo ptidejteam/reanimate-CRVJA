@@ -1,7 +1,4 @@
-import antlr4 from "antlr4";
-import AmosToJavaScriptTranslator from "@/src/transpiler/AmosToJavaScriptTranslator";
-import AMOSParser from "../src/grammar/generated/AMOSParser";
-import AMOSLexer from "../src/grammar/generated/AMOSLexer";
+import { translateAmos } from "../helpers/translate";
 
 test("variables_fetcher", () => {
 
@@ -82,18 +79,10 @@ End
 
     `;
 
-   const chars = new antlr4.InputStream(amosBasicCode);
-   const lexer = new AMOSLexer(chars);
-   const tokens = new antlr4.CommonTokenStream(lexer);
-   const parser = new AMOSParser(tokens);
-
-   const tree = parser.program();
-
-   // Translate the parsed AMOS BASIC into JavaScript
-   const translator = new AmosToJavaScriptTranslator();
-   const walker = new antlr4.tree.ParseTreeWalker();
-   walker.walk(translator, tree);
-   const translatedJsCode = translator.getJavaScript(); // Get the translated JavaScript code
+   const [lexErrs, parseErrs, normalizedJS] = translateAmos(amosBasicCode);
+  expect(lexErrs.errors).toEqual([]);
+  expect(parseErrs.errors).toEqual([]);
+  
 let targetString =
       `  
 let XW = 0; XW = 70;
@@ -106,9 +95,9 @@ let WB = 0; WB = 30;
 let HB = 0; HB = 60;
   `
    /* test */
-   const normalizedTranslatedJsCode = translatedJsCode.replace(/\s+/g, ' ').trim();
+   
    const normalizedExpectedJsCode = targetString.replace(/\s+/g, ' ').trim();
-   expect(normalizedTranslatedJsCode).toContain(normalizedExpectedJsCode);
+   expect(normalizedJS).toContain(normalizedExpectedJsCode);
    /* test */
 
 

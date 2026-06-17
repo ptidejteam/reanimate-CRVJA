@@ -2,9 +2,9 @@ import { translateAmos } from "./helpers/translate";
 
 test("1D arrays creation, update and global reference", () => {
   const amosBasicCode = `
-  Dim C(1)
-  Global C(1)
-  C(0) = 10
+    Dim C(1)
+    Global C(1)
+    C(0) = 10
   `;
 
   const [lexErrs, parseErrs, translatedJS] = translateAmos(amosBasicCode);
