@@ -1,13 +1,13 @@
 "use client";
 import { useState, useEffect } from "react";
 import antlr4 from "antlr4";
-import AmosToJavaScriptTranslator from "@/src/transpiler/AmosToJavaScriptTranslator";
+import AmosToJavaScriptTranslator from "@/src/transpiler/AmosTranspiler";
 import AMOSParser from "@/src/grammar/generated/AMOSParser";
 import AMOSLexer from "@/src/grammar/generated/AMOSLexer";
 import prettier from "prettier/standalone";
 import babelPlugin from "prettier/plugins/babel";
 import estreePlugin from "prettier/plugins/estree";
-import CollectingErrorListener from "@/src/transpiler/CollectingErrorListener";
+import CollectingErrorListener from "@/src/transpiler/ErrorListener";
 
 export function useAMOSParser(amosCode) {
   const [jsCode, setJsCode] = useState("");

@@ -7,13 +7,13 @@ import React, {
 import {
 	Sketch
 } from "@uiw/react-color";
-import AMOSDecoder from "@/src/tools/AmosDecoder";
-import AnalogClock from "@/src/tools/UI/analogClock";
+import AMOSDecoder from "@/src/utils/amosDecoder";
+import AnalogClock from "@/src/app/components/ui/analogClock";
 import {
 	WorkbenchIcon,
 	WorkbenchShell,
 	WorkbenchWindow
-} from "@/src/tools/UI/workbench";
+} from "@/src/app/components/ui/workbench";
 import ReactMarkdown from 'react-markdown';
 import {
 	styleButton
@@ -21,26 +21,26 @@ import {
 import {
 	useAMOSParser
 } from "@/src/app/hooks/useAMOSParser";
-import CodeEditorWithErrors from "@/src/app/components/Editor/CodeEditorWithErrors";
-import ExampleTabs from "@/src/app/components/Editor/ExampleTabs";
+import CodeEditorWithErrors from "@/src/app/components/editor/CodeEditorWithErrors";
+import ExampleTabs from "@/src/app/components/editor/ExampleTabs";
 import {
 	downloadASCFile
-} from "@/src/tools/fileUtils";
+} from "@/src/utils/fileHandler";
 import {
 	parseBankFile
-} from "@/src/tools/bankReader/loadBank";
+} from "@/src/utils/parseAmosBank";
 import {
 	generateAmosBankFile
-} from "@/src/tools/bankWriter/generateAmosBankFile";
+} from "@/src/utils/generateAmosBank";
 import {
 	renderSpritePixels
-} from "@/src/tools/spriteRenderer";
+} from "@/src/utils/spriteRenderer";
 import {
 	useBankCreator
 } from "@/src/app/hooks/useBankCreator";
-import BankEditor from "@/src/app/components/BankEditor/BankEditor";
-import AmosRunner from "@/src/app/components/Runner/AmosRunner";
-import BankSlotManager from "@/src/app/components/BankManager/BankSlotManager";
+import BankEditor from "@/src/app/components/bank/BankEditor";
+import AmosRunner from "@/src/app/components/runner/AmosRunner";
+import BankSlotManager from "@/src/app/components/bank/BankSlotManager";
 
 function App() {
 	const [showCode, setShowCode] = useState(false);

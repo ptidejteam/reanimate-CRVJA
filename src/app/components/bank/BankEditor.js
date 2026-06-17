@@ -1,9 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { Sketch } from "@uiw/react-color";
-import { generateAmosBankFile } from "@/src/tools/bankWriter/generateAmosBankFile";
-import { parseBankFile } from "@/src/tools/bankReader/loadBank";
-import { renderSpritePixels } from "@/src/tools/spriteRenderer";
+import { generateAmosBankFile } from "@/src/utils/generateAmosBank";
+import { parseBankFile } from "@/src/utils/parseAmosBank";
+import { renderSpritePixels } from "@/src/utils/spriteRenderer";
 
 export default function BankEditor({ bankCreator, setBankCreator }) {
   const [palette, setPalette] = useState(

@@ -3,7 +3,7 @@ import {
   parseExtensionToTable,
   printAMOSSource,
   TokenTable,
-} from "./AmosCsStyle";
+} from "./amosBinaryParser";
 function collectTableEntries(table) {
   const out = [];
   // common cases
