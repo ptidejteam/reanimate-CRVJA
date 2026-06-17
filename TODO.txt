@@ -95,3 +95,10 @@ The creation of (multidimensional) arrays is hacked for 1 or 2 dimensions, and a
 
 Right now, JavaScript arrays are always with "1" as value for their dimensions
 	See "const ${name} = new Array(1`;"
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+- Make all the tests pass -- do we need to write more tests?
+- Write a paper (ICSE2027 - GAS)
+- JavaScript?
+- What are we going to do with the "Old Games" written in deprecated CRVJA?
