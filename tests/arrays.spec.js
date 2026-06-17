@@ -2,18 +2,21 @@ import { translateAmos } from "./helpers/translate";
 
 test("1D arrays creation, update and global reference", () => {
   const amosBasicCode = `
-  Dim C()
+  Dim C(1)
   Global C(1)
   C(0) = 10
   `;
 
   const [lexErrs, parseErrs, translated] = translateAmos(amosBasicCode);
 
-  console.log(lexErrs);
-  console.log(parseErrs);
+  expect(lexErrs.errors).toEqual([]);
+  expect(parseErrs.errors).toEqual([]);
 
-  // expect(lexErrs).notEmpty();
-  // expect(parseErrs).notEmpty();
+  const normalizedJS = translated.replace(/\s+/g, " ").trim();
+
+  expect(normalizedJS).toContain(
+    "const C = Array(1).fill(0); C[Math.trunc(0)] = 10;",
+  );
 });
 
 test("2D arrays creation, update and global reference", () => {
@@ -21,16 +24,20 @@ test("2D arrays creation, update and global reference", () => {
   Dim S(2,2)
   Global S(2)
   S(1,0) = 20
-  Text 100,100,S(1,0)
+  TEMP = S(1,0)
+  Text 100,100,TEMP
   `;
 
   const [lexErrs, parseErrs, translated] = translateAmos(amosBasicCode);
-  // const normalized = translated.replace(/\s+/g, ' ').trim();
 
-  // Dim S(2,2) creates a 3x3 2D array
-  expect(translated).toContain(
+  expect(lexErrs.errors).toEqual([]);
+  expect(parseErrs.errors).toEqual([]);
+  const normalizedJS = translated.replace(/\s+/g, " ").trim();
+
+  // Dim S(2,2)
+  expect(normalizedJS).toContain(
     "const S = Array(2).fill(0).map(x => Array(2).fill(0));",
   );
-  // S(1,0) = 20 updates element at y=0, x=1 => S[0][1] = 20
-  expect(translated).toContain("S[Math.trunc(1)][Math.trunc(0)] = 20;");
+  // S(1,0) = 20
+  expect(normalizedJS).toContain("S[Math.trunc(1)][Math.trunc(0)] = 20;");
 });
