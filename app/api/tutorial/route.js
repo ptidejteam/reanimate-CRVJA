@@ -3,7 +3,7 @@ import path from "path";
 
 export async function GET() {
   try {
-    const filePath = path.join(process.cwd(), "tutorial.md");
+    const filePath = path.join(process.cwd(), "./docs/tutorial.md");
     const content = fs.readFileSync(filePath, "utf-8");
     return new Response(content, {
       headers: { "Content-Type": "text/plain" },

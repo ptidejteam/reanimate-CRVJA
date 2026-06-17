@@ -12,7 +12,6 @@ import CollectingErrorListener from "@/src/transpiler/CollectingErrorListener";
 export function translateAmos(amosBasicCode) {
   const chars = new antlr4.InputStream(amosBasicCode);
   const lexer = new AMOSLexer(chars);
-//   let translated = "";
 
   const lexErr = new CollectingErrorListener();
   lexer.removeErrorListeners();
@@ -32,6 +31,6 @@ export function translateAmos(amosBasicCode) {
   walker.walk(translator, tree);
 
 
-  const translated = translator.getJavaScript();
-  return [lexErr, parseErr, translated];
+  const translatedJS = translator.getJavaScript();
+  return [lexErr, parseErr, translatedJS];
 }
