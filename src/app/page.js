@@ -323,7 +323,7 @@ function App() {
                             label: "Pac-Man",
                             onClick: async () => {
                               const resBank1 = await fetch(
-                                "/examples/Example1_Pac-Man/Example1_Pac-Man.abk",
+                                "/examples_/Example1_Pac-Man/Example1_Pac-Man.abk",
                               );
                               const blob = await resBank1.blob();
                               const file = new File(
@@ -334,7 +334,7 @@ function App() {
 
                               const text = await (
                                 await fetch(
-                                  "/examples/Example1_Pac-Man/Example1_Pac-Man.asc",
+                                  "/examples_/Example1_Pac-Man/Example1_Pac-Man.asc",
                                 )
                               ).text();
                               setAmosCode(text);
@@ -346,7 +346,7 @@ function App() {
                             onClick: async () => {
                               const text = await (
                                 await fetch(
-                                  "/examples/Example2_Piano/Example2_Piano.asc",
+                                  "/examples_/Example2_Piano/Example2_Piano.asc",
                                 )
                               ).text();
                               setAmosCode(text);
@@ -360,7 +360,7 @@ function App() {
                             onClick: async () => {
                               const text = await (
                                 await fetch(
-                                  "/examples/Example3_Rotating_Triangle/Example3_Rotating_Triangle.asc",
+                                  "/examples_/Example3_Rotating_Triangle/Example3_Rotating_Triangle.asc",
                                 )
                               ).text();
                               setAmosCode(text);
