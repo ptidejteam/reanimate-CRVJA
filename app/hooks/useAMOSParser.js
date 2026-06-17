@@ -64,5 +64,9 @@ export function useAMOSParser(amosCode) {
     return () => clearTimeout(id);
   }, [amosCode]);
 
-  return { jsCode, parseErrors, forceParse };
+  return {
+    jsCode,
+    parseErrors,
+    forceParse,
+  };
 }

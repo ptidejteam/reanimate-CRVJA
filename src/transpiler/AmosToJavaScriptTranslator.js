@@ -9,16 +9,16 @@ class AmosToJavaScriptTranslator extends AMOSListener {
 		this.id = 0;
 		// https://www.rapidtables.com/web/color/RGB_Color.html
 		this.colorMapping = {
-			 0: 'rgb(0,0,0)',
-			 1: 'rgb(255,255,255)',
-			 2: 'rgb(255,0,0)',
-			 3: 'rgb(0,255,0)',
-			 4: 'rgb(0,0,255)',
-			 5: 'rgb(255,255,0)',
-			 6: 'rgb(0,255,255)',
-			 7: 'rgb(255,0,255)',
-			 8: 'rgb(192,192,192)',
-			 9: 'rgb(128,128,128)',
+			0: 'rgb(0,0,0)',
+			1: 'rgb(255,255,255)',
+			2: 'rgb(255,0,0)',
+			3: 'rgb(0,255,0)',
+			4: 'rgb(0,0,255)',
+			5: 'rgb(255,255,0)',
+			6: 'rgb(0,255,255)',
+			7: 'rgb(255,0,255)',
+			8: 'rgb(192,192,192)',
+			9: 'rgb(128,128,128)',
 			10: 'rgb(128,0,0)',
 			11: 'rgb(128,128,0)',
 			12: 'rgb(0,128,0)',
@@ -1522,12 +1522,12 @@ document.getElementById('amos-screen').appendChild(${varName});`;
 			const numberOfDimensions = struct.expression1().length;
 			let dimension = struct.expression1()[0].getText();
 			this.output += `const ${name} = Array(${dimension}).fill(0)`;
-			
-			for(let i = 1; i < numberOfDimensions; i++) {
+
+			for (let i = 1; i < numberOfDimensions; i++) {
 				let dimension = struct.expression1()[i].getText();
 				this.output += `.map(x => Array(${dimension}).fill(0)`;
 			}
-			for(let i = 1; i < numberOfDimensions; i++) {
+			for (let i = 1; i < numberOfDimensions; i++) {
 				this.output += ')';
 			}
 
@@ -1658,7 +1658,7 @@ document.getElementById('amos-screen').appendChild(${varName});`;
 
 	handleTerm(accumulator, termContext) {
 		const children = termContext.children;
-		if(termContext.children != null) {
+		if (termContext.children != null) {
 			for (let i = 0; i < children.length; i++) {
 				const child = children[i];
 				const childName = child.constructor.name;
@@ -1777,7 +1777,6 @@ document.getElementById('amos-screen').appendChild(${varName});`;
 				}
 			}
 		}
-
 		this.output += `if (currentPressedKey === ${leftExpression}]) {`;
 	}
 
@@ -1804,7 +1803,7 @@ document.getElementById('amos-screen').appendChild(${varName});`;
 
 		// TODO: Functions, like Rnd(), should be treated properly in the corresponding semantic actions
 		result = result.replace(/Rnd\s*\(([^)]+)\)/gi, 'randomInt($1)');
-console.log(result);
+		// console.log(result);
 		return result;
 	}
 }
