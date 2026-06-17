@@ -67,6 +67,14 @@ describe("parseBankFile", () => {
 });
 
 import { translateAmos } from "./helpers/translate";
+
+function translate(code) {
+  const [lexErrs, parseErrs, normalizedJS] = translateAmos(code);
+  expect(lexErrs.errors).toEqual([]);
+  expect(parseErrs.errors).toEqual([]);
+  return normalizedJS.replace(/\s+/g, " ").trim();
+}
+
 const vm = require("vm");
 describe("Transpiler JS syntax validation", () => {
   test("generates syntactically valid JS", () => {
@@ -81,3 +89,5 @@ describe("Transpiler JS syntax validation", () => {
     }
   });
 });
+
+

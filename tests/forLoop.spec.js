@@ -1,16 +1,19 @@
 import { translateAmos } from "./helpers/translate";
 
+function translate(code) {
+  const [lexErrs, parseErrs, normalizedJS] = translateAmos(code);
+  expect(lexErrs.errors).toEqual([]);
+  expect(parseErrs.errors).toEqual([]);
+  return normalizedJS.replace(/\s+/g, " ").trim();
+}
+
 test("for_loop_simple", () => {
   const amosBasicCode = `
     For I=0 To 10
     Next I
   `;
 
-  const [lexErrs, parseErrs, translatedJS] = translateAmos(amosBasicCode);
-  expect(lexErrs.errors).toEqual([]);
-  expect(parseErrs.errors).toEqual([]);
-
-  const normalizedJS = translatedJS.replace(/\s+/g, " ").trim();
+  const normalizedJS = translate(amosBasicCode);
 
   const testTarget = `for (I = 0; I <= 10; I++) {}`;
   expect(normalizedJS).toContain(testTarget);
@@ -29,11 +32,7 @@ test("for_loop_with_code", () => {
     Next I
     `;
 
-  const [lexErrs, parseErrs, translatedJS] = translateAmos(amosBasicCode);
-  expect(lexErrs.errors).toEqual([]);
-  expect(parseErrs.errors).toEqual([]);
-
-  const normalizedJS = translatedJS.replace(/\s+/g, " ").trim();
+  const normalizedJS = translate(amosBasicCode);
 
   expect(normalizedJS).toContain("for (I = 0; I <= 10; I++) {");
   expect(normalizedJS).toContain(
@@ -43,3 +42,4 @@ test("for_loop_with_code", () => {
   expect(normalizedJS).toContain("soundPlayer(37+I, 1 * 1000);");
   expect(normalizedJS).toContain("P_DRAWKEYS(-1);");
 });
+

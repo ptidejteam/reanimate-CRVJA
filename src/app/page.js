@@ -10,16 +10,16 @@ import {
 } from "@/src/app/components/ui/workbench";
 import ReactMarkdown from "react-markdown";
 import { styleButton } from "@/src/app/constants/styles";
-import { useAMOSParser } from "@/src/app/hooks/useAMOSParser";
-import CodeEditorWithErrors from "@/src/app/components/editor_/CodeEditorWithErrors";
-import ExampleTabs from "@/src/app/components/editor_/ExampleTabs";
+import { useAMOSParser } from "@/src/app/hooks/useAmosParser";
+import CodeEditorWithErrors from "@/src/app/components/editor/CodeEditorWithErrors";
+import ExampleTabs from "@/src/app/components/editor/ExampleTabs";
 import { downloadASCFile } from "@/src/utils/fileHandler";
 import { parseBankFile } from "@/src/utils/parseAmosBank";
 import { generateAmosBankFile } from "@/src/utils/generateAmosBank";
 import { renderSpritePixels } from "@/src/utils/spriteRenderer";
 import { useBankCreator } from "@/src/app/hooks/useBankCreator";
 import BankEditor from "@/src/app/components/bank/BankEditor";
-import AmosRunner from "@/src/app/components/runner_/AmosRunner";
+import AmosRunner from "@/src/app/components/runner/AmosRunner";
 import BankSlotManager from "@/src/app/components/bank/BankSlotManager";
 
 function App() {
@@ -323,7 +323,7 @@ function App() {
                             label: "Pac-Man",
                             onClick: async () => {
                               const resBank1 = await fetch(
-                                "/examples_/Example1_Pac-Man/Example1_Pac-Man.abk",
+                                "/examples/Example1_Pac-Man/Example1_Pac-Man.abk",
                               );
                               const blob = await resBank1.blob();
                               const file = new File(
@@ -334,7 +334,7 @@ function App() {
 
                               const text = await (
                                 await fetch(
-                                  "/examples_/Example1_Pac-Man/Example1_Pac-Man.asc",
+                                  "/examples/Example1_Pac-Man/Example1_Pac-Man.asc",
                                 )
                               ).text();
                               setAmosCode(text);
@@ -346,7 +346,7 @@ function App() {
                             onClick: async () => {
                               const text = await (
                                 await fetch(
-                                  "/examples_/Example2_Piano/Example2_Piano.asc",
+                                  "/examples/Example2_Piano/Example2_Piano.asc",
                                 )
                               ).text();
                               setAmosCode(text);
@@ -360,7 +360,7 @@ function App() {
                             onClick: async () => {
                               const text = await (
                                 await fetch(
-                                  "/examples_/Example3_Rotating_Triangle/Example3_Rotating_Triangle.asc",
+                                  "/examples/Example3_Rotating_Triangle/Example3_Rotating_Triangle.asc",
                                 )
                               ).text();
                               setAmosCode(text);

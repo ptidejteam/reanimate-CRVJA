@@ -1,5 +1,12 @@
 import { translateAmos } from "../helpers/translate";
 
+function translate(code) {
+  const [lexErrs, parseErrs, normalizedJS] = translateAmos(code);
+  expect(lexErrs.errors).toEqual([]);
+  expect(parseErrs.errors).toEqual([]);
+  return normalizedJS.replace(/\s+/g, " ").trim();
+}
+
 test("procedures", () => {
 
   const amosBasicCode = `
@@ -7,30 +14,27 @@ test("procedures", () => {
   End Proc
     `;
 
-  const [lexErrs, parseErrs, normalizedJS] = translateAmos(amosBasicCode);
-  expect(lexErrs.errors).toEqual([]);
-  expect(parseErrs.errors).toEqual([]);
+  const normalizedJS = translate(amosBasicCode);
   
-
-  /* test */
   const expectedJsCode = `let lastTimeP_DRAWKEYS = 0; 
-  let timeoutIdP_DRAWKEYS = null; // Track the timeout ID 
-  const P_DRAWKEYS = (PRESSEDKEYNUMBER) => { 
-    const currentTime = Date.now(); 
-    const timeSinceLastCall = currentTime - lastTimeP_DRAWKEYS; 
-    if (timeSinceLastCall < 16) { 
-    if (timeoutIdP_DRAWKEYS) clearTimeout(timeoutIdP_DRAWKEYS); // Clear any existing timeout 
-    timeoutIdP_DRAWKEYS = setTimeout(() => { P_DRAWKEYS(PRESSEDKEYNUMBER); }, 100 - timeSinceLastCall); 
-    return; } lastTimeP_DRAWKEYS = currentTime; timeoutIdP_DRAWKEYS = null; // Clear the timeout ID after execution }
+  let timeoutIdP_DRAWKEYS = null;
+  function P_DRAWKEYS(PRESSEDKEYNUMBER) {
+    const currentTime = Date.now();
+    const timeSinceLastCall = currentTime - lastTimeP_DRAWKEYS;
+    if (timeSinceLastCall < 16) {
+      if (timeoutIdP_DRAWKEYS) {
+        clearTimeout(timeoutIdP_DRAWKEYS);
+      }
+      timeoutIdP_DRAWKEYS = setTimeout(() => { P_DRAWKEYS(PRESSEDKEYNUMBER); }, 100 - timeSinceLastCall);
+      return;
+    }
+    lastTimeP_DRAWKEYS = currentTime;
+    timeoutIdP_DRAWKEYS = null; 
 `;
 
-  // Normalizar a string gerada e a esperada para remover quebras de linha e espaços extras
-  
   const normalizedExpectedJsCode = expectedJsCode.replace(/\s+/g, ' ').trim();
 
   expect(normalizedJS).toContain(normalizedExpectedJsCode);
-
-
 });
 
 test("procedure calls translation with and without parameters", () => {
@@ -40,23 +44,19 @@ test("procedure calls translation with and without parameters", () => {
   End Proc
   
   Procedure TWINS[A,B]
-    Text 10,20,"Twins"
+    Text A,B,"Twins"
   End Proc
   
   HELLO
   TWINS[6,9]
   `;
 
-  const [lexErrs, parseErrs, normalizedJS] = translateAmos(amosBasicCode);
-  expect(lexErrs.errors).toEqual([]);
-  expect(parseErrs.errors).toEqual([]);
+  const normalizedJS = translate(amosBasicCode);
   
-
-  
-
   // Assert that HELLO was called
   expect(normalizedJS).toContain("HELLO();");
 
   // Assert that TWINS was called with arguments 6 and 9
   expect(normalizedJS).toContain("TWINS(6, 9);");
 });
+
