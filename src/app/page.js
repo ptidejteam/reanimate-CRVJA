@@ -10,16 +10,16 @@ import {
 } from "@/src/app/components/ui/workbench";
 import ReactMarkdown from "react-markdown";
 import { styleButton } from "@/src/app/constants/styles";
-import { useAMOSParser } from "@/src/app/hooks/useAMOSParser";
-import CodeEditorWithErrors from "@/src/app/components/editor_/CodeEditorWithErrors";
-import ExampleTabs from "@/src/app/components/editor_/ExampleTabs";
+import { useAMOSParser } from "@/src/app/hooks/useAmosParser";
+import CodeEditorWithErrors from "@/src/app/components/editor/CodeEditorWithErrors";
+import ExampleTabs from "@/src/app/components/editor/ExampleTabs";
 import { downloadASCFile } from "@/src/utils/fileHandler";
 import { parseBankFile } from "@/src/utils/parseAmosBank";
 import { generateAmosBankFile } from "@/src/utils/generateAmosBank";
 import { renderSpritePixels } from "@/src/utils/spriteRenderer";
 import { useBankCreator } from "@/src/app/hooks/useBankCreator";
 import BankEditor from "@/src/app/components/bank/BankEditor";
-import AmosRunner from "@/src/app/components/runner_/AmosRunner";
+import AmosRunner from "@/src/app/components/runner/AmosRunner";
 import BankSlotManager from "@/src/app/components/bank/BankSlotManager";
 
 function App() {
