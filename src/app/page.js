@@ -331,7 +331,6 @@ function App() {
                                 "Example1_Pac-Man.abk",
                               );
                               handleFileChange(0, file);
-
                               const text = await (
                                 await fetch(
                                   "/examples/Example1_Pac-Man/Example1_Pac-Man.asc",
@@ -384,6 +383,81 @@ function App() {
                     />
                   </div>
                 </div>
+
+                  <div
+                    style={{
+                      width: "100%",
+                      marginTop: "0px", // This is the margin above the "Examples" text and buttons
+                    }}
+                  >
+                    <ExampleTabs
+                      tabs={[
+                        [
+                          {
+                            label: "Pac-Man",
+                            onClick: async () => {
+                              const resBank1 = await fetch(
+                                "/examples/Example1_Pac-Man/Example1_Pac-Man.abk",
+                              );
+                              const blob = await resBank1.blob();
+                              const file = new File(
+                                [blob],
+                                "Example1_Pac-Man.abk",
+                              );
+                              handleFileChange(0, file);
+                              const text = await (
+                                await fetch(
+                                  "/examples/Example1_Pac-Man/Example1_Pac-Man.asc",
+                                )
+                              ).text();
+                              setAmosCode(text);
+                              forceParse(text);
+                            },
+                          },
+                          {
+                            label: "Piano",
+                            onClick: async () => {
+                              const text = await (
+                                await fetch(
+                                  "/examples/Example2_Piano/Example2_Piano.asc",
+                                )
+                              ).text();
+                              setAmosCode(text);
+                              forceParse(text);
+                            },
+                          },
+                        ],
+                        [
+                          {
+                            label: "Rotating Triangle",
+                            onClick: async () => {
+                              const text = await (
+                                await fetch(
+                                  "/examples/Example3_Rotating_Triangle/Example3_Rotating_Triangle.asc",
+                                )
+                              ).text();
+                              setAmosCode(text);
+                              forceParse(text);
+                            },
+                          },
+                          {
+                            label: "Colourful Text",
+                            onClick: async () => {
+                              const text = await (
+                                await fetch(
+                                  "/examples/Example4_Colourful_Text/Example4_Colourful_Text.asc",
+                                )
+                              ).text();
+                              setAmosCode(text);
+                              forceParse(text);
+                            },
+                          },
+                        ],
+                      ]}
+                    />
+                  </div>
+                </div>
+
                 <div
                   style={{
                     width: "100%", // This is the area containing the Code Editor and Program Screen
