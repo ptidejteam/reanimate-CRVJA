@@ -368,10 +368,15 @@ function App() {
                             },
                           },
                           {
-                            label: "Empty",
-                            onClick: () => {
-                              setAmosCode("");
-                              forceParse("");
+                            label: "Colourful Text",
+                            onClick: async () => {
+                              const text = await (
+                                await fetch(
+                                  "/examples/Example4_Colourful_Text/Example4_Colourful_Text.asc",
+                                )
+                              ).text();
+                              setAmosCode(text);
+                              forceParse(text);
                             },
                           },
                         ],
