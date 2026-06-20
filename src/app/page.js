@@ -13,6 +13,7 @@ import { styleButton } from "@/src/app/constants/styles";
 import { useAMOSParser } from "@/src/app/hooks/useAmosParser";
 import CodeEditorWithErrors from "@/src/app/components/editor/CodeEditorWithErrors";
 import ExampleTabs from "@/src/app/components/editor/ExampleTabs";
+import ReAnimate26Tabs from "@/src/app/components/editor/ReAnimate26Tabs";
 import { downloadASCFile } from "@/src/utils/fileHandler";
 import { parseBankFile } from "@/src/utils/parseAmosBank";
 import { generateAmosBankFile } from "@/src/utils/generateAmosBank";
@@ -164,6 +165,7 @@ function App() {
                     style={{
                       display: "flex",
                       flexDirection: "row",
+                      marginBottom: "10px",
                       gap: "10px",
                     }}
                   >
@@ -180,8 +182,6 @@ function App() {
                         style={{
                           display: "flex",
                           flexDirection: "row",
-
-                          alignItems: "center",
                           gap: "10px",
                         }}
                       >
@@ -227,7 +227,6 @@ function App() {
                         style={{
                           display: "flex",
                           flexDirection: "row",
-                          alignContent: "center",
                         }}
                       >
                         <AMOSDecoder
@@ -314,6 +313,7 @@ function App() {
                     style={{
                       width: "100%",
                       marginTop: "0px", // This is the margin above the "Examples" text and buttons
+					  padding: "10px"
                     }}
                   >
                     <ExampleTabs
@@ -322,10 +322,10 @@ function App() {
                           {
                             label: "Pac-Man",
                             onClick: async () => {
-                              const resBank1 = await fetch(
+                              const resBank = await fetch(
                                 "/examples/Example1_Pac-Man/Example1_Pac-Man.abk",
                               );
-                              const blob = await resBank1.blob();
+                              const blob = await resBank.blob();
                               const file = new File(
                                 [blob],
                                 "Example1_Pac-Man.abk",
@@ -381,71 +381,34 @@ function App() {
                         ],
                       ]}
                     />
-                  </div>
-                </div>
-
-                  <div
-                    style={{
-                      width: "100%",
-                      marginTop: "0px", // This is the margin above the "Examples" text and buttons
-                    }}
-                  >
-                    <ExampleTabs
+					&nbsp;
+                    <ReAnimate26Tabs
                       tabs={[
                         [
                           {
-                            label: "Pac-Man",
+                            label: "Escape From Reanimate",
                             onClick: async () => {
-                              const resBank1 = await fetch(
-                                "/examples/Example1_Pac-Man/Example1_Pac-Man.abk",
+                              let resBank = await fetch(
+                                "/reanimate26/EscapeFromReanimate/AmosBank_Escape1.abk",
                               );
-                              const blob = await resBank1.blob();
-                              const file = new File(
+                              let blob = await resBank.blob();
+                              let file = new File(
                                 [blob],
-                                "Example1_Pac-Man.abk",
+                                "AmosBank_Escape1.abk",
                               );
                               handleFileChange(0, file);
+                              resBank = await fetch(
+                                "/reanimate26/EscapeFromReanimate/AmosBank_Escape2.abk",
+                              );
+                              blob = await resBank.blob();
+                              file = new File(
+                                [blob],
+                                "AmosBank_Escape2.abk",
+                              );
+                              handleFileChange(1, file);
                               const text = await (
                                 await fetch(
-                                  "/examples/Example1_Pac-Man/Example1_Pac-Man.asc",
-                                )
-                              ).text();
-                              setAmosCode(text);
-                              forceParse(text);
-                            },
-                          },
-                          {
-                            label: "Piano",
-                            onClick: async () => {
-                              const text = await (
-                                await fetch(
-                                  "/examples/Example2_Piano/Example2_Piano.asc",
-                                )
-                              ).text();
-                              setAmosCode(text);
-                              forceParse(text);
-                            },
-                          },
-                        ],
-                        [
-                          {
-                            label: "Rotating Triangle",
-                            onClick: async () => {
-                              const text = await (
-                                await fetch(
-                                  "/examples/Example3_Rotating_Triangle/Example3_Rotating_Triangle.asc",
-                                )
-                              ).text();
-                              setAmosCode(text);
-                              forceParse(text);
-                            },
-                          },
-                          {
-                            label: "Colourful Text",
-                            onClick: async () => {
-                              const text = await (
-                                await fetch(
-                                  "/examples/Example4_Colourful_Text/Example4_Colourful_Text.asc",
+                                  "/reanimate26/EscapeFromReanimate/Game.asc",
                                 )
                               ).text();
                               setAmosCode(text);
@@ -455,6 +418,7 @@ function App() {
                         ],
                       ]}
                     />
+					&nbsp;
                   </div>
                 </div>
 
@@ -482,8 +446,6 @@ function App() {
                       style={{
                         display: "flex",
                         flexDirection: "row",
-                        alignContent: "center",
-                        alignItems: "center",
                       }}
                     >
                       <label htmlFor="amos-code"> Code Editor </label>
