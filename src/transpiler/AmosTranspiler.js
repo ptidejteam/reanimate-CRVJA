@@ -1414,13 +1414,15 @@ function ${name}(${props}) {
   }
 
   enterText(ctx) {
-    const x = ctx.expression1(0)?.getText();
-    const y = ctx.expression1(1)?.getText();
     const text = (ctx.STRING() || ctx.IDENTIFIER())?.getText();
+	const cleanText = text.replace(/ /g, " "); // Replace all occurrences of <Space> with <Em Dash>
 
-    const cleanX = x.replace(/[^a-zA-Z0-9]/g, "");
-    const cleanY = y.replace(/[^a-zA-Z0-9]/g, "");
-    const varName = `textDiv${cleanX}${cleanY}`;
+    const x       = ctx.expression1(0)?.getText();
+    const cleanX  = x.replace(/[^a-zA-Z0-9]/g, "");
+    const y       = ctx.expression1(1)?.getText();
+    const cleanY  = y.replace(/[^a-zA-Z0-9]/g, "");
+	const randomS = (Math.random() + 1).toString(36).substring(7);
+    const varName = `textDiv${cleanX}${cleanY}${randomS}`;
 
     const isNumeric = (str) => /^\d+$/.test(str);
     const xValue = isNumeric(x) ? `'${x}px'` : `(${x}) + 'px'`;
@@ -1429,8 +1431,8 @@ function ${name}(${props}) {
     // TODO: Find other elements below and, if covering them, delete them
     this.output += `
 const ${varName} = document.createElement('div');
-${varName}.innerText = ${text};
-${varName}.id = 'textDiv${x}${y}' + Math.random();
+${varName}.innerText = ${cleanText};
+${varName}.id = 'textDiv${x}${y}${randomS}';
 ${varName}.style.position = 'absolute';
 ${varName}.style.left = ${xValue};
 ${varName}.style.top = ${yValue};
