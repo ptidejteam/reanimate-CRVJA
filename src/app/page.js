@@ -52,11 +52,15 @@ function App() {
 
     reader.readAsText(file);
   };
-  const handleFileChange = (index, file) => {
-    console.log(file);
-    const newBankFiles = [...bankFiles];
-    newBankFiles[index] = file;
-    setBankFiles(newBankFiles);
+  const clearBanks = () => {
+	while(bankFiles.length > 0) {
+		bankFiles.pop();
+	}
+	setBankFiles(bankFiles);
+  };
+  const handleBankChange = (index, file) => {
+	bankFiles[index] = file;
+	setBankFiles(bankFiles);
   };
   const [runNonce, setRunNonce] = useState(0);
   const onRunClick = () => {
@@ -322,6 +326,7 @@ function App() {
                           {
                             label: "Pac-Man",
                             onClick: async () => {
+                              clearBanks();
                               const resBank = await fetch(
                                 "/examples/Example1_Pac-Man/Example1_Pac-Man.abk",
                               );
@@ -330,7 +335,7 @@ function App() {
                                 [blob],
                                 "Example1_Pac-Man.abk",
                               );
-                              handleFileChange(0, file);
+                              handleBankChange(0, file);
                               const text = await (
                                 await fetch(
                                   "/examples/Example1_Pac-Man/Example1_Pac-Man.asc",
@@ -388,6 +393,7 @@ function App() {
                           {
                             label: "Escape From Reanimate",
                             onClick: async () => {
+                              clearBanks();
                               let resBank = await fetch(
                                 "/reanimate26/EscapeFromReanimate/AmosBank_Escape1.abk",
                               );
@@ -396,7 +402,7 @@ function App() {
                                 [blob],
                                 "AmosBank_Escape1.abk",
                               );
-                              handleFileChange(0, file);
+                              handleBankChange(0, file);
                               resBank = await fetch(
                                 "/reanimate26/EscapeFromReanimate/AmosBank_Escape2.abk",
                               );
@@ -405,7 +411,7 @@ function App() {
                                 [blob],
                                 "AmosBank_Escape2.abk",
                               );
-                              handleFileChange(1, file);
+                              handleBankChange(1, file);
                               const text = await (
                                 await fetch(
                                   "/reanimate26/EscapeFromReanimate/Game.asc",
@@ -482,7 +488,7 @@ function App() {
                 <BankSlotManager
                   numBanks={numBanks}
                   bankFiles={bankFiles}
-                  onFileChange={handleFileChange}
+                  onFileChange={handleBankChange}
                 />
               </div>
             </div>
