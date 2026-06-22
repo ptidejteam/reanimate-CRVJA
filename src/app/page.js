@@ -391,11 +391,11 @@ function App() {
                       tabs={[
                         [
                           {
-                            label: "Escape From Reanimate",
+                            label: "Escape From Reanimate 🥇",
                             onClick: async () => {
                               clearBanks();
                               let resBank = await fetch(
-                                "/reanimate26/EscapeFromReanimate/AmosBank_Escape1.abk",
+                                "/reanimate26/EscapeFromReanimate_Kotowicz_Maher_Abdalla_Ullmann/AmosBank_Escape1.abk",
                               );
                               let blob = await resBank.blob();
                               let file = new File(
@@ -404,7 +404,7 @@ function App() {
                               );
                               handleBankChange(0, file);
                               resBank = await fetch(
-                                "/reanimate26/EscapeFromReanimate/AmosBank_Escape2.abk",
+                                "/reanimate26/EscapeFromReanimate_Kotowicz_Maher_Abdalla_Ullmann/AmosBank_Escape2.abk",
                               );
                               blob = await resBank.blob();
                               file = new File(
@@ -414,7 +414,135 @@ function App() {
                               handleBankChange(1, file);
                               const text = await (
                                 await fetch(
-                                  "/reanimate26/EscapeFromReanimate/Game.asc",
+                                  "/reanimate26/EscapeFromReanimate_Kotowicz_Maher_Abdalla_Ullmann/Game.asc",
+                                )
+                              ).text();
+                              setAmosCode(text);
+                              forceParse(text);
+                            },
+                          },
+                          {
+                            label: "Park Bedlam 🥇",
+                            onClick: async () => {
+                              clearBanks();
+                              let resBank = await fetch(
+                                "/reanimate26/ParkBedlam_Shifan_Franiczek_Ejaz_Scistri/AleksBank.abk",
+                              );
+                              let blob = await resBank.blob();
+                              let file = new File(
+                                [blob],
+                                "AleksBank.abk",
+                              );
+                              handleBankChange(0, file);
+                              resBank = await fetch(
+                                "/reanimate26/ParkBedlam_Shifan_Franiczek_Ejaz_Scistri/Cat.abk",
+                              );
+                              blob = await resBank.blob();
+                              file = new File(
+                                [blob],
+                                "Cat.abk",
+                              );
+                              handleBankChange(1, file);
+                              resBank = await fetch(
+                                "/reanimate26/ParkBedlam_Shifan_Franiczek_Ejaz_Scistri/DuckSquirrel.abk",
+                              );
+                              blob = await resBank.blob();
+                              file = new File(
+                                [blob],
+                                "DuckSquirrel.abk",
+                              );
+                              handleBankChange(2, file);
+                              resBank = await fetch(
+                                "/reanimate26/ParkBedlam_Shifan_Franiczek_Ejaz_Scistri/Pigeon.abk",
+                              );
+                              blob = await resBank.blob();
+                              file = new File(
+                                [blob],
+                                "Pigeon.abk",
+                              );
+                              handleBankChange(3, file);
+                              resBank = await fetch(
+                                "/reanimate26/ParkBedlam_Shifan_Franiczek_Ejaz_Scistri/Raccoon.abk",
+                              );
+                              blob = await resBank.blob();
+                              file = new File(
+                                [blob],
+                                "Raccoon.abk",
+                              );
+                              handleBankChange(4, file);
+                              const text = await (
+                                await fetch(
+                                  "/reanimate26/ParkBedlam_Shifan_Franiczek_Ejaz_Scistri/park_bedlam_v20.asc",
+                                )
+                              ).text();
+                              setAmosCode(text);
+                              forceParse(text);
+                            },
+                          },
+						],
+						[
+                          {
+                            label: "Welcome to the Backrooms 🥈",
+                            onClick: async () => {
+                              clearBanks();
+                              const resBank = await fetch(
+                                "/reanimate26/Welcome_to_the_Backrooms_Politowski_Bigot_Serra_Lopez/Sprite.abk",
+                              );
+                              const blob = await resBank.blob();
+                              const file = new File(
+                                [blob],
+                                "Sprite.abk",
+                              );
+                              handleBankChange(0, file);
+                              const text = await (
+                                await fetch(
+                                  "/reanimate26/Welcome_to_the_Backrooms_Politowski_Bigot_Serra_Lopez/Welcome_to_the_Backrooms.asc",
+                                )
+                              ).text();
+                              setAmosCode(text);
+                              forceParse(text);
+                            },
+                          },
+                        ],
+						[
+                          {
+                            label: "Galaxy Patrol 🥉",
+                            onClick: async () => {
+                              clearBanks();
+                              const resBank = await fetch(
+                                "/reanimate26/GalaxyPatrol_Tondorf_Chua_Zongo_Bijani/gjs.abk",
+                              );
+                              const blob = await resBank.blob();
+                              const file = new File(
+                                [blob],
+                                "gjs.abk",
+                              );
+                              handleBankChange(0, file);
+                              const text = await (
+                                await fetch(
+                                  "/reanimate26/GalaxyPatrol_Tondorf_Chua_Zongo_Bijani/GalaxyPatrol_TCZB.asc",
+                                )
+                              ).text();
+                              setAmosCode(text);
+                              forceParse(text);
+                            },
+                          },
+                          {
+                            label: "World of Iris 🥉",
+                            onClick: async () => {
+                              clearBanks();
+                              const resBank = await fetch(
+                                "/reanimate26/WorldOfIris_Mioto_Petrillo_Yefi_Guéhéneuc/WoI.abk",
+                              );
+                              const blob = await resBank.blob();
+                              const file = new File(
+                                [blob],
+                                "WoI.abk",
+                              );
+                              handleBankChange(0, file);
+                              const text = await (
+                                await fetch(
+                                  "/reanimate26/WorldOfIris_Mioto_Petrillo_Yefi_Guéhéneuc/WoI.asc",
                                 )
                               ).text();
                               setAmosCode(text);
