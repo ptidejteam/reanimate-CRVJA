@@ -7,6 +7,35 @@ export default function AmosRunner({ jsCode, runNonce, bankFiles }) {
   useEffect(() => {
     bankFilesRef.current = bankFiles;
   }, [bankFiles]);
+  // Put as full screen toggle on Shift+F1, since F11 is often taken by browsers and you might want an easy way to go fullscreen without it
+  useEffect(() => {
+  const handleKeyDown = async (event) => {
+    if (event.shiftKey && event.key === 'F1') {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const gameContainer = document.getElementById('game-container');
+
+      if (!gameContainer) return;
+
+      try {
+        if (!document.fullscreenElement) {
+          await gameContainer.requestFullscreen();
+        } else {
+          await document.exitFullscreen();
+        }
+      } catch (error) {
+        console.error('Fullscreen error:', error);
+      }
+    }
+  };
+
+  window.addEventListener('keydown', handleKeyDown, true);
+
+  return () => {
+    window.removeEventListener('keydown', handleKeyDown, true);
+  };
+}, []);
 
   useEffect(() => {
     if (!jsCode) return;
