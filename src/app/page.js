@@ -77,6 +77,23 @@ function App() {
   const [tutorialContent, setTutorialContent] = useState("");
   const [selectedIcon, setSelectedIcon] = useState(null);
 
+  const handleApiTest = async () => {
+    try {
+      const response = await fetch("/api/hello");
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+
+      console.log("API Success:", data.message);
+
+      alert("API Says: " + data.message);
+    } catch (error) {
+      console.error("Failed to fetch API:", error);
+    }
+  };
+
   useEffect(() => {
     if (showTutorial && !tutorialContent) {
       fetch("/docs/tutorial.md")
@@ -262,6 +279,12 @@ function App() {
                         }}
                       >
                         Run Code
+                      </ActionButton>
+                      <ActionButton
+                        icon="/icons/play-button.png"
+                        onClick={handleApiTest}
+                      >
+                        Test API
                       </ActionButton>
                     </div>
                   </div>
@@ -481,7 +504,6 @@ function App() {
               {tutorialContent}
             </ReactMarkdown>
           </div>
-
         </WorkbenchWindow>
       )}
     </WorkbenchShell>
