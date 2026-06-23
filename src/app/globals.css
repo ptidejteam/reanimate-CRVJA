@@ -18,3 +18,31 @@ html, body {
   height: 100%;
 
 }
+
+
+.action-button {
+  background-color: #00aaaa;
+  min-width: 100px;
+  color: white;
+  font-weight: bold;
+  padding: 4px 10px;
+  border: 2px solid #006666;
+  box-shadow: 2px 2px 0 #004444;
+  text-shadow: 1px 1px 0 #006666;
+  letter-spacing: 1px;
+  font-family: monospace;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.1s ease-in-out;
+  transform: translate(0, 0);
+}
+
+.action-button:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 0px 0px 0 #004444;
+}
+
+.action-button:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 #004444;
+}

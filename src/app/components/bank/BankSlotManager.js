@@ -17,14 +17,16 @@ export default function BankSlotManager({ numBanks, bankFiles, onFileChange }) {
           width: "100%",
           display: "flex",
           flexDirection: "column",
+          marginLeft: "14px",
         }}
       >
         <div>
+          {/* Left Side - Loaded Banks */}
           {" "}
           {bankFiles.map((file, index) => (
             <li key={index}>
               Bank {index + 1}:{" "}
-              {file ? file.name.split("_")[1] : <i>No file selected</i>}
+              {file ? file.name : <i>No file selected</i>}
             </li>
           ))}
         </div>
@@ -36,6 +38,7 @@ export default function BankSlotManager({ numBanks, bankFiles, onFileChange }) {
           flexDirection: "column",
         }}
       >
+        {/* Right Side - User Imports */}
         <div style={{ width: "100%" }}>
           {Array.from({ length: numBanks }, (_, index) => (
             <div style={{ marginBottom: "10px" }} key={index}>

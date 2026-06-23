@@ -1,7 +1,7 @@
 "use client";
 import React from 'react';
 
-export default function CodeEditorWithErrors({
+export default function CodeEditor({
   value,
   onChange,
   errors = [], // [{ line: 1-based, column: 0-based, msg }]

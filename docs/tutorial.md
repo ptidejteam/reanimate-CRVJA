@@ -313,25 +313,3 @@ Loop
 Click the **Run code** button. Use the arrow keys or **W, A, S, D** to move your character. Go catch that fruit!
 
 ---
-
-## 5. Important Tips & Troubleshooting
-
-To save you from debugging headaches, keep these CRVJA transpiler behaviors in mind:
-
-1. **How to Hide a Sprite (Workaround for `Sprite Off`)**:
-   In official AMOS, you can hide a sprite using `Sprite Off`. In CRVJA, `Sprite Off` is not currently working. 
-   * **Workaround**: To hide a sprite, simply draw it off-screen, such as:
-     ```amos
-     Sprite 1, -100, -100, 0
-     ```
-2. **Variable String Assignments Limitation**:
-   Assigning non-empty string literals to variables (e.g., `NAME$ = "Player"`) is currently syntactically invalid in the CRVJA parser. Always pass strings directly into commands (like `Text 10, 20, "HELLO!"`).
-3. **No Unary Minus Reassignment**:
-   Assigning a negative value to a variable using a unary operator (e.g. `X = -X`) may fail parsing. Use standard subtraction instead: `X = 0 - X`.
-4. **Key mapping scan codes**:
-   If you want to use other keys, you can refer to the following raw code list:
-   * **W, A, S, D**: `$11`, `$1E`, `$1F`, `$20`
-   * **Up, Left, Right, Down Arrows**: `$6E`, `$70`, `$71`, `$73`
-   * **Space**: `$39`
-   * **Escape**: `$1`
-   * **Enter**: `$1C` (Note: standard numpad enter is `$67`)
