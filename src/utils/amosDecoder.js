@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, forwardRef, useImperativeHandle } from "react";
 import {
   parseExtensionToTable,
   printAMOSSource,
@@ -112,8 +112,7 @@ function findExtSlots(code) {
   }
   return [...slots];
 }
-export default function AMOSDecoder({ onDecoded }) {
-  const fileInputRef = useRef(null);
+const AMOSDecoder = forwardRef(({ onDecoded }, ref) => {
   const tableRef = useRef(null);
   const [ready, setReady] = useState(false); // <- gate UI
   const [log, setLog] = useState("");
@@ -125,16 +124,9 @@ export default function AMOSDecoder({ onDecoded }) {
       // Core tokens (slot 0) — all defined in seedBuiltins()
       seedBuiltins(table);
 
-      // 2) Optional simple hardcoded helpers (if you still need a few)
-      // table.set(0x005c, "I", ","); table.set(0x0094, "I", "To"); ... etc.
-
-      // 3) Extensions — make sure the files exist under /public/amos_libs/
-      // NOTE: slot 8 matches the Ext#8 @xxxx you’re seeing in your output
       try {
         const libs = [
           { file: "/extensions/AMOSPro_AMCAF.Lib", slot: 8 },
-          // add more: { file: "/amos_libs/AMOSPro_Turbo_Plus.Lib", slot: 8 },
-          //            { file: "/amos_libs/AMOSPro_IO.Lib", slot: 7 }, etc.
         ];
         for (const { file, slot } of libs) {
           const res = await fetch(file);
@@ -156,78 +148,29 @@ export default function AMOSDecoder({ onDecoded }) {
     })();
   }, []);
 
-  const handleFile = (e) => {
-    const file = e.target.files[0];
-    if (!file || !tableRef.current) return;
+  useImperativeHandle(ref, () => ({
+    handleFile: (file) => {
+      if (!file || !tableRef.current) return;
 
-    const r = new FileReader();
-    r.onload = () => {
-      const buf = new Uint8Array(r.result);
-      const tokenizedLen = be32(buf, 16) >>> 0;
-      const code = buf.subarray(20, 20 + tokenizedLen);
-      console.log("Ext slots in this program:", findExtSlots(code)); // e.g. [8]
-      const text = printAMOSSource(code, tableRef.current);
-      onDecoded?.(text);
-      setLog(""); // or keep a console log if you want
-
-
-    };
-    r.readAsArrayBuffer(file);
-  };
+      const r = new FileReader();
+      r.onload = () => {
+        const buf = new Uint8Array(r.result);
+        const tokenizedLen = be32(buf, 16) >>> 0;
+        const code = buf.subarray(20, 20 + tokenizedLen);
+        console.log("Ext slots in this program:", findExtSlots(code)); // e.g. [8]
+        const text = printAMOSSource(code, tableRef.current);
+        onDecoded?.(text);
+        setLog(""); // or keep a console log if you want
+      };
+      r.readAsArrayBuffer(file);
+    }
+  }));
 
   return (
-    <div>
-      <button
-        onClick={() => fileInputRef.current?.click()}
-        style={{
-          backgroundColor: "#00aaaa",
-          color: "white",
-          fontWeight: "bold",
-          padding: "10px 20px",
-          border: "4px solid #006666",
-          boxShadow: "4px 4px 0 #004444",
-          textShadow: "1px 1px 0 #006666",
-          letterSpacing: "1px",
-          fontFamily: "monospace",
-          minWidth: "300px",
-          fontSize: "16px",
-          cursor: "pointer",
-          transition: "all 0.1s ease-in-out",
-        }}
-        onMouseDown={(e) => {
-          e.target.style.transform = "translate(4px, 4px)";
-          e.target.style.boxShadow = "0 0 0 #004444";
-        }}
-        onMouseUp={(e) => {
-          e.target.style.transform = "translate(0, 0)";
-          e.target.style.boxShadow = "4px 4px 0 #004444";
-        }}
-        onMouseLeave={(e) => {
-          e.target.style.transform = "translate(0, 0)";
-          e.target.style.boxShadow = "4px 4px 0 #004444";
-        }}
-        onMouseEnter={(e) => {
-          e.target.style.transform = "translate(2px, 2px)";
-          e.target.style.boxShadow = "2px 2px 0 #004444";
-        }}
-        onMouseOut={(e) => {
-          e.target.style.transform = "translate(0, 0)";
-          e.target.style.boxShadow = "4px 4px 0 #004444";
-        }}
-      >
-        {" "}
-        Load .AMOS File{" "}
-      </button>
-
-      <input
-        type="file"
-        ref={fileInputRef}
-        onChange={handleFile}
-        style={{ display: "none" }}
-        accept=".amos,.AMOS"
-      />
-
+    <div style={{ display: "none" }}>
       <pre style={{ whiteSpace: "pre-wrap", marginTop: 10 }}>{log}</pre>
     </div>
   );
-}
+});
+
+export default AMOSDecoder;

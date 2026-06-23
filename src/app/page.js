@@ -9,11 +9,10 @@ import {
   WorkbenchWindow,
 } from "@/src/app/components/ui/workbench";
 import ReactMarkdown from "react-markdown";
-import { styleButton } from "@/src/app/constants/styles";
 import { useAMOSParser } from "@/src/app/hooks/useAmosParser";
-import CodeEditorWithErrors from "@/src/app/components/editor/CodeEditorWithErrors";
-import ExampleTabs from "@/src/app/components/editor/ExampleTabs";
-import ReAnimate26Tabs from "@/src/app/components/editor/ReAnimate26Tabs";
+import CodeEditor from "@/src/app/components/editor/CodeEditor";
+import ActionButton from "@/src/app/components/ui/ActionButton";
+import SideNavigation from "@/src/app/components/editor/SideNavigation";
 import { downloadASCFile } from "@/src/utils/fileHandler";
 import { parseBankFile } from "@/src/utils/parseAmosBank";
 import { generateAmosBankFile } from "@/src/utils/generateAmosBank";
@@ -25,11 +24,14 @@ import BankSlotManager from "@/src/app/components/bank/BankSlotManager";
 
 function App() {
   const [showCode, setShowCode] = useState(false);
+  const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
   const [numBanks, setNumBanks] = useState(6);
   const [bankFiles, setBankFiles] = useState([]);
   const [option, setOption] = useState("file");
   const [AmosCode, setAmosCode] = useState("");
   const fileInputRef = useRef();
+  const amosFileInputRef = useRef();
+  const amosDecoderRef = useRef();
   const [createBank, setCreateBank] = useState(false);
   const [bankFileNames, setBankFileNames] = useState(
     Array(numBanks).fill(null),
@@ -53,14 +55,14 @@ function App() {
     reader.readAsText(file);
   };
   const clearBanks = () => {
-	while(bankFiles.length > 0) {
-		bankFiles.pop();
-	}
-	setBankFiles(bankFiles);
+    while (bankFiles.length > 0) {
+      bankFiles.pop();
+    }
+    setBankFiles(bankFiles);
   };
   const handleBankChange = (index, file) => {
-	bankFiles[index] = file;
-	setBankFiles(bankFiles);
+    bankFiles[index] = file;
+    setBankFiles(bankFiles);
   };
   const [runNonce, setRunNonce] = useState(0);
   const onRunClick = () => {
@@ -77,7 +79,7 @@ function App() {
 
   useEffect(() => {
     if (showTutorial && !tutorialContent) {
-      fetch("/api/tutorial")
+      fetch("/docs/tutorial.md")
         .then((res) => res.text())
         .then((text) => setTutorialContent(text))
         .catch((err) => console.error("Failed to load tutorial", err));
@@ -142,482 +144,192 @@ function App() {
       {/* Windows */}
       {showCode && (
         <WorkbenchWindow title="CRVJA" onClose={() => setShowCode(false)}>
-          <div>
-            <div
-              style={{
-                display: "flex",
-                marginTop: "0px", // This is the margin above the load/save/run buttons
-                padding: "0px", // This is the padding around "inside" the Workbench "window"
-              }}
-            >
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              width: "100%",
+              height: "100%",
+            }}
+          >
+            {isSideMenuOpen && (
+              <SideNavigation
+                clearBanks={clearBanks}
+                handleBankChange={handleBankChange}
+                setAmosCode={setAmosCode}
+                forceParse={forceParse}
+                setIsSideMenuOpen={setIsSideMenuOpen}
+              />
+            )}
+            <div style={{ width: "100%" }}>
               <div
                 style={{
-                  width: "100%",
                   display: "flex",
-                  flexDirection: "column",
+                  marginTop: "0px", // This is the margin above the load/save/run buttons
+                  padding: "0px", // This is the padding around "inside" the Workbench "window"
                 }}
               >
                 <div
                   style={{
                     width: "100%",
                     display: "flex",
-                    flexDirection: "row",
-                    height: "fit-content", // This is the area around the buttons at the top
+                    flexDirection: "column",
                   }}
                 >
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      marginBottom: "10px",
-                      gap: "10px",
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: "100%",
-                        display: "flex",
-                        flexDirection: "column",
-                        marginLeft: "-2px",
-                        gap: "10px",
-                      }}
-                    >
-                      <div
-                        style={{
-                          display: "flex",
-                          flexDirection: "row",
-                          gap: "10px",
-                        }}
-                      >
-                        <button
-                          onClick={() => fileInputRef.current?.click()}
-                          style={styleButton}
-                          onMouseDown={(e) => {
-                            e.target.style.transform = "translate(4px, 4px)";
-                            e.target.style.boxShadow = "0 0 0 #004444";
-                          }}
-                          onMouseUp={(e) => {
-                            e.target.style.transform = "translate(0, 0)";
-                            e.target.style.boxShadow = "4px 4px 0 #004444";
-                          }}
-                          onMouseLeave={(e) => {
-                            e.target.style.transform = "translate(0, 0)";
-                            e.target.style.boxShadow = "4px 4px 0 #004444";
-                          }}
-                          onMouseEnter={(e) => {
-                            e.target.style.transform = "translate(2px, 2px)";
-                            e.target.style.boxShadow = "2px 2px 0 #004444";
-                          }}
-                          onMouseOut={(e) => {
-                            e.target.style.transform = "translate(0, 0)";
-                            e.target.style.boxShadow = "4px 4px 0 #004444";
-                          }}
-                        >
-                          {" "}
-                          Load .ASC File{" "}
-                        </button>
-
-                        <input
-                          type="file"
-                          ref={fileInputRef}
-                          onChange={handleFileUpload}
-                          style={{
-                            display: "none",
-                          }}
-                          accept=".asc, .txt, .amo"
-                        />
-                      </div>
-                      <div
-                        style={{
-                          display: "flex",
-                          flexDirection: "row",
-                        }}
-                      >
-                        <AMOSDecoder
-                          onDecoded={(text) => setDecodedText(text)}
-                        />
-                      </div>
-                    </div>
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "10px",
-                      }}
-                    >
-                      <button
-                        onClick={() => {
-                          const filename = "my_amos_code.asc"; // or generate dynamic name
-                          downloadASCFile(filename, AmosCode);
-                        }}
-                        style={styleButton}
-                        onMouseDown={(e) => {
-                          e.target.style.transform = "translate(4px, 4px)";
-                          e.target.style.boxShadow = "0 0 0 #004444";
-                        }}
-                        onMouseUp={(e) => {
-                          e.target.style.transform = "translate(0, 0)";
-                          e.target.style.boxShadow = "4px 4px 0 #004444";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.target.style.transform = "translate(0, 0)";
-                          e.target.style.boxShadow = "4px 4px 0 #004444";
-                        }}
-                        onMouseEnter={(e) => {
-                          e.target.style.transform = "translate(2px, 2px)";
-                          e.target.style.boxShadow = "2px 2px 0 #004444";
-                        }}
-                        onMouseOut={(e) => {
-                          e.target.style.transform = "translate(0, 0)";
-                          e.target.style.boxShadow = "4px 4px 0 #004444";
-                        }}
-                      >
-                        {" "}
-                        Save .ASC File{" "}
-                      </button>
-
-                      <button
-                        onClick={async () => {
-                          try {
-                            await forceParse(AmosCode); // updates jsCode
-                            onRunClick(); // bumps runNonce -> useEffect runs -> iframe rebuilt
-                          } catch (err) {
-                            console.error("❌ Failed to run code:", err);
-                          }
-                        }}
-                        style={styleButton}
-                        onMouseDown={(e) => {
-                          e.target.style.transform = "translate(4px, 4px)";
-                          e.target.style.boxShadow = "0 0 0 #004444";
-                        }}
-                        onMouseUp={(e) => {
-                          e.target.style.transform = "translate(0, 0)";
-                          e.target.style.boxShadow = "4px 4px 0 #004444";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.target.style.transform = "translate(0, 0)";
-                          e.target.style.boxShadow = "4px 4px 0 #004444";
-                        }}
-                        onMouseEnter={(e) => {
-                          e.target.style.transform = "translate(2px, 2px)";
-                          e.target.style.boxShadow = "2px 2px 0 #004444";
-                        }}
-                        onMouseOut={(e) => {
-                          e.target.style.transform = "translate(0, 0)";
-                          e.target.style.boxShadow = "4px 4px 0 #004444";
-                        }}
-                      >
-                        {" "}
-                        Run Program{" "}
-                      </button>
-                    </div>
-                  </div>
-
                   <div
                     style={{
                       width: "100%",
-                      marginTop: "0px", // This is the margin above the "Examples" text and buttons
-					  padding: "10px"
-                    }}
-                  >
-                    <ExampleTabs
-                      tabs={[
-                        [
-                          {
-                            label: "Pac-Man",
-                            onClick: async () => {
-                              clearBanks();
-                              const resBank = await fetch(
-                                "/examples/Example1_Pac-Man/Example1_Pac-Man.abk",
-                              );
-                              const blob = await resBank.blob();
-                              const file = new File(
-                                [blob],
-                                "Example1_Pac-Man.abk",
-                              );
-                              handleBankChange(0, file);
-                              const text = await (
-                                await fetch(
-                                  "/examples/Example1_Pac-Man/Example1_Pac-Man.asc",
-                                )
-                              ).text();
-                              setAmosCode(text);
-                              forceParse(text);
-                            },
-                          },
-                          {
-                            label: "Piano",
-                            onClick: async () => {
-                              const text = await (
-                                await fetch(
-                                  "/examples/Example2_Piano/Example2_Piano.asc",
-                                )
-                              ).text();
-                              setAmosCode(text);
-                              forceParse(text);
-                            },
-                          },
-                        ],
-                        [
-                          {
-                            label: "Rotating Triangle",
-                            onClick: async () => {
-                              const text = await (
-                                await fetch(
-                                  "/examples/Example3_Rotating_Triangle/Example3_Rotating_Triangle.asc",
-                                )
-                              ).text();
-                              setAmosCode(text);
-                              forceParse(text);
-                            },
-                          },
-                          {
-                            label: "Colourful Text",
-                            onClick: async () => {
-                              const text = await (
-                                await fetch(
-                                  "/examples/Example4_Colourful_Text/Example4_Colourful_Text.asc",
-                                )
-                              ).text();
-                              setAmosCode(text);
-                              forceParse(text);
-                            },
-                          },
-                        ],
-                      ]}
-                    />
-					&nbsp;
-                    <ReAnimate26Tabs
-                      tabs={[
-                        [
-                          {
-                            label: "Escape From Reanimate 🥇",
-                            onClick: async () => {
-                              clearBanks();
-                              let resBank = await fetch(
-                                "/reanimate26/EscapeFromReanimate_Kotowicz_Maher_Abdalla_Ullmann/AmosBank_Escape1.abk",
-                              );
-                              let blob = await resBank.blob();
-                              let file = new File(
-                                [blob],
-                                "AmosBank_Escape1.abk",
-                              );
-                              handleBankChange(0, file);
-                              resBank = await fetch(
-                                "/reanimate26/EscapeFromReanimate_Kotowicz_Maher_Abdalla_Ullmann/AmosBank_Escape2.abk",
-                              );
-                              blob = await resBank.blob();
-                              file = new File(
-                                [blob],
-                                "AmosBank_Escape2.abk",
-                              );
-                              handleBankChange(1, file);
-                              const text = await (
-                                await fetch(
-                                  "/reanimate26/EscapeFromReanimate_Kotowicz_Maher_Abdalla_Ullmann/Game.asc",
-                                )
-                              ).text();
-                              setAmosCode(text);
-                              forceParse(text);
-                            },
-                          },
-                          {
-                            label: "Park Bedlam 🥇",
-                            onClick: async () => {
-                              clearBanks();
-                              let resBank = await fetch(
-                                "/reanimate26/ParkBedlam_Shifan_Franiczek_Ejaz_Scistri/AleksBank.abk",
-                              );
-                              let blob = await resBank.blob();
-                              let file = new File(
-                                [blob],
-                                "AleksBank.abk",
-                              );
-                              handleBankChange(0, file);
-                              resBank = await fetch(
-                                "/reanimate26/ParkBedlam_Shifan_Franiczek_Ejaz_Scistri/Cat.abk",
-                              );
-                              blob = await resBank.blob();
-                              file = new File(
-                                [blob],
-                                "Cat.abk",
-                              );
-                              handleBankChange(1, file);
-                              resBank = await fetch(
-                                "/reanimate26/ParkBedlam_Shifan_Franiczek_Ejaz_Scistri/DuckSquirrel.abk",
-                              );
-                              blob = await resBank.blob();
-                              file = new File(
-                                [blob],
-                                "DuckSquirrel.abk",
-                              );
-                              handleBankChange(2, file);
-                              resBank = await fetch(
-                                "/reanimate26/ParkBedlam_Shifan_Franiczek_Ejaz_Scistri/Pigeon.abk",
-                              );
-                              blob = await resBank.blob();
-                              file = new File(
-                                [blob],
-                                "Pigeon.abk",
-                              );
-                              handleBankChange(3, file);
-                              resBank = await fetch(
-                                "/reanimate26/ParkBedlam_Shifan_Franiczek_Ejaz_Scistri/Raccoon.abk",
-                              );
-                              blob = await resBank.blob();
-                              file = new File(
-                                [blob],
-                                "Raccoon.abk",
-                              );
-                              handleBankChange(4, file);
-                              const text = await (
-                                await fetch(
-                                  "/reanimate26/ParkBedlam_Shifan_Franiczek_Ejaz_Scistri/park_bedlam_v20.asc",
-                                )
-                              ).text();
-                              setAmosCode(text);
-                              forceParse(text);
-                            },
-                          },
-						],
-						[
-                          {
-                            label: "Welcome to the Backrooms 🥈",
-                            onClick: async () => {
-                              clearBanks();
-                              const resBank = await fetch(
-                                "/reanimate26/Welcome_to_the_Backrooms_Politowski_Bigot_Serra_Lopez/Sprite.abk",
-                              );
-                              const blob = await resBank.blob();
-                              const file = new File(
-                                [blob],
-                                "Sprite.abk",
-                              );
-                              handleBankChange(0, file);
-                              const text = await (
-                                await fetch(
-                                  "/reanimate26/Welcome_to_the_Backrooms_Politowski_Bigot_Serra_Lopez/Welcome_to_the_Backrooms.asc",
-                                )
-                              ).text();
-                              setAmosCode(text);
-                              forceParse(text);
-                            },
-                          },
-                        ],
-						[
-                          {
-                            label: "Galaxy Patrol 🥉",
-                            onClick: async () => {
-                              clearBanks();
-                              const resBank = await fetch(
-                                "/reanimate26/GalaxyPatrol_Tondorf_Chua_Zongo_Bijani/gjs.abk",
-                              );
-                              const blob = await resBank.blob();
-                              const file = new File(
-                                [blob],
-                                "gjs.abk",
-                              );
-                              handleBankChange(0, file);
-                              const text = await (
-                                await fetch(
-                                  "/reanimate26/GalaxyPatrol_Tondorf_Chua_Zongo_Bijani/GalaxyPatrol_TCZB.asc",
-                                )
-                              ).text();
-                              setAmosCode(text);
-                              forceParse(text);
-                            },
-                          },
-                          {
-                            label: "World of Iris 🥉",
-                            onClick: async () => {
-                              clearBanks();
-                              const resBank = await fetch(
-                                "/reanimate26/WorldOfIris_Mioto_Petrillo_Yefi_Guéhéneuc/WoI.abk",
-                              );
-                              const blob = await resBank.blob();
-                              const file = new File(
-                                [blob],
-                                "WoI.abk",
-                              );
-                              handleBankChange(0, file);
-                              const text = await (
-                                await fetch(
-                                  "/reanimate26/WorldOfIris_Mioto_Petrillo_Yefi_Guéhéneuc/WoI.asc",
-                                )
-                              ).text();
-                              setAmosCode(text);
-                              forceParse(text);
-                            },
-                          },
-                        ],
-                      ]}
-                    />
-					&nbsp;
-                  </div>
-                </div>
-
-                <div
-                  style={{
-                    width: "100%", // This is the area containing the Code Editor and Program Screen
-                    display: "flex",
-                    flexDirection: "row",
-                    height: "fit-content",
-                    border: "1px solid black",
-                    justifyContent: "space-between",
-                    padding: "10px",
-                  }}
-                >
-                  <div
-                    style={{
-                      width: "100%", // This is the area around the Code Editor
                       display: "flex",
-                      flexDirection: "column",
-                      minHeight: "80vh", // Need this to show an empty code editor
-                      alignItems: "center",
+                      flexDirection: "row",
+                      height: "fit-content", // This is the area around the buttons at the top
                     }}
                   >
                     <div
                       style={{
                         display: "flex",
                         flexDirection: "row",
+                        marginBottom: "10px",
+                        gap: "10px",
+                        alignItems: "center",
+                        flexWrap: "wrap",
                       }}
                     >
-                      <label htmlFor="amos-code"> Code Editor </label>
+                      <ActionButton
+                        id="menu-toggle-btn"
+                        icon="/icons/menu-button.png"
+                        onClick={() => setIsSideMenuOpen(!isSideMenuOpen)}
+                      >
+                        Menu
+                      </ActionButton>
+
+                      <ActionButton
+                        icon="/icons/upload-button.png"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        Load .ASC
+                      </ActionButton>
+
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleFileUpload}
+                        style={{
+                          display: "none",
+                        }}
+                        accept=".asc, .txt, .amo"
+                      />
+
+                      <ActionButton
+                        icon="/icons/upload-button.png"
+                        onClick={() => amosFileInputRef.current?.click()}
+                      >
+                        Load .AMOS
+                      </ActionButton>
+                      <input
+                        type="file"
+                        ref={amosFileInputRef}
+                        onChange={(e) =>
+                          amosDecoderRef.current?.handleFile(e.target.files[0])
+                        }
+                        style={{ display: "none" }}
+                        accept=".amos,.AMOS"
+                      />
+
+                      <AMOSDecoder
+                        ref={amosDecoderRef}
+                        onDecoded={(text) => setDecodedText(text)}
+                      />
+
+                      <ActionButton
+                        icon="/icons/download-button.png"
+                        onClick={() => {
+                          const filename = "my_amos_code.asc"; // or generate dynamic name
+                          downloadASCFile(filename, AmosCode);
+                        }}
+                      >
+                        Save .ASC
+                      </ActionButton>
+
+                      <ActionButton
+                        icon="/icons/play-button.png"
+                        onClick={async () => {
+                          try {
+                            await forceParse(AmosCode); // updates jsCode
+                            onRunClick(); // bumps runNonce -> useEffect runs -> iframe rebuilt
+                          } catch (err) {
+                            console.error("Failed to run code:", err);
+                          }
+                        }}
+                      >
+                        Run Code
+                      </ActionButton>
                     </div>
-                    <CodeEditorWithErrors
-                      value={AmosCode}
-                      onChange={setAmosCode}
-                      errors={parseErrors}
-                      style={{
-                        width: "44vw", // This is the actual coding area
-                        height: "100%",
-                        margin: "0px",
-                      }}
-                    />
                   </div>
                   <div
                     style={{
-                      width: "100%", // This is the area around the Program Screen
+                      width: "100%", // This is the area containing the Code Editor and Program Screen
                       display: "flex",
-                      flexDirection: "column",
-                      maxHeight: "fit-content",
-                      alignItems: "center",
+                      flexDirection: "row",
+                      height: "fit-content",
+                      border: "1px solid black",
+                      justifyContent: "space-between",
+                      padding: "10px",
                     }}
                   >
-                    <label htmlFor="amos-code"> Program Screen </label>
-                    <AmosRunner
-                      jsCode={jsCode}
-                      runNonce={runNonce}
-                      bankFiles={bankFiles}
-                    />
+                    <div
+                      style={{
+                        width: "100%", // This is the area around the Code Editor
+                        display: "flex",
+                        flexDirection: "column",
+                        minHeight: "80vh", // Need this to show an empty code editor
+                        alignItems: "center",
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "row",
+                          marginBottom: "10px",
+                        }}
+                      >
+                        <label htmlFor="amos-code"> Code Editor </label>
+                      </div>
+                      <CodeEditor
+                        value={AmosCode}
+                        onChange={setAmosCode}
+                        errors={parseErrors}
+                        style={{
+                          width: "44vw", // This is the actual coding area
+                          height: "100%",
+                          margin: "0px",
+                        }}
+                      />
+                    </div>
+                    <div
+                      style={{
+                        width: "100%", // This is the area around the Program Screen
+                        display: "flex",
+                        flexDirection: "column",
+                        maxHeight: "fit-content",
+                        alignItems: "center",
+                        marginBottom: "100px",
+                      }}
+                    >
+                      <label htmlFor="amos-code"> Program Screen </label>
+                      <AmosRunner
+                        jsCode={jsCode}
+                        runNonce={runNonce}
+                        bankFiles={bankFiles}
+                      />
+                    </div>
                   </div>
+                  &nbsp;
+                  <BankSlotManager
+                    numBanks={numBanks}
+                    bankFiles={bankFiles}
+                    onFileChange={handleBankChange}
+                  />
                 </div>
-                &nbsp;
-                <BankSlotManager
-                  numBanks={numBanks}
-                  bankFiles={bankFiles}
-                  onFileChange={handleBankChange}
-                />
               </div>
             </div>
           </div>
@@ -766,9 +478,10 @@ function App() {
                 },
               }}
             >
-              {tutorialContent}{" "}
-            </ReactMarkdown>{" "}
-          </div>{" "}
+              {tutorialContent}
+            </ReactMarkdown>
+          </div>
+
         </WorkbenchWindow>
       )}
     </WorkbenchShell>

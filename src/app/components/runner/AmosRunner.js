@@ -56,6 +56,7 @@ export default function AmosRunner({ jsCode, runNonce, bankFiles }) {
     iframe.style.display = "block";
     iframe.style.width = "640px"; // initial; iframe will resize itself
     iframe.style.height = "480px";
+    iframe.style.marginTop = "10px";
     host.style.display = "inline-block";
 
     // ---- PLAIN JS selector; find the bank file inputs in the PARENT ----
