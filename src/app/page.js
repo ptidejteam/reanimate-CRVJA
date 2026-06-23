@@ -289,6 +289,7 @@ function App() {
                         style={{
                           display: "flex",
                           flexDirection: "row",
+                          marginBottom: "10px",
                         }}
                       >
                         <label htmlFor="amos-code"> Code Editor </label>
@@ -311,6 +312,7 @@ function App() {
                         flexDirection: "column",
                         maxHeight: "fit-content",
                         alignItems: "center",
+                        marginBottom: "100px",
                       }}
                     >
                       <label htmlFor="amos-code"> Program Screen </label>
