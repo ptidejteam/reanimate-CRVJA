@@ -21,6 +21,7 @@ import { useBankCreator } from "@/src/app/hooks/useBankCreator";
 import BankEditor from "@/src/app/components/bank/BankEditor";
 import AmosRunner from "@/src/app/components/runner/AmosRunner";
 import BankSlotManager from "@/src/app/components/bank/BankSlotManager";
+import { checkApiStatus } from "@/src/services/api";
 
 function App() {
   const [showCode, setShowCode] = useState(false);
@@ -79,18 +80,12 @@ function App() {
 
   const handleApiTest = async () => {
     try {
-      const response = await fetch("/api/hello");
+      const data = await checkApiStatus();
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
+      console.log("API Success: ", data);
 
-      console.log("API Success:", data.message);
-
-      alert("API Says: " + data.message);
     } catch (error) {
-      console.error("Failed to fetch API:", error);
+      console.error("Failed to fetch API: ", error);
     }
   };
 
