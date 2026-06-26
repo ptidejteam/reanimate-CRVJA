@@ -1,11 +1,11 @@
 // src/services/api.js
 
-const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:4000';
+const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 export async function checkApiStatus() {
     try {
         // Make the HTTP GET request
-        const response = await fetch(`${API_BASE_URL}/api`);
+        const response = await fetch(`${NEXT_PUBLIC_API_URL}/api`);
 
         // Handle HTTP errors (e.g., 404 or 500)
         if (!response.ok) {
