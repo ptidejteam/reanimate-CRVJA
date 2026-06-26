@@ -21,6 +21,7 @@ import { useBankCreator } from "@/src/app/hooks/useBankCreator";
 import BankEditor from "@/src/app/components/bank/BankEditor";
 import AmosRunner from "@/src/app/components/runner/AmosRunner";
 import BankSlotManager from "@/src/app/components/bank/BankSlotManager";
+import { checkApiStatus } from "@/src/services/api";
 
 function App() {
   const [showCode, setShowCode] = useState(false);
@@ -76,6 +77,17 @@ function App() {
   const [showTutorial, setShowTutorial] = useState(false);
   const [tutorialContent, setTutorialContent] = useState("");
   const [selectedIcon, setSelectedIcon] = useState(null);
+
+  const handleApiTest = async () => {
+    try {
+      const data = await checkApiStatus();
+
+      console.log("API Success: ", data);
+
+    } catch (error) {
+      console.error("Failed to fetch API: ", error);
+    }
+  };
 
   useEffect(() => {
     if (showTutorial && !tutorialContent) {
@@ -262,6 +274,12 @@ function App() {
                         }}
                       >
                         Run Code
+                      </ActionButton>
+                      <ActionButton
+                        icon="/icons/play-button.png"
+                        onClick={handleApiTest}
+                      >
+                        Test API
                       </ActionButton>
                     </div>
                   </div>
@@ -481,7 +499,6 @@ function App() {
               {tutorialContent}
             </ReactMarkdown>
           </div>
-
         </WorkbenchWindow>
       )}
     </WorkbenchShell>
