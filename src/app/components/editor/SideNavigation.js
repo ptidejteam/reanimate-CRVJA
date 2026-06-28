@@ -175,7 +175,7 @@ export default function SideNavigation({
     >
       <div style={{ width: "100%" }}>
         <div style={{ marginBottom: "20px" }}>
-          <h3
+          <h4
             style={{
               borderBottom: "2px solid #ccc",
               paddingBottom: "4px",
@@ -184,7 +184,7 @@ export default function SideNavigation({
             }}
           >
             Examples
-          </h3>
+          </h4>
           <ul style={{ listStyleType: "none", padding: 0, margin: 0, width: "100%" }}>
             {examples.map((ex, index) => (
               <li key={index}>
@@ -194,7 +194,7 @@ export default function SideNavigation({
           </ul>
         </div>
         <div>
-          <h3
+          <h4
             style={{
               borderBottom: "2px solid #ccc",
               paddingBottom: "4px",
@@ -202,7 +202,7 @@ export default function SideNavigation({
             }}
           >
             ReAnimate'26 Realisations
-          </h3>
+          </h4>
           <ul style={{ listStyleType: "none", padding: 0, margin: 0, width: "100%" }}>
             {reanimate26Examples.map((ex, index) => (
               <li key={index}>

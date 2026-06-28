@@ -25,7 +25,7 @@ import { checkApiStatus } from "@/src/services/api";
 
 function App() {
   const [showCode, setShowCode] = useState(false);
-  const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
+  const [isSideMenuOpen, setIsSideMenuOpen] = useState(true);
   const [numBanks, setNumBanks] = useState(6);
   const [bankFiles, setBankFiles] = useState([]);
   const [option, setOption] = useState("file");
@@ -72,7 +72,7 @@ function App() {
   };
   const [showRender, setShowRender] = useState(false);
   const [showSpriteEditor, setShowSpriteEditor] = useState(false);
-  const [showExamples, setShowExamples] = useState(false);
+  const [showExamples, setShowExamples] = useState(false); // TODO: To remove?
   const [showClock, setShowClock] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
   const [tutorialContent, setTutorialContent] = useState("");
