@@ -9,10 +9,12 @@ import BankSlotManager from "@/src/app/components/bank/BankSlotManager";
 import { transpile } from "@/src/services/transpile";
 
 export default function CinaIDE({ onClose }) {
+  const defaultTranspilerVersion = "2.0.0";
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(true);
   const [numBanks, setNumBanks] = useState(6);
   const [bankFiles, setBankFiles] = useState([]);
   const [AmosCode, setAmosCode] = useState("");
+  const [transpilerVersion, setTranspilerVersion] = useState(defaultTranspilerVersion);
   const fileInputRef = useRef();
   const amosFileInputRef = useRef();
   const amosDecoderRef = useRef();
@@ -27,6 +29,11 @@ export default function CinaIDE({ onClose }) {
   useEffect(() => {
     setTranslatedCode(translatedCode);
   }, [translatedCode]);
+
+  useEffect(() => {
+    console.log("Transpiler version changed to: ", transpilerVersion);
+    setTranspilerVersion(transpilerVersion);
+  }, [transpilerVersion]);
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
@@ -61,7 +68,7 @@ export default function CinaIDE({ onClose }) {
     try {
       const body = {
         code: AmosCode,
-        version: "2.0.0",
+        version: transpilerVersion,
       };
 
       const response = await transpile(body);
@@ -74,6 +81,7 @@ export default function CinaIDE({ onClose }) {
 
       setTranslatedCode(resTranslatedCode);
       console.log("translatedCode: ", resTranslatedCode);
+      console.log("transpilerVersion: ", transpilerVersion);
     } catch (error) {
       console.error("Failed to fetch API: ", error);
     }
@@ -94,6 +102,7 @@ export default function CinaIDE({ onClose }) {
             handleBankChange={handleBankChange}
             setAmosCode={setAmosCode}
             setIsSideMenuOpen={setIsSideMenuOpen}
+            setTranspilerVersion={setTranspilerVersion}
           />
         )}
         <div style={{ width: "100%" }}>

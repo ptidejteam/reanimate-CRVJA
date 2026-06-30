@@ -30,16 +30,6 @@ function App() {
   const [tutorialContent, setTutorialContent] = useState("");
   const [selectedIcon, setSelectedIcon] = useState(null);
 
-  const handleApiTest = async () => {
-    try {
-      const data = await checkApiStatus();
-
-      console.log("API Success: ", data);
-    } catch (error) {
-      console.error("Failed to fetch API: ", error);
-    }
-  };
-
   useEffect(() => {
     if (showTutorial && !tutorialContent) {
       fetch("/docs/tutorial.md")

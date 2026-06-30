@@ -7,6 +7,7 @@ export default function SideNavigation({
   clearBanks,
   handleBankChange,
   setAmosCode,
+  setTranspilerVersion,
   // forceParse,
 }) {
   const ref = useRef(null);
@@ -22,7 +23,12 @@ export default function SideNavigation({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [setIsSideMenuOpen]);
-  const loadExample = async (ascPath, bankPaths = []) => {
+
+  const loadExample = async (
+    ascPath,
+    bankPaths = [],
+    transpilerConfigsPath = "",
+  ) => {
     try {
       clearBanks();
       for (let i = 0; i < bankPaths.length; i++) {
@@ -31,6 +37,14 @@ export default function SideNavigation({
         const file = new File([blob], bankPaths[i].name);
         handleBankChange(i, file);
       }
+
+      if (transpilerConfigsPath) {
+        const resTranspilerVerions = await fetch(transpilerConfigsPath);
+        const transpilerVersionText = await resTranspilerVerions.text();
+        setTranspilerVersion(transpilerVersionText);
+        console.log("Loaded transpiler version from file: ", transpilerVersionText);
+      }
+
       const resAsc = await fetch(ascPath);
       const text = await resAsc.text();
       setAmosCode(text);
@@ -49,27 +63,34 @@ export default function SideNavigation({
     {
       label: "Pac-Man",
       action: () =>
-        loadExample("/examples/Example1_Pac-Man/Example1_Pac-Man.asc", [
-          {
-            path: "/examples/Example1_Pac-Man/Example1_Pac-Man.abk",
-            name: "Example1_Pac-Man.abk",
-          },
-        ]),
+        loadExample(
+          "/examples/Example1_Pac-Man/Example1_Pac-Man.asc",
+          [
+            {
+              path: "/examples/Example1_Pac-Man/Example1_Pac-Man.abk",
+              name: "Example1_Pac-Man.abk",
+            },
+          ],
+          "/examples/Example1_Pac-Man/crvja.txt"
+        ),
     },
     {
       label: "Piano",
-      action: () =>
-        loadExample("/examples/Example2_Piano/Example2_Piano.asc"),
+      action: () => loadExample("/examples/Example2_Piano/Example2_Piano.asc"),
     },
     {
       label: "Rotating Triangle",
       action: () =>
-        loadExample("/examples/Example3_Rotating_Triangle/Example3_Rotating_Triangle.asc"),
+        loadExample(
+          "/examples/Example3_Rotating_Triangle/Example3_Rotating_Triangle.asc",
+        ),
     },
     {
       label: "Colourful Text",
       action: () =>
-        loadExample("/examples/Example4_Colourful_Text/Example4_Colourful_Text.asc"),
+        loadExample(
+          "/examples/Example4_Colourful_Text/Example4_Colourful_Text.asc",
+        ),
     },
   ];
 
@@ -88,7 +109,7 @@ export default function SideNavigation({
               path: "/reanimate26/EscapeFromReanimate_Kotowicz_Maher_Abdalla_Ullmann/AmosBank_Escape2.abk",
               name: "AmosBank_Escape2.abk",
             },
-          ]
+          ],
         ),
     },
     {
@@ -117,7 +138,7 @@ export default function SideNavigation({
               path: "/reanimate26/ParkBedlam_Shifan_Franiczek_Ejaz_Scistri/Raccoon.abk",
               name: "Raccoon.abk",
             },
-          ]
+          ],
         ),
     },
     {
@@ -130,7 +151,7 @@ export default function SideNavigation({
               path: "/reanimate26/Welcome_to_the_Backrooms_Politowski_Bigot_Serra_Lopez/Sprite.abk",
               name: "Sprite.abk",
             },
-          ]
+          ],
         ),
     },
     {
@@ -143,7 +164,7 @@ export default function SideNavigation({
               path: "/reanimate26/GalaxyPatrol_Tondorf_Chua_Zongo_Bijani/gjs.abk",
               name: "gjs.abk",
             },
-          ]
+          ],
         ),
     },
     {
@@ -156,7 +177,8 @@ export default function SideNavigation({
               path: "/reanimate26/WorldOfIris_Mioto_Petrillo_Yefi_Guéhéneuc/WoI.abk",
               name: "WoI.abk",
             },
-          ]
+          ],
+          "/reanimate26/WorldOfIris_Mioto_Petrillo_Yefi_Guéhéneuc/crvja.txt"
         ),
     },
   ];
@@ -190,7 +212,14 @@ export default function SideNavigation({
           >
             Examples
           </h4>
-          <ul style={{ listStyleType: "none", padding: 0, margin: 0, width: "100%" }}>
+          <ul
+            style={{
+              listStyleType: "none",
+              padding: 0,
+              margin: 0,
+              width: "100%",
+            }}
+          >
             {examples.map((ex, index) => (
               <li key={index}>
                 <FileActionButton label={ex.label} onClick={ex.action} />
@@ -208,7 +237,14 @@ export default function SideNavigation({
           >
             ReAnimate'26 Realisations
           </h4>
-          <ul style={{ listStyleType: "none", padding: 0, margin: 0, width: "100%" }}>
+          <ul
+            style={{
+              listStyleType: "none",
+              padding: 0,
+              margin: 0,
+              width: "100%",
+            }}
+          >
             {reanimate26Examples.map((ex, index) => (
               <li key={index}>
                 <FileActionButton label={ex.label} onClick={ex.action} />
