@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import ExampleLoadButton from "./ExampleLoadButton";
+import FileActionButton from "./FileActionButton";
 
 export default function SideNavigation({
   isSideMenuOpen,
@@ -188,7 +188,7 @@ export default function SideNavigation({
           <ul style={{ listStyleType: "none", padding: 0, margin: 0, width: "100%" }}>
             {examples.map((ex, index) => (
               <li key={index}>
-                <ExampleLoadButton label={ex.label} onClick={ex.action} />
+                <FileActionButton label={ex.label} onClick={ex.action} />
               </li>
             ))}
           </ul>
@@ -206,7 +206,7 @@ export default function SideNavigation({
           <ul style={{ listStyleType: "none", padding: 0, margin: 0, width: "100%" }}>
             {reanimate26Examples.map((ex, index) => (
               <li key={index}>
-                <ExampleLoadButton label={ex.label} onClick={ex.action} />
+                <FileActionButton label={ex.label} onClick={ex.action} />
               </li>
             ))}
           </ul>

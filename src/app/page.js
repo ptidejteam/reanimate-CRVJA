@@ -19,7 +19,7 @@ import { generateAmosBankFile } from "@/src/utils/generateAmosBank";
 import { renderSpritePixels } from "@/src/utils/spriteRenderer";
 import { useBankCreator } from "@/src/app/hooks/useBankCreator";
 import BankEditor from "@/src/app/components/bank/BankEditor";
-import AmosRunner from "@/src/app/components/runner/AmosRunner";
+import AmosRunner from "@/src/app/components/editor/AmosRunner";
 import BankSlotManager from "@/src/app/components/bank/BankSlotManager";
 import { checkApiStatus } from "@/src/services/checkApiStatus";
 import { transpile } from "../services/transpile";
@@ -147,11 +147,11 @@ function App() {
         }}
       >
         <WorkbenchIcon
-          id="crvja"
-          label="CRVJA"
-          icon="/icons/beer.png"
+          id="cina"
+          label="CINA"
+          icon="/icons/cina.png"
           onOpen={() => setShowCode(true)}
-          selected={selectedIcon === "crvja"}
+          selected={selectedIcon === "cina"}
           setSelectedIcon={setSelectedIcon}
         />{" "}
         <WorkbenchIcon
@@ -189,7 +189,7 @@ function App() {
       </div>
       {/* Windows */}
       {showCode && (
-        <WorkbenchWindow title="CRVJA" onClose={() => setShowCode(false)}>
+        <WorkbenchWindow title="CINA IDE" onClose={() => setShowCode(false)}>
           <div
             style={{
               display: "flex",
@@ -301,12 +301,6 @@ function App() {
                         onClick={handleTranspile}
                       >
                         Run Code
-                      </ActionButton>
-                      <ActionButton
-                        icon="/icons/play-button.png"
-                        onClick={handleApiTest}
-                      >
-                        Test API
                       </ActionButton>
                     </div>
                   </div>
