@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import ExampleLoadButton from "./ExampleLoadButton";
+import FileActionButton from "../ui/FileActionButton";
 
 export default function SideNavigation({
   isSideMenuOpen,
@@ -35,6 +35,11 @@ export default function SideNavigation({
       const text = await resAsc.text();
       setAmosCode(text);
       // forceParse(text);
+
+      // Close the side menu after loading
+      if (setIsSideMenuOpen) {
+        setIsSideMenuOpen(false);
+      }
     } catch (err) {
       console.error("Failed to load example:", err);
     }
@@ -188,7 +193,7 @@ export default function SideNavigation({
           <ul style={{ listStyleType: "none", padding: 0, margin: 0, width: "100%" }}>
             {examples.map((ex, index) => (
               <li key={index}>
-                <ExampleLoadButton label={ex.label} onClick={ex.action} />
+                <FileActionButton label={ex.label} onClick={ex.action} />
               </li>
             ))}
           </ul>
@@ -206,7 +211,7 @@ export default function SideNavigation({
           <ul style={{ listStyleType: "none", padding: 0, margin: 0, width: "100%" }}>
             {reanimate26Examples.map((ex, index) => (
               <li key={index}>
-                <ExampleLoadButton label={ex.label} onClick={ex.action} />
+                <FileActionButton label={ex.label} onClick={ex.action} />
               </li>
             ))}
           </ul>

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-export default function ExampleLoadButton({ label, onClick }) {
+export default function FileActionButton({ label, onClick }) {
   const [isHovered, setIsHovered] = useState(false);
 
   return (

@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import { Sketch } from "@uiw/react-color";
-import AMOSDecoder from "@/src/utils/amosDecoder";
 import AnalogClock from "@/src/app/components/ui/analogClock";
 import {
   WorkbenchIcon,
@@ -10,32 +9,18 @@ import {
 } from "@/src/app/components/ui/workbench";
 import ReactMarkdown from "react-markdown";
 import { useAMOSParser } from "@/src/app/hooks/useAmosParser";
-import CodeEditor from "@/src/app/components/editor/CodeEditor";
-import ActionButton from "@/src/app/components/ui/ActionButton";
-import SideNavigation from "@/src/app/components/editor/SideNavigation";
-import { downloadASCFile } from "@/src/utils/fileHandler";
 import { parseBankFile } from "@/src/utils/parseAmosBank";
 import { generateAmosBankFile } from "@/src/utils/generateAmosBank";
 import { renderSpritePixels } from "@/src/utils/spriteRenderer";
 import { useBankCreator } from "@/src/app/hooks/useBankCreator";
 import BankEditor from "@/src/app/components/bank/BankEditor";
-import AmosRunner from "@/src/app/components/runner/AmosRunner";
-import BankSlotManager from "@/src/app/components/bank/BankSlotManager";
 import { checkApiStatus } from "@/src/services/checkApiStatus";
-import { transpile } from "../services/transpile";
+import CinaIDE from "@/src/app/components/cina/CinaIDE";
 
 function App() {
   const [showCode, setShowCode] = useState(false);
-  const [isSideMenuOpen, setIsSideMenuOpen] = useState(true);
-  const [numBanks, setNumBanks] = useState(6);
-  const [bankFiles, setBankFiles] = useState([]);
   const [option, setOption] = useState("file");
-  const [AmosCode, setAmosCode] = useState("");
-  const fileInputRef = useRef();
-  const amosFileInputRef = useRef();
-  const amosDecoderRef = useRef();
   const [createBank, setCreateBank] = useState(false);
-  const [decodedText, setDecodedText] = useState("");
   const { bankCreator, setBankCreator, clearBank } = useBankCreator();
   const [showRender, setShowRender] = useState(false);
   const [showSpriteEditor, setShowSpriteEditor] = useState(false);
@@ -44,80 +29,12 @@ function App() {
   const [showTutorial, setShowTutorial] = useState(false);
   const [tutorialContent, setTutorialContent] = useState("");
   const [selectedIcon, setSelectedIcon] = useState(null);
-  const [translatedCode, setTranslatedCode] = useState("");
-  // const { jsCode, parseErrors, forceParse } = useAMOSParser(AmosCode);
-
-  const [bankFileNames, setBankFileNames] = useState(
-    Array(numBanks).fill(null),
-  );
-
-  useEffect(() => {
-    setAmosCode(decodedText);
-  }, [decodedText]);
-
-  useEffect(() => {
-    setTranslatedCode(translatedCode);
-  }, [translatedCode]);
-
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-
-    reader.onload = (event) => {
-      const amosBasicCode = event.target.result;
-      setAmosCode(amosBasicCode);
-      // forceParse(amosBasicCode);
-    };
-
-    reader.readAsText(file);
-  };
-
-  const clearBanks = () => {
-    while (bankFiles.length > 0) {
-      bankFiles.pop();
-    }
-    setBankFiles(bankFiles);
-  };
-
-  const handleBankChange = (index, file) => {
-    bankFiles[index] = file;
-    setBankFiles(bankFiles);
-  };
-
-  const [runNonce, setRunNonce] = useState(0);
-
-  const onRunClick = () => {
-    // If you re-parse AMOS here, keep it; otherwise just bump the nonce
-    setRunNonce((n) => n + 1);
-  };
 
   const handleApiTest = async () => {
     try {
       const data = await checkApiStatus();
 
       console.log("API Success: ", data);
-    } catch (error) {
-      console.error("Failed to fetch API: ", error);
-    }
-  };
-
-  const handleTranspile = async () => {
-    try {
-      const body = {
-        code: AmosCode,
-        version: "2.0.0",
-      };
-
-      const response = await transpile(body);
-
-      const {
-        lexicalErrors: lexicalErrors,
-        syntaxErrors: syntaxErrors,
-        translatedCode: resTranslatedCode,
-      } = response.data;
-
-      setTranslatedCode(resTranslatedCode);
-      console.log("translatedCode: ", translatedCode);
     } catch (error) {
       console.error("Failed to fetch API: ", error);
     }
@@ -147,11 +64,11 @@ function App() {
         }}
       >
         <WorkbenchIcon
-          id="crvja"
-          label="CRVJA"
-          icon="/icons/beer.png"
+          id="cina"
+          label="CINA"
+          icon="/icons/cina.png"
           onOpen={() => setShowCode(true)}
-          selected={selectedIcon === "crvja"}
+          selected={selectedIcon === "cina"}
           setSelectedIcon={setSelectedIcon}
         />{" "}
         <WorkbenchIcon
@@ -189,196 +106,8 @@ function App() {
       </div>
       {/* Windows */}
       {showCode && (
-        <WorkbenchWindow title="CRVJA" onClose={() => setShowCode(false)}>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              width: "100%",
-              height: "100%",
-            }}
-          >
-            {isSideMenuOpen && (
-              <SideNavigation
-                clearBanks={clearBanks}
-                handleBankChange={handleBankChange}
-                setAmosCode={setAmosCode}
-                // forceParse={forceParse}
-                setIsSideMenuOpen={setIsSideMenuOpen}
-              />
-            )}
-            <div style={{ width: "100%" }}>
-              <div
-                style={{
-                  display: "flex",
-                  marginTop: "0px", // This is the margin above the load/save/run buttons
-                  padding: "0px", // This is the padding around "inside" the Workbench "window"
-                }}
-              >
-                <div
-                  style={{
-                    width: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                  }}
-                >
-                  <div
-                    style={{
-                      width: "100%",
-                      display: "flex",
-                      flexDirection: "row",
-                      height: "fit-content", // This is the area around the buttons at the top
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        marginBottom: "10px",
-                        gap: "10px",
-                        alignItems: "center",
-                        flexWrap: "wrap",
-                      }}
-                    >
-                      <ActionButton
-                        id="menu-toggle-btn"
-                        icon="/icons/menu-button.png"
-                        onClick={() => setIsSideMenuOpen(!isSideMenuOpen)}
-                      >
-                        Menu
-                      </ActionButton>
-
-                      <ActionButton
-                        icon="/icons/upload-button.png"
-                        onClick={() => fileInputRef.current?.click()}
-                      >
-                        Load .ASC
-                      </ActionButton>
-
-                      <input
-                        type="file"
-                        ref={fileInputRef}
-                        onChange={handleFileUpload}
-                        style={{
-                          display: "none",
-                        }}
-                        accept=".asc, .txt, .amo"
-                      />
-
-                      <ActionButton
-                        icon="/icons/upload-button.png"
-                        onClick={() => amosFileInputRef.current?.click()}
-                      >
-                        Load .AMOS
-                      </ActionButton>
-                      <input
-                        type="file"
-                        ref={amosFileInputRef}
-                        onChange={(e) =>
-                          amosDecoderRef.current?.handleFile(e.target.files[0])
-                        }
-                        style={{ display: "none" }}
-                        accept=".amos,.AMOS"
-                      />
-
-                      <AMOSDecoder
-                        ref={amosDecoderRef}
-                        onDecoded={(text) => setDecodedText(text)}
-                      />
-
-                      <ActionButton
-                        icon="/icons/download-button.png"
-                        onClick={() => {
-                          const filename = "my_amos_code.asc"; // or generate dynamic name
-                          downloadASCFile(filename, AmosCode);
-                        }}
-                      >
-                        Save .ASC
-                      </ActionButton>
-
-                      <ActionButton
-                        icon="/icons/play-button.png"
-                        onClick={handleTranspile}
-                      >
-                        Run Code
-                      </ActionButton>
-                      <ActionButton
-                        icon="/icons/play-button.png"
-                        onClick={handleApiTest}
-                      >
-                        Test API
-                      </ActionButton>
-                    </div>
-                  </div>
-                  <div
-                    style={{
-                      width: "100%", // This is the area containing the Code Editor and Program Screen
-                      display: "flex",
-                      flexDirection: "row",
-                      height: "fit-content",
-                      border: "1px solid black",
-                      justifyContent: "space-between",
-                      padding: "10px",
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: "100%", // This is the area around the Code Editor
-                        display: "flex",
-                        flexDirection: "column",
-                        minHeight: "80vh", // Need this to show an empty code editor
-                        alignItems: "center",
-                      }}
-                    >
-                      <div
-                        style={{
-                          display: "flex",
-                          flexDirection: "row",
-                          marginBottom: "10px",
-                        }}
-                      >
-                        <label htmlFor="amos-code"> Code Editor </label>
-                      </div>
-                      <CodeEditor
-                        value={AmosCode}
-                        onChange={setAmosCode}
-                        // errors={parseErrors}
-                        style={{
-                          width: "44vw", // This is the actual coding area
-                          height: "100%",
-                          margin: "0px",
-                        }}
-                      />
-                    </div>
-                    <div
-                      style={{
-                        width: "100%", // This is the area around the Program Screen
-                        display: "flex",
-                        flexDirection: "column",
-                        maxHeight: "fit-content",
-                        alignItems: "center",
-                        marginBottom: "100px",
-                      }}
-                    >
-                      <label htmlFor="amos-code"> Program Screen </label>
-                      <AmosRunner
-                        jsCode={translatedCode}
-                        runNonce={runNonce}
-                        bankFiles={bankFiles}
-                      />
-                    </div>
-                  </div>
-                  &nbsp;
-                  <BankSlotManager
-                    numBanks={numBanks}
-                    bankFiles={bankFiles}
-                    onFileChange={handleBankChange}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-          &nbsp;
+        <WorkbenchWindow title="CINA IDE" onClose={() => setShowCode(false)}>
+          <CinaIDE />
         </WorkbenchWindow>
       )}
 
