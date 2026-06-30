@@ -35,6 +35,11 @@ export default function SideNavigation({
       const text = await resAsc.text();
       setAmosCode(text);
       // forceParse(text);
+
+      // Close the side menu after loading
+      if (setIsSideMenuOpen) {
+        setIsSideMenuOpen(false);
+      }
     } catch (err) {
       console.error("Failed to load example:", err);
     }
