@@ -4,7 +4,7 @@ const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost
 
 export async function checkApiStatus() {
     try {
-        // Make the HTTP GET request
+        // Make the HTTP POST request
         const response = await fetch(`${NEXT_PUBLIC_API_URL}/api`);
 
         // Handle HTTP errors (e.g., 404 or 500)

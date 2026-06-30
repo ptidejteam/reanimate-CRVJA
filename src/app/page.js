@@ -21,7 +21,8 @@ import { useBankCreator } from "@/src/app/hooks/useBankCreator";
 import BankEditor from "@/src/app/components/bank/BankEditor";
 import AmosRunner from "@/src/app/components/runner/AmosRunner";
 import BankSlotManager from "@/src/app/components/bank/BankSlotManager";
-import { checkApiStatus } from "@/src/services/api";
+import { checkApiStatus } from "@/src/services/checkApiStatus";
+import { transpile } from "../services/transpile";
 
 function App() {
   const [showCode, setShowCode] = useState(false);
@@ -34,42 +35,8 @@ function App() {
   const amosFileInputRef = useRef();
   const amosDecoderRef = useRef();
   const [createBank, setCreateBank] = useState(false);
-  const [bankFileNames, setBankFileNames] = useState(
-    Array(numBanks).fill(null),
-  );
   const [decodedText, setDecodedText] = useState("");
   const { bankCreator, setBankCreator, clearBank } = useBankCreator();
-  const { jsCode, parseErrors, forceParse } = useAMOSParser(AmosCode);
-  useEffect(() => {
-    setAmosCode(decodedText);
-  }, [decodedText]);
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-
-    reader.onload = (event) => {
-      const amosBasicCode = event.target.result;
-      setAmosCode(amosBasicCode);
-      forceParse(amosBasicCode);
-    };
-
-    reader.readAsText(file);
-  };
-  const clearBanks = () => {
-    while (bankFiles.length > 0) {
-      bankFiles.pop();
-    }
-    setBankFiles(bankFiles);
-  };
-  const handleBankChange = (index, file) => {
-    bankFiles[index] = file;
-    setBankFiles(bankFiles);
-  };
-  const [runNonce, setRunNonce] = useState(0);
-  const onRunClick = () => {
-    // If you re-parse AMOS here, keep it; otherwise just bump the nonce
-    setRunNonce((n) => n + 1);
-  };
   const [showRender, setShowRender] = useState(false);
   const [showSpriteEditor, setShowSpriteEditor] = useState(false);
   const [showExamples, setShowExamples] = useState(false);
@@ -77,13 +44,80 @@ function App() {
   const [showTutorial, setShowTutorial] = useState(false);
   const [tutorialContent, setTutorialContent] = useState("");
   const [selectedIcon, setSelectedIcon] = useState(null);
+  const [translatedCode, setTranslatedCode] = useState("");
+  // const { jsCode, parseErrors, forceParse } = useAMOSParser(AmosCode);
+
+  const [bankFileNames, setBankFileNames] = useState(
+    Array(numBanks).fill(null),
+  );
+
+  useEffect(() => {
+    setAmosCode(decodedText);
+  }, [decodedText]);
+
+  useEffect(() => {
+    setTranslatedCode(translatedCode);
+  }, [translatedCode]);
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+
+    reader.onload = (event) => {
+      const amosBasicCode = event.target.result;
+      setAmosCode(amosBasicCode);
+      // forceParse(amosBasicCode);
+    };
+
+    reader.readAsText(file);
+  };
+
+  const clearBanks = () => {
+    while (bankFiles.length > 0) {
+      bankFiles.pop();
+    }
+    setBankFiles(bankFiles);
+  };
+
+  const handleBankChange = (index, file) => {
+    bankFiles[index] = file;
+    setBankFiles(bankFiles);
+  };
+
+  const [runNonce, setRunNonce] = useState(0);
+
+  const onRunClick = () => {
+    // If you re-parse AMOS here, keep it; otherwise just bump the nonce
+    setRunNonce((n) => n + 1);
+  };
 
   const handleApiTest = async () => {
     try {
       const data = await checkApiStatus();
 
       console.log("API Success: ", data);
+    } catch (error) {
+      console.error("Failed to fetch API: ", error);
+    }
+  };
 
+  const handleTranspile = async () => {
+    try {
+      const body = {
+        code: AmosCode,
+        version: "2.0.0",
+      };
+
+      const response = await transpile(body);
+
+      const {
+        lexicalErrors: lexicalErrors,
+        syntaxErrors: syntaxErrors,
+        translatedCode: resTranslatedCode,
+      } = response.data;
+
+      setTranslatedCode(resTranslatedCode);
+      console.log("translatedCode: ", translatedCode);
     } catch (error) {
       console.error("Failed to fetch API: ", error);
     }
@@ -169,7 +203,7 @@ function App() {
                 clearBanks={clearBanks}
                 handleBankChange={handleBankChange}
                 setAmosCode={setAmosCode}
-                forceParse={forceParse}
+                // forceParse={forceParse}
                 setIsSideMenuOpen={setIsSideMenuOpen}
               />
             )}
@@ -264,14 +298,7 @@ function App() {
 
                       <ActionButton
                         icon="/icons/play-button.png"
-                        onClick={async () => {
-                          try {
-                            await forceParse(AmosCode); // updates jsCode
-                            onRunClick(); // bumps runNonce -> useEffect runs -> iframe rebuilt
-                          } catch (err) {
-                            console.error("Failed to run code:", err);
-                          }
-                        }}
+                        onClick={handleTranspile}
                       >
                         Run Code
                       </ActionButton>
@@ -315,7 +342,7 @@ function App() {
                       <CodeEditor
                         value={AmosCode}
                         onChange={setAmosCode}
-                        errors={parseErrors}
+                        // errors={parseErrors}
                         style={{
                           width: "44vw", // This is the actual coding area
                           height: "100%",
@@ -335,7 +362,7 @@ function App() {
                     >
                       <label htmlFor="amos-code"> Program Screen </label>
                       <AmosRunner
-                        jsCode={jsCode}
+                        jsCode={translatedCode}
                         runNonce={runNonce}
                         bankFiles={bankFiles}
                       />

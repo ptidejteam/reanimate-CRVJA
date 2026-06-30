@@ -7,7 +7,7 @@ export default function SideNavigation({
   clearBanks,
   handleBankChange,
   setAmosCode,
-  forceParse,
+  // forceParse,
 }) {
   const ref = useRef(null);
 
@@ -34,7 +34,7 @@ export default function SideNavigation({
       const resAsc = await fetch(ascPath);
       const text = await resAsc.text();
       setAmosCode(text);
-      forceParse(text);
+      // forceParse(text);
     } catch (err) {
       console.error("Failed to load example:", err);
     }
