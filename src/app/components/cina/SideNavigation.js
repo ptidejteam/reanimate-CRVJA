@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import FileActionButton from "./FileActionButton";
+import FileActionButton from "../ui/FileActionButton";
 
 export default function SideNavigation({
   isSideMenuOpen,
