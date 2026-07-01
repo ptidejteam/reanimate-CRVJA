@@ -7,6 +7,7 @@ import { downloadASCFile } from "@/src/utils/fileHandler";
 import AmosRunner from "@/src/app/components/cina/AmosRunner";
 import BankSlotManager from "@/src/app/components/bank/BankSlotManager";
 import { transpile } from "@/src/services/transpile";
+import VersionSelector from "@/src/app/components/cina/VersionSelector";
 
 export default function CinaIDE({ onClose }) {
   const defaultTranspilerVersion = "2.0.0";
@@ -80,7 +81,6 @@ export default function CinaIDE({ onClose }) {
       } = response.data;
 
       setTranslatedCode(resTranslatedCode);
-      console.log("translatedCode: ", resTranslatedCode);
       console.log("transpilerVersion: ", transpilerVersion);
     } catch (error) {
       console.error("Failed to fetch API: ", error);
@@ -195,6 +195,13 @@ export default function CinaIDE({ onClose }) {
                   <ActionButton icon="/icons/play-button.png" onClick={handleTranspile}>
                     Run Code
                   </ActionButton>
+
+                  <VersionSelector 
+                    value={transpilerVersion}
+                    onChange={setTranspilerVersion}
+                  >
+                    Version
+                  </VersionSelector>
                 </div>
               </div>
               <div

@@ -8,7 +8,6 @@ export default function SideNavigation({
   handleBankChange,
   setAmosCode,
   setTranspilerVersion,
-  // forceParse,
 }) {
   const ref = useRef(null);
 
@@ -39,16 +38,14 @@ export default function SideNavigation({
       }
 
       if (transpilerConfigsPath) {
-        const resTranspilerVerions = await fetch(transpilerConfigsPath);
-        const transpilerVersionText = await resTranspilerVerions.text();
+        const resTranspilerVersions = await fetch(transpilerConfigsPath);
+        const transpilerVersionText = await resTranspilerVersions.text();
         setTranspilerVersion(transpilerVersionText);
-        console.log("Loaded transpiler version from file: ", transpilerVersionText);
       }
 
       const resAsc = await fetch(ascPath);
       const text = await resAsc.text();
       setAmosCode(text);
-      // forceParse(text);
 
       // Close the side menu after loading
       if (setIsSideMenuOpen) {
@@ -71,18 +68,23 @@ export default function SideNavigation({
               name: "Example1_Pac-Man.abk",
             },
           ],
-          "/examples/Example1_Pac-Man/crvja.txt"
+          "/examples/Example1_Pac-Man/crvja.txt",
         ),
     },
     {
       label: "Piano",
-      action: () => loadExample("/examples/Example2_Piano/Example2_Piano.asc"),
+      action: () => loadExample("/examples/Example2_Piano/Example2_Piano.asc",
+        [],
+      "/examples/Example2_Piano/crvja.txt",
+      ),
     },
     {
       label: "Rotating Triangle",
       action: () =>
         loadExample(
           "/examples/Example3_Rotating_Triangle/Example3_Rotating_Triangle.asc",
+          [],
+          "/examples/Example3_Rotating_Triangle/crvja.txt"
         ),
     },
     {
@@ -90,6 +92,17 @@ export default function SideNavigation({
       action: () =>
         loadExample(
           "/examples/Example4_Colourful_Text/Example4_Colourful_Text.asc",
+          [],
+          "/examples/Example4_Colourful_Text/crvja.txt"
+        ),
+    },
+    {
+      label: "Text on V1",
+      action: () =>
+        loadExample(
+          "/examples/Example5_Text_V1/Example5_Text_V1.asc",
+          [],
+          "/examples/Example5_Text_V1/crvja.txt"
         ),
     },
   ];
@@ -110,6 +123,7 @@ export default function SideNavigation({
               name: "AmosBank_Escape2.abk",
             },
           ],
+          "/reanimate26/EscapeFromReanimate_Kotowicz_Maher_Abdalla_Ullmann/crvja.txt"
         ),
     },
     {
@@ -139,6 +153,7 @@ export default function SideNavigation({
               name: "Raccoon.abk",
             },
           ],
+          "/reanimate26/ParkBedlam_Shifan_Franiczek_Ejaz_Scistri/crvja.txt"
         ),
     },
     {
@@ -152,6 +167,7 @@ export default function SideNavigation({
               name: "Sprite.abk",
             },
           ],
+          "/reanimate26/Welcome_to_the_Backrooms_Politowski_Bigot_Serra_Lopez/crvja.txt"
         ),
     },
     {
@@ -165,6 +181,7 @@ export default function SideNavigation({
               name: "gjs.abk",
             },
           ],
+          "/reanimate26/GalaxyPatrol_Tondorf_Chua_Zongo_Bijani/crvja.txt"
         ),
     },
     {
@@ -178,7 +195,7 @@ export default function SideNavigation({
               name: "WoI.abk",
             },
           ],
-          "/reanimate26/WorldOfIris_Mioto_Petrillo_Yefi_Guéhéneuc/crvja.txt"
+          "/reanimate26/WorldOfIris_Mioto_Petrillo_Yefi_Guéhéneuc/crvja.txt",
         ),
     },
   ];
@@ -192,8 +209,8 @@ export default function SideNavigation({
         borderRight: "1px solid black",
         paddingRight: "10px",
         marginRight: "10px",
-        minWidth: "500px",
-        maxWidth: "500px",
+        minWidth: "400px",
+        maxWidth: "400px",
         paddingTop: "10px",
         alignItems: "flex-start",
         overflowY: "auto",
@@ -235,7 +252,7 @@ export default function SideNavigation({
               marginBottom: "10px",
             }}
           >
-            ReAnimate'26 Realisations
+            ReAnimate'26 Games
           </h4>
           <ul
             style={{

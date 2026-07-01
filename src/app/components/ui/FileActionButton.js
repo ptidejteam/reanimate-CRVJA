@@ -11,7 +11,7 @@ export default function FileActionButton({ label, onClick }) {
       style={{
         display: "flex",
         alignItems: "center",
-        padding: "8px 12px",
+        padding: "8px 8px",
         marginBottom: "8px",
         backgroundColor: isHovered ? "#e0f7f7" : "#f5f5f5",
         border: "1px solid #ccc",

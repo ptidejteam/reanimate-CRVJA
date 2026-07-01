@@ -621,7 +621,10 @@ export function WorkbenchShell({ children }) {
       style={{
         width: "100vw",
         height: "100vh",
-        background: WB_COLORS.screenBlue,
+        backgroundImage: "url('/wallpaper/crvja_wallpaper.svg')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundColor: WB_COLORS.screenBlue,
 
         position: "relative",
         overflow: "hidden",
@@ -638,7 +641,7 @@ export function WorkbenchShell({ children }) {
           fontWeight: "bold",
         }}
       >
-        CRVJA Tool Suite v{process.env.NEXT_PUBLIC_APP_VERSION}
+        CRVJA Tool Suite
       </div>
 
       {React.Children.map(children, (child) => {
